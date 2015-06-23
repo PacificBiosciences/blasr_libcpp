@@ -49,7 +49,7 @@ sources := $(wildcard algorithms/alignment/*.cpp) \
 		   $(wildcard *.cpp)
 
 ifdef nohdf
-sources := $(filter-out files/% utils/FileOfFileNames.cpp, $(sources))
+sources := $(filter-out files/% utils/FileOfFileNames.cpp format/SAMHeaderPrinter.cpp, $(sources))
 endif
 
 objects := $(sources:.cpp=.o)
