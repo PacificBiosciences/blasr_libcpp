@@ -1,6 +1,6 @@
 language: cpp
 script: 
-  - nopbbam=1 make
+  - nopbbam=1 nohdf=1 make
 compiler:
   - gcc
 # - clang
