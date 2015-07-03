@@ -8,7 +8,7 @@ std::vector<SAMHeaderItem> MakeSAMHeaderItems(const std::string & fromString){
     std::vector<SAMHeaderItem> items;
 
     std::vector<std::string> vs;
-    Tokenize(fromString, ";", vs);
+    Splice(fromString, ";", vs);
     std::vector<std::string>::iterator it;
     for (it = vs.begin(); it != vs.end(); it++) {
         items.push_back(SAMHeaderItem(*it));
@@ -34,7 +34,7 @@ std::string SAMHeaderItem::ToString() {
 // SAMHeaderTag
 SAMHeaderTag::SAMHeaderTag(const std::string & fromString) {
     std::vector<std::string> vs;
-    Tokenize(fromString, ":", vs);
+    Splice(fromString, ":", vs);
     if (vs.size() == 2) {
         _tagName = vs[0];
         if (vs[1].find("=") != std::string::npos) {
@@ -86,7 +86,7 @@ void SAMHeaderTag::AddItems(const std::string & fromString) {
 SAMHeaderGroup::SAMHeaderGroup(const std::string & fromString) {
     if (fromString == "" || fromString[0] != '@') return;
     std::vector<std::string> vs;
-    Tokenize(fromString.substr(1), "\t", vs);
+    Splice(fromString.substr(1), "\t", vs);
     if (vs.size() >= 1) {
         std::vector<std::string>::iterator it = vs.begin();
         _groupName = (*it);

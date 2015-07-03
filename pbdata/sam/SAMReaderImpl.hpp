@@ -73,7 +73,7 @@ void SAMReader<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment>::StoreKVPairs(s
   // Split on tab delineated line.
   //
   std::vector<std::string> kvPairStrings;
-  Tokenize(line, "\t", kvPairStrings);
+  Splice(line, "\t", kvPairStrings);
   KeywordValueStringsToPairs(kvPairStrings, kvPairs);
 }
 

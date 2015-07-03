@@ -4,7 +4,7 @@
 void GetSMRTReadCoordinates(FASTQSequence &seq, int &x, int &y) {
 	std::string str(seq.title, seq.titleLength);
 	std::vector<std::string> titleTokens;
-	Tokenize(str, "_", titleTokens);
+	Splice(str, "_", titleTokens);
 	int i;
 	x = y = -1;
 	int cmp;
@@ -22,7 +22,7 @@ void GetSMRTReadCoordinates(FASTQSequence &seq, int &x, int &y) {
 
 void GetSpringfieldHoleNumberFromTitle(FASTQSequence &seq, unsigned int &holeNumber) {
 	std::vector<std::string> titleTokens;
-	Tokenize(seq.title, "/", titleTokens);
+	Splice(seq.title, "/", titleTokens);
 	if (titleTokens.size() < 2) {
 		return;
 	}
