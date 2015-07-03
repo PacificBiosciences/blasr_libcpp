@@ -1,6 +1,6 @@
 language: cpp
 script: 
-  - nopbbam=1 nohdf=1 make
+  - make nopbbam=1 COMMON_NO_THIRD_PARTY_REQD=true
 compiler:
   - gcc
 # - clang
