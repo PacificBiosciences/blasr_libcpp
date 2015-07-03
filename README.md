@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ylipacbio/blasr_libcpp.svg?branch=master)](https://travis-ci.org/ylipacbio/blasr_libcpp)
+[![Build Status](https://travis-ci.org/PacificBiosciences/blasr_libcpp.svg?branch=master)](https://travis-ci.org/PacificBiosciences/blasr_libcpp)
 #What is blasr_libcpp#
 
 Blasr_libcpp is a **library** used by blasr and other executables such as samtoh5, loadPulses for analyzing PacBio sequences. This library contains three sub-directories, including pbdata, hdf and alignment.
