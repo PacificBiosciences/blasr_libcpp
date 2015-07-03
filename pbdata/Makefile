@@ -59,7 +59,7 @@ all debug profile g: mklibconfig $(TARGET_LIB)
 mklibconfig:
 ifeq ($(origin nopbbam), undefined)
 	@grep "USE_PBBAM" libconfig.h 2>/dev/null 1>/dev/null || echo "#define USE_PBBAM" > libconfig.h
-    INCLUDES += -I$(PBBAM_INCLUDE) -I$(HTSLIB_INCLUDE) -I$(BOOST_INCLUDE)
+	INCLUDES += -I$(PBBAM_INCLUDE) -I$(HTSLIB_INCLUDE) -I$(BOOST_INCLUDE)
 else
 	@rm -f libconfig.h && echo "" > libconfig.h && echo "no use libpbbam"
 endif
