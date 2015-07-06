@@ -23,7 +23,7 @@ int IsSpace(char c);
 
 int ToWords(string &orig, vector<string> &words); 
 
-int Tokenize(string orig, string pattern, vector<string> &tokens); 
+int Splice(const string & orig, const string & pattern, vector<string> &tokens); 
 
 void ParseSeparatedList(const string &csl, vector<string> &values, char delim=','); 
 
