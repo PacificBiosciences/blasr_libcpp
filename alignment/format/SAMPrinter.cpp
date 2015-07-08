@@ -77,9 +77,10 @@ void SAMOutput::AddGaps(T_AlignmentCandidate &alignment, int gapIndex,
     }
 }
 
-void SAMOutput::AddMatchBlockCigarOps(DNASequence & qSeq, DNASequence & tSeq, blasr::Block & b,
+void SAMOutput::AddMatchBlockCigarOps(DNASequence & qSeq, DNASequence & tSeq, 
+        blasr::Block & b, DNALength & qSeqPos, DNALength & tSeqPos,
         std::vector<int> & opSize, std::vector<char> & opChar) {
-    DNALength qPos = b.qPos, tPos = b.tPos, n = 0;
+    DNALength qPos = qSeqPos + b.qPos, tPos = tSeqPos + b.tPos, n = 0;
     bool started = false, prevSeqMatch = false;
     for(DNALength i = 0; i < b.length; i++) {
         bool curSeqMatch = (qSeq[qPos + i] == tSeq[tPos + i]);
@@ -137,6 +138,7 @@ void SAMOutput::CreateNoClippingCigarOps(T_AlignmentCandidate &alignment,
                     AddMatchBlockCigarOps(alignment.qAlignedSeq, 
                                           alignment.tAlignedSeq, 
                                           alignment.blocks[b], 
+                                          alignment.qPos, alignment.tPos,
                                           opSize, opChar);
                 } else {
                     opSize.push_back(matchLength);
@@ -158,6 +160,7 @@ void SAMOutput::CreateNoClippingCigarOps(T_AlignmentCandidate &alignment,
                 AddMatchBlockCigarOps(alignment.qAlignedSeq, 
                                       alignment.tAlignedSeq, 
                                       alignment.blocks[b], 
+                                      alignment.qPos, alignment.tPos,
                                       opSize, opChar);
             } else {
                 opSize.push_back(matchLength);

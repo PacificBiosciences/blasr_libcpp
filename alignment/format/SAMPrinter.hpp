@@ -41,6 +41,7 @@ void AddGaps(T_AlignmentCandidate &alignment, int gapIndex,
 
 // Add sequence match/mismatch CIGAR string Ops for block b.
 void AddMatchBlockCigarOps(DNASequence & qSeq, DNASequence & tSeq, blasr::Block & b,
+        DNALength & qSeqPos, DNALength & tSeqPos,
         std::vector<int> & opSize, std::vector<char> & opChar);
 
 // If cigarUseSeqMatch is true, cigar string uses '=' and 'X' 
