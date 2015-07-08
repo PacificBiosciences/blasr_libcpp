@@ -41,22 +41,32 @@ def compose_libconfig(pbbam=False):
     return content
 
 def compose_defines_with_hdf_headers(HDF_HEADERS):
+    thisdir = os.path.dirname(os.path.abspath(__file__))
     return """
 HDF_HEADERS:=%(HDF_HEADERS)s
 #HDF5_INC?=${HDF_HEADERS}/src
 CPPFLAGS+=-I${HDF_HEADERS}/src -I${HDF_HEADERS}/c++/src
 CPPFLAGS+=-I../pbdata -I../hdf -I../alignment
-"""%(dict(HDF_HEADERS=HDF_HEADERS))
+LIBPBDATA_LIB     ?=../pbdata/libpbdata.so
+LIBPBIHDF_LIB     ?=../pbdata/libpbihdf.so
+LIBBLASR_LIB      ?=../pbdata/libblasr.so
+"""%(dict(thisdir=thisdir, HDF_HEADERS=HDF_HEADERS))
 
 def compose_defines():
     """
     Note that our local 'hdf' subdir will not even build
     in this case.
     """
+    thisdir = os.path.dirname(os.path.abspath(__file__))
     return """
-nohdf:=1
-INCLUDES+=-I../pbdata -I../hdf -I../alignment
-"""
+LIBPBDATA_INCLUDE ?=../pbdata
+LIBPBIHDF_INCLUDE ?=../hdf
+LIBBLASR_INCLUDE  ?=../alignment
+LIBPBDATA_LIB     ?=%(thisdir)s/pbdata/libpbdata.so
+LIBPBIHDF_LIB     ?=%(thisdir)s/pbdata/libpbihdf.so
+LIBBLASR_LIB      ?=%(thisdir)s/pbdata/libblasr.so
+nohdf             ?=1
+"""%(dict(thisdir=thisdir))
 
 def get_OS_STRING():
     G_BUILDOS_CMD = """bash -c 'set -e; set -o pipefail; id=$(lsb_release -si | tr "[:upper:]" "[:lower:]"); rel=$(lsb_release -sr); case $id in ubuntu) printf "$id-%04d\n" ${rel/./};; centos) echo "$id-${rel%%.*}";; *) echo "$id-$rel";; esac' 2>/dev/null"""
