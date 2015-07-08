@@ -44,7 +44,7 @@ def compose_defines_with_hdf_headers(HDF_HEADERS):
     thisdir = os.path.dirname(os.path.abspath(__file__))
     return """
 HDF_HEADERS:=%(HDF_HEADERS)s
-#HDF5_INC?=${HDF_HEADERS}/src
+#HDF5_INCLUDE?=${HDF_HEADERS}/src
 CPPFLAGS+=-I${HDF_HEADERS}/src -I${HDF_HEADERS}/c++/src
 CPPFLAGS+=-I../pbdata -I../hdf -I../alignment
 LIBPBDATA_LIB     ?=../pbdata/libpbdata.so
@@ -136,7 +136,7 @@ def compose_defines_pacbio(envin):
     setifenv(env, envin, 'nohdf', '1')
     nondefaults = set([
             'CXX', 'AR',
-            'HDF5_INC', 'HDF5_LIB',
+            'HDF5_INCLUDE', 'HDF5_LIB',
             'PBBAM_INCLUDE', 'PBBAM_LIB',
             'HTSLIB_INCLUDE', 'HTSLIB_LIB',
             'BOOST_INCLUDE',
