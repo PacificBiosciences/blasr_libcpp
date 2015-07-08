@@ -5,9 +5,9 @@ SHELL=/bin/bash
 # $Change: 140182 $ 
 
 all:
-	${MAKE} -C pbdata -f build.mk all
-	${MAKE} -C hdf -f build.mk all
-	${MAKE} -C alignment -f build.mk all
+	${MAKE} -C pbdata all
+	${MAKE} -C hdf all
+	${MAKE} -C alignment all
 
 debug:
 	${MAKE} subs
@@ -22,9 +22,9 @@ gtest:
 	${MAKE} -C unittest -f normal.Makefile gtest
 
 clean:
-	${MAKE} -C pbdata -f build.mk clean
-	${MAKE} -C hdf -f build.mk clean
-	${MAKE} -C alignment -f build.mk clean
+	${MAKE} -C pbdata clean
+	${MAKE} -C hdf clean
+	${MAKE} -C alignment clean
 	#@${MAKE} -C unittest clean
 
 cleanall: clean
