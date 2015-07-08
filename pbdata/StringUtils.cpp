@@ -62,48 +62,22 @@ int ToWords(string &orig, vector<string> &words) {
     return words.size();
 }
 
-int Tokenize(string orig, string pattern, vector<string> &tokens) {
-    VectorIndex tokenStart, tokenEnd;
-    int patternLength = pattern.size();
-    int origLength    = orig.size();
-    if (origLength == 0) {
-        return 0;
-    }
-    bool prevWasToken = false;
-    tokenEnd = 0;
-    tokenStart = 0;
-    //for (tokenEnd = 0; tokenEnd < origLength-patternLength; tokenEnd) {
-    while(tokenEnd < origLength - patternLength) {
-        while (tokenStart < origLength - patternLength and 
-                orig.compare(tokenStart, patternLength, pattern, 0, patternLength) == 0) {
-            tokenStart++;
-        }
-        tokenEnd = tokenStart + 1;
+// Splice a string by pattern and save to a vector of token strings.
+int Splice(const string & orig, const string & pattern, vector<string> & tokens) {
+    assert(pattern.size() > 0);
 
-        prevWasToken = false;
-        while (tokenEnd < origLength - patternLength) {
-            if (orig.compare(tokenEnd, patternLength, pattern, 0, patternLength) == 0) {
-                // add this token to the vector of tokens
-                if (tokenEnd - tokenStart >= 1) {
-                    prevWasToken = true;
-                    tokens.push_back(orig.substr(tokenStart, tokenEnd - tokenStart));
-                }
-                tokenEnd+=patternLength;
-                tokenStart = tokenEnd;
-                break;
-            }
-            else {
-                prevWasToken = false;
-                ++tokenEnd;
-            }
-        }
+    tokens.clear();
+    size_t search_start = 0;
+    size_t find_pos = orig.find(pattern, search_start);
+    while(find_pos != string::npos) {
+        string x = orig.substr(search_start, find_pos - search_start);
+        tokens.push_back(x);
+        search_start = find_pos + pattern.size();
+        find_pos = orig.find(pattern, search_start);
     }
-    if (tokenEnd - tokenStart > 1) {
-        tokens.push_back(orig.substr(tokenStart, tokenEnd - tokenStart+1));
-    }
+    tokens.push_back(orig.substr(search_start));
     return tokens.size();
 }
-
 
 void ParseSeparatedList(const string &csl, vector<string> &values, char delim) {
     stringstream cslStrm(csl);
