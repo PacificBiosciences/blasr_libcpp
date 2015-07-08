@@ -8,7 +8,7 @@ CPPFLAGS        += $(patsubst %,-I%,${INCLUDES})
 	${AR} $(ARFLAGS) $@ $^
 
 %.so:
-	${CXX} ${LD_SHAREDFLAGS} -o $@ $^
+	${CXX} ${LD_SHAREDFLAGS} ${LDFLAGS} -o $@ $^
 
 %.o: %.cpp
 	$(CXX) $(CXXOPTS) $(CXXFLAGS) $(LEGACY) $(CPPFLAGS) -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o) $(@:%.o=%.d)" -c $< -o $@

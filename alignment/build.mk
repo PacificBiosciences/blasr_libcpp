@@ -6,6 +6,7 @@ include ../defines.mk
 CXXOPTS := -std=c++11 -pedantic -MMD -MP -Wno-long-long
 INCLUDES += . ${LIBPBDATA_INCLUDE} ${HDF5_INCLUDE} ${PBBAM_INCLUDE} ${HTSLIB_INCLUDE} ${BOOST_INCLUDE}
 DEP_LIBS += ${LIBPBDATA_LIB} ${HDF5_LIB} ${PBBAM_LIB} ${HTSLIB_LIB} ${ZLIB_LIB}
+LDFLAGS  += $(patsubst %,$(dirname %),${DEP_LIBS})
 
 all: libblasr.a libblasr.so
 

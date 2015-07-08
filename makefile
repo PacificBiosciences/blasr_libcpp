@@ -28,3 +28,5 @@ clean:
 	#@${MAKE} -C unittest clean
 
 cleanall: clean
+
+# Note: hdf/ will not build if nohdf=1 is configured.
