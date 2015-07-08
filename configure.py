@@ -117,8 +117,11 @@ def update_env_if(envout, envin, keys):
         if key in envin:
             envout[key] = envin[key]
 def compose_defs_env(env):
-    return '\n'.join('%-20s ?= %s' %(k, v) for k,v in env.items()) + '\n'
-
+    # We disallow env overrides for anything with a default from GNU make.
+    nons = ['CXX', 'CC', 'AR'] # 'SHELL'?
+    ovr    = ['%-20s ?= %s' %(k, v) for k,v in env.items() if k not in nons]
+    nonovr = ['%-20s := %s' %(k, v) for k,v in env.items() if k in nons]
+    return '\n'.join(ovr + nonovr + [''])
 def compose_defines_pacbio(envin):
     """
     This is used by mobs via buildcntl.sh.
