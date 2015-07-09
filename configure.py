@@ -136,7 +136,9 @@ def compose_defines_pacbio(envin):
     setifenv(env, envin, 'LIBPBDATA_LIB', '../pbdata/libpbdata.so')
     setifenv(env, envin, 'LIBPBIHDF_LIB', '../hdf/libpbihdf.so')
     setifenv(env, envin, 'LIBBLASR_LIB', '../alignment/libblasr.so')
-    setifenv(env, envin, 'nohdf', '1')
+    if 'nohdf' in envin:
+        env['nohdf'] = envin['nohdf']
+        # Otherwise, do not define it at all.
     nondefaults = set([
             'CXX', 'AR',
             'HDF5_INCLUDE', 'HDF5_LIB',
