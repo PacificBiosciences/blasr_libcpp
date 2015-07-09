@@ -9,6 +9,9 @@ all:
 	${MAKE} -C hdf all
 	${MAKE} -C alignment all
 
+whoa:
+	nelly
+
 debug:
 	${MAKE} subs
 
