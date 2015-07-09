@@ -33,21 +33,12 @@ std::string SAMHeaderItem::ToString() {
 
 // SAMHeaderTag
 SAMHeaderTag::SAMHeaderTag(const std::string & fromString) {
-<<<<<<< HEAD
-    std::vector<std::string> vs;
-    Splice(fromString, ":", vs);
-    if (vs.size() == 2) {
-        _tagName = vs[0];
-        if (vs[1].find("=") != std::string::npos) {
-            AddItems(vs[1]);
-=======
     size_t pos = fromString.find(":");
     if (pos != string::npos) {
         _tagName = fromString.substr(0, pos);
         string tagValue = fromString.substr(pos + 1);
         if (tagValue.find("=") != std::string::npos) {
             AddItems(tagValue);
->>>>>>> p4build
         } else {
             _tagValue = tagValue;
         }
