@@ -126,6 +126,10 @@ int HDFScanDataReader::Read(ScanData &scanData) {
         whenStartedAtom.Read(scanData.whenStarted);
     }
 
+    ReadSequencingKit(scanData.sequencingKit_);
+
+    ReadBindingKit(scanData.bindingKit_);
+
     return 1;
 }
 
@@ -213,20 +217,21 @@ int HDFScanDataReader::LoadBaseMap(map<char, int> & baseMap) {
 
 void HDFScanDataReader::Close() {
     if (useMovieName) {
-        movieNameAtom.dataspace.close();
+        movieNameAtom.Close();
     }
     if (useRunCode) {
-        runCodeAtom.dataspace.close();
+        runCodeAtom.Close();
     }
     if (useWhenStarted) {
-        whenStartedAtom.dataspace.close();
+        whenStartedAtom.Close();
     }
-    baseMapAtom.dataspace.close();
-    platformIdAtom.dataspace.close();
-    frameRateAtom.dataspace.close();
-    numFramesAtom.dataspace.close();
-    sequencingKitAtom.dataspace.close();
-    bindingKitAtom.dataspace.close();
+
+    baseMapAtom.Close();
+    platformIdAtom.Close();
+    frameRateAtom.Close();
+    numFramesAtom.Close();
+    sequencingKitAtom.Close();
+    bindingKitAtom.Close();
 
     scanDataGroup.Close();
     dyeSetGroup.Close();

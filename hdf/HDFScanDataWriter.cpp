@@ -28,6 +28,8 @@ void HDFScanDataWriter::CreateRunInfoGroup(){
     platformIdAtom.Create(runInfoGroup.group, "PlatformId");
     platformNameAtom.Create(runInfoGroup.group, "PlatformName");
     runCodeAtom.Create(runInfoGroup.group, "RunCode");
+    bindingKitAtom.Create(runInfoGroup.group, "BindingKit");
+    sequencingKitAtom.Create(runInfoGroup.group, "SequencingKit");
 }
 
 HDFScanDataWriter::HDFScanDataWriter(HDFFile & _outFile) {
@@ -39,8 +41,7 @@ HDFScanDataWriter::HDFScanDataWriter(HDFGroup & _rootGroup) {
 }
 
 HDFScanDataWriter::~HDFScanDataWriter() { 
-    // Assume that closing the hdf file must be done
-    // manually and not in a destructor.
+    this->Close();
 }
 
 int HDFScanDataWriter::Initialize(HDFGroup & _rootGroup) {
@@ -78,6 +79,8 @@ void HDFScanDataWriter::Write(ScanData & scanData) {
             "simulated_runcode":(scanData.runCode));
     WritePlatformId((scanData.platformId==NoPlatform)?
             (Springfield):(scanData.platformId));
+    WriteBindingKit(scanData.BindingKit());
+    WriteSequencingKit(scanData.SequencingKit());
 }
 
 void HDFScanDataWriter::WriteFrameRate(float frameRate) {
@@ -123,9 +126,9 @@ void HDFScanDataWriter::WriteNumAnalog(const unsigned int numAnalog) {
 }
 
 void HDFScanDataWriter::WritePlatformId(const PlatformId id) {
-    //Write /ScanData/RunInfo/Flatform attribute.
-    platformIdAtom.Write(id);
+    //Write /ScanData/RunInfo/Platform attribute.
     std::string name = (id == Springfield)?"Springfield":"Astro";
+    platformIdAtom.Write(id);
     platformNameAtom.Write(name);
 }
 
@@ -139,20 +142,30 @@ void HDFScanDataWriter::WriteRunCode(const std::string runCode) {
     runCodeAtom.Write(runCode);
 }
 
+void HDFScanDataWriter::WriteBindingKit(const std::string & bindingKit) {
+    bindingKitAtom.Write(bindingKit);
+}
+
+void HDFScanDataWriter::WriteSequencingKit(const std::string & sequencingKit) {
+    sequencingKitAtom.Write(sequencingKit);
+}
+
 void HDFScanDataWriter::Close() {
     // Close /ScanData/AcqParams attributes.
-    whenStartedAtom.dataspace.close();
-    frameRateAtom.dataspace.close();
-    numFramesAtom.dataspace.close();
+    whenStartedAtom.Close();
+    frameRateAtom.Close();
+    numFramesAtom.Close();
 
     // Close /ScanData/DyeSet attributes.
-    baseMapAtom.dataspace.close();
+    baseMapAtom.Close();
 
     // Close /ScanData/RunInfo attributes.
-    movieNameAtom.dataspace.close();
-    runCodeAtom.dataspace.close();
-    platformIdAtom.dataspace.close();
-    platformNameAtom.dataspace.close();
+    movieNameAtom.Close();
+    runCodeAtom.Close();
+    platformIdAtom.Close();
+    platformNameAtom.Close();
+    bindingKitAtom.Close();
+    sequencingKitAtom.Close();
 
     // Close /ScanData/AcqParams|DyeSet|RunInfo.
     acqParamsGroup.Close();

@@ -27,6 +27,9 @@ private:
 	HDFAtom<std::string> movieNameAtom;
 	HDFAtom<std::string> runCodeAtom;
 
+	HDFAtom<std::string> bindingKitAtom;
+	HDFAtom<std::string> sequencingKitAtom;
+
 	HDFAtom<unsigned int> platformIdAtom;
 	HDFAtom<std::string> platformNameAtom;
 
@@ -66,6 +69,11 @@ public:
     void WriteRunCode(const std::string runCode);
 
 	void Close();
+
+private:
+    void WriteBindingKit(const std::string & bindingKit);
+
+    void WriteSequencingKit(const std::string & sequencingKit);
 };
 
 #endif
