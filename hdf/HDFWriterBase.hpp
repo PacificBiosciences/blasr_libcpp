@@ -35,80 +35,50 @@
 
 // Author: Yuan Li
 
-#ifndef DATA_HDF_HDF_SCAN_DATA_WRITER_H_
-#define DATA_HDF_HDF_SCAN_DATA_WRITER_H_
-
+#ifndef _BLASR_HDFWRITERBASE_HPP_
+#define _BLASR_HDFWRITERBASE_HPP_
 #include <string>
 #include <iostream>
-#include "HDFFile.hpp"
+#include <sstream>
+#include <vector>
 #include "HDFGroup.hpp"
 #include "HDFAtom.hpp"
-#include "Enumerations.h"
-#include "reads/ScanData.hpp"
 
-class HDFScanDataWriter {
-private:
-    HDFGroup * rootGroupPtr;
-	HDFGroup scanDataGroup;
-	HDFGroup acqParamsGroup;
-    HDFGroup dyeSetGroup;
-	HDFGroup runInfoGroup;
+class HDFWriterBase {
+public:
+    HDFWriterBase(const std::string & filename)
+    : filename_(filename)
+    {}
 
-	HDFAtom<std::string> whenStartedAtom;
-	HDFAtom<float> frameRateAtom;
-	HDFAtom<unsigned int> numFramesAtom;
-
-    HDFAtom<std::string> baseMapAtom;
-    HDFAtom<unsigned int> numAnalogAtom;
-
-	HDFAtom<std::string> movieNameAtom;
-	HDFAtom<std::string> runCodeAtom;
-
-	HDFAtom<std::string> bindingKitAtom;
-	HDFAtom<std::string> sequencingKitAtom;
-
-	HDFAtom<unsigned int> platformIdAtom;
-	HDFAtom<std::string> platformNameAtom;
-
-    void CreateAcqParamsGroup();
-
-    void CreateDyeSetGroup();
-
-    void CreateRunInfoGroup();
+    ~HDFWriterBase() {}
 
 public:
-	HDFScanDataWriter(HDFFile & _outFile);
+    /// \returns Target H5 filename.
+    std::string Filename(void) {return filename_;}
 
-    HDFScanDataWriter(HDFGroup & _rootGroup);
+    std::vector<std::string> Errors(void) const;
 
-    ~HDFScanDataWriter();
+protected:
+    std::string filename_;
+    std::vector<std::string> errors_; 
+
+    bool AddChildGroup(HDFGroup & parentGroup, 
+                       HDFGroup & childGroup,
+                       const std::string & childGroupName);
+
+    bool AddAttribute(HDFData & group, 
+                      const std::string & attributeName, 
+                      const std::vector<std::string> & attributeValues);
     
-    int Initialize(HDFGroup & _rootGroup);
-      
-    void Write(const ScanData & scanData);
+    void AddErrorMessage(const std::string & errmsg);
+
+    void FAILED_TO_CREATE_GROUP_ERROR(const std::string & groupName);
    
-	void WriteFrameRate(const float frameRate);
+    void FAILED_TO_CREATE_ATTRIBUTE_ERROR(const std::string & attributeName);
 
-    void WriteNumFrames(const unsigned int numFrames);
+    void PARENT_GROUP_NOT_INITIALIZED_ERROR(const std::string & groupName);
 
-    void WriteWhenStarted(const std::string whenStarted);
-
-	void Close();
-  
-private:
-    void WriteBaseMap(const std::string baseMapStr);
-   
-    void WriteNumAnalog(const unsigned int numAnalog);
-
-    void WritePlatformId(const PlatformId id);
-   
-    void WriteMovieName(const std::string movieName);
-
-    void WriteRunCode(const std::string runCode);
-
-    void WriteBindingKit(const std::string & bindingKit);
-
-    void WriteSequencingKit(const std::string & sequencingKit);
+    virtual void Close(void) = 0;
 };
 
 #endif

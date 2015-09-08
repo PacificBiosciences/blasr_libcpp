@@ -20,11 +20,11 @@ public:
 
     H5::H5Location* GetObject(); 
 
-    HDFData(H5::CommonFG* _container, std::string _datasetName); 
+    HDFData(H5::CommonFG* _container, const std::string & _datasetName); 
 
     HDFData(); 
 
-    bool IsInitialized(); 
+    bool IsInitialized() const; 
 
     //
     // Allow derived classes to be initialized generically.
@@ -40,11 +40,11 @@ public:
     //
     virtual int Initialize(HDFGroup &parentGroup, const std::string &datasetName);
 
-    int BaseInitializeDataset(H5::CommonFG &hdfFile, std::string _datasetName); 
+    int BaseInitializeDataset(H5::CommonFG &hdfFile, const std::string & _datasetName); 
 
-    int InitializeDataset(HDFGroup &group, std::string _datasetName); 
+    int InitializeDataset(HDFGroup &group, const std::string & _datasetName); 
 
-    int InitializeDataset(H5::CommonFG &hdfFile, std::string _datasetName); 
+    int InitializeDataset(H5::CommonFG &hdfFile, const std::string & _datasetName); 
 
     void Close(); 
 };

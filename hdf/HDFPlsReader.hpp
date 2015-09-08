@@ -446,7 +446,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
         signalMatrix.Read(curPos, curPos + plsSeqLength, &signal[0]); // read off one row.
         int i;
         for (i = 0; i < basSeqLength; i++) {
-          dest[i] = signal[basToPlsIndex[i]*4 + scanDataReader.baseMap[basSeq[i]]];
+          dest[i] = signal[basToPlsIndex[i]*4 + scanDataReader.BaseMap()[basSeq[i]]];
         }
       }
       else {

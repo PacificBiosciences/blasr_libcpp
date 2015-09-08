@@ -1,3 +1,40 @@
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+//
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted (subject to the limitations in the
+// disclaimer below) provided that the following conditions are met:
+//
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+//  * Redistributions in binary form must reproduce the above
+//    copyright notice, this list of conditions and the following
+//    disclaimer in the documentation and/or other materials provided
+//    with the distribution.
+//
+//  * Neither the name of Pacific Biosciences nor the names of its
+//    contributors may be used to endorse or promote products derived
+//    from this software without specific prior written permission.
+//
+// NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+// GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY PACIFIC
+// BIOSCIENCES AND ITS CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL PACIFIC BIOSCIENCES OR ITS
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
+
+// Author: Mark Chaisson
+
 #include <stdlib.h> 
 #include "SMRTSequence.hpp"
 
@@ -18,7 +55,7 @@ void SMRTSequence::SetNull() {
     highQualityRegionScore = 0;
     // ZMWMetrics
     for (size_t i = 0; i < 4; i++) {
-        hqRegionSnr[i] = -1;
+        hqRegionSnr_[i] = -1;
     }
     readScore = -1;
     holeNumber = static_cast<UInt>(-1);
@@ -43,6 +80,7 @@ void SMRTSequence::Allocate(DNALength length) {
 
     FASTQSequence::AllocateRichQualityValues(length);
     seq           = new Nucleotide[length];
+    this->length  = length;
     qual.Allocate(length);
     preBaseFrames = new HalfWord[length];
     widthInFrames = new HalfWord[length];
@@ -255,7 +293,8 @@ void SMRTSequence::SetReadGroupId(const std::string & rid) {
 }
 
 #ifdef USE_PBBAM
-void SMRTSequence::Copy(const PacBio::BAM::BamRecord & record) {
+void SMRTSequence::Copy(const PacBio::BAM::BamRecord & record,
+                        bool copyAllQVs) {
     Free();
 
     copiedFromBam = true;
@@ -267,6 +306,16 @@ void SMRTSequence::Copy(const PacBio::BAM::BamRecord & record) {
     // Do NOT copy other SMRTQVs such as startFrame, meanSignal...
     (static_cast<FASTQSequence*>(this))->Copy(record);
 
+    if (copyAllQVs) {
+        if (record.HasPreBaseFrames()) {
+            std::vector<uint16_t> qvs = record.PreBaseFrames().DataRaw();
+            assert(preBaseFrames == nullptr);
+            preBaseFrames = new HalfWord[qvs.size()];
+            std::memcpy(preBaseFrames, &qvs[0], qvs.size() * sizeof(HalfWord));
+        }
+    }
+
+    // preBaseQVs are not included in BamRecord, and will not be copied.
     // Copy read group id from BamRecord.
     SetReadGroupId(record.ReadGroupId());
 
@@ -276,8 +325,21 @@ void SMRTSequence::Copy(const PacBio::BAM::BamRecord & record) {
     zmwData.holeNumber = static_cast<UInt> (record.HoleNumber()); 
 
     // Set hq region read score
-    if (record.Impl().HasTag("rq"))
+    if (record.Impl().HasTag("rq")) {
         highQualityRegionScore = record.Impl().TagValue("rq").ToInt32();
+        readScore = highQualityRegionScore / 1000.0;
+    }
 
+    // Set HQRegionSNR if record has the 'sn' tag 
+    if (record.HasSignalToNoise()) {
+        // Signal to noise ratio of ACGT (in that particular ORDER) over 
+        // HQRegion from BAM: record.SignalToNoise() 
+        std::vector<float> snrs = record.SignalToNoise();
+        this->HQRegionSnr('A', snrs[0]) 
+             .HQRegionSnr('C', snrs[1])
+             .HQRegionSnr('G', snrs[2]) 
+             .HQRegionSnr('T', snrs[3]);
+    }
 }
+
 #endif

@@ -133,9 +133,9 @@ void CollectSubreadIntervals(T_Sequence &read, RegionTable *regionTablePtr,
 
                 RegionAnnotation & ra = regionTablePtr->table[regionIndex];
 				subreadIntervals.push_back(ReadInterval(
-                    ra.row[RegionAnnotation::RegionStart],
-				    ra.row[RegionAnnotation::RegionEnd],
-                    ra.row[RegionAnnotation::RegionScore]));
+                            ra.GetStart(),
+                            ra.GetEnd(),
+                            ra.GetScore()));
 			}
 		}
 	}
@@ -159,21 +159,18 @@ void CollectSubreadIntervals(T_Sequence &read, RegionTable *regionTablePtr,
             // The first subread covers [0, RegionStart of first adapter)
 			subreadIntervals.push_back(ReadInterval(0, 
                 regionTablePtr->table[adapterIntervalIndices[0]].
-                    row[RegionAnnotation::RegionStart]));
+                    GetStart()));
 
             // The subread[i] covers (RegionEnd of i-1-th adapter, RegionStart of i-th adapter)
 			for (i = 0; i + 1 < adapterIntervalIndices.size(); i++) {
 				subreadIntervals.push_back(ReadInterval(
-                    regionTablePtr->table[adapterIntervalIndices[i]].
-                        row[RegionAnnotation::RegionEnd],
-				    regionTablePtr->table[adapterIntervalIndices[i+1]].
-                        row[RegionAnnotation::RegionStart]));
+                    regionTablePtr->table[adapterIntervalIndices[i]].GetEnd(),
+				    regionTablePtr->table[adapterIntervalIndices[i+1]].GetStart()));
 			}
             // The last subread covers (RegionEnd of last adapter, end of read)
 			subreadIntervals.push_back(
                 ReadInterval(regionTablePtr->table[
-                    adapterIntervalIndices[adapterIntervalIndices.size()-1]].
-                        row[RegionAnnotation::RegionEnd],
+                    adapterIntervalIndices[adapterIntervalIndices.size()-1]].GetEnd(),
 				read.length));
 		}
 	}
@@ -205,9 +202,9 @@ void CollectAdapterIntervals(T_Sequence &read,
         if (regionTablePtr->GetType(regionIndex) ==  Adapter) {
             RegionAnnotation & ra = regionTablePtr->table[regionIndex];
             adapterIntervals.push_back(ReadInterval(
-                ra.row[RegionAnnotation::RegionStart],
-                ra.row[RegionAnnotation::RegionEnd],
-                ra.row[RegionAnnotation::RegionScore]));
+                        ra.GetStart(),
+                        ra.GetEnd(), 
+                        ra.GetScore()));
         }
     }
 }

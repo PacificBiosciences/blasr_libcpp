@@ -89,7 +89,7 @@ int HDFScanDataReader::Initialize(HDFGroup *pulseDataGroup) {
     // Load baseMap which maps bases (ATGC) to channel orders.
     // This should always be present.
     //
-    if (LoadBaseMap(baseMap) == 0)
+    if (LoadBaseMap(baseMap_) == 0)
         return 0;
 
     //
@@ -125,6 +125,10 @@ int HDFScanDataReader::Read(ScanData &scanData) {
     if (useWhenStarted) {
         whenStartedAtom.Read(scanData.whenStarted);
     }
+
+    ReadSequencingKit(scanData.sequencingKit_);
+
+    ReadBindingKit(scanData.bindingKit_);
 
     return 1;
 }
@@ -190,7 +194,7 @@ int HDFScanDataReader::LoadMovieName(string &movieNameP) {
     }
 }
 
-int HDFScanDataReader::LoadBaseMap(map<char, int> & baseMap) {
+int HDFScanDataReader::LoadBaseMap(map<char, size_t> & baseMap) {
     // Map bases to channel order in hdf pls file.
     if (dyeSetGroup.ContainsAttribute("BaseMap") and
             baseMapAtom.Initialize(dyeSetGroup, "BaseMap")) {
@@ -204,8 +208,8 @@ int HDFScanDataReader::LoadBaseMap(map<char, int> & baseMap) {
         baseMap.clear();
         for(size_t i = 0; i < baseMapStr.size(); i++) {
             baseMap[toupper(baseMapStr[i])] = i;
-            baseMap[tolower(baseMapStr[i])] = i;
         }
+        this->baseMap_ = baseMap;
         return 1;
     }
     return 0;
@@ -213,20 +217,21 @@ int HDFScanDataReader::LoadBaseMap(map<char, int> & baseMap) {
 
 void HDFScanDataReader::Close() {
     if (useMovieName) {
-        movieNameAtom.dataspace.close();
+        movieNameAtom.Close();
     }
     if (useRunCode) {
-        runCodeAtom.dataspace.close();
+        runCodeAtom.Close();
     }
     if (useWhenStarted) {
-        whenStartedAtom.dataspace.close();
+        whenStartedAtom.Close();
     }
-    baseMapAtom.dataspace.close();
-    platformIdAtom.dataspace.close();
-    frameRateAtom.dataspace.close();
-    numFramesAtom.dataspace.close();
-    sequencingKitAtom.dataspace.close();
-    bindingKitAtom.dataspace.close();
+
+    baseMapAtom.Close();
+    platformIdAtom.Close();
+    frameRateAtom.Close();
+    numFramesAtom.Close();
+    sequencingKitAtom.Close();
+    bindingKitAtom.Close();
 
     scanDataGroup.Close();
     dyeSetGroup.Close();

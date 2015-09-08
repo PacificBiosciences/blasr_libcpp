@@ -35,80 +35,67 @@
 
 // Author: Yuan Li
 
-#ifndef DATA_HDF_HDF_SCAN_DATA_WRITER_H_
-#define DATA_HDF_HDF_SCAN_DATA_WRITER_H_
+#ifndef _HDF_REGIONS_WRITER_HPP_
+#define _HDF_REGIONS_WRITER_HPP_
 
 #include <string>
-#include <iostream>
-#include "HDFFile.hpp"
-#include "HDFGroup.hpp"
-#include "HDFAtom.hpp"
 #include "Enumerations.h"
-#include "reads/ScanData.hpp"
+#include "reads/RegionTable.hpp"
+#include "HDFFile.hpp"
+#include "HDFArray.hpp"
+#include "HDF2DArray.hpp"
+#include "HDFAtom.hpp"
+#include "HDFWriterBase.hpp"
 
-class HDFScanDataWriter {
-private:
-    HDFGroup * rootGroupPtr;
-	HDFGroup scanDataGroup;
-	HDFGroup acqParamsGroup;
-    HDFGroup dyeSetGroup;
-	HDFGroup runInfoGroup;
+using namespace H5;
+using namespace std;
 
-	HDFAtom<std::string> whenStartedAtom;
-	HDFAtom<float> frameRateAtom;
-	HDFAtom<unsigned int> numFramesAtom;
-
-    HDFAtom<std::string> baseMapAtom;
-    HDFAtom<unsigned int> numAnalogAtom;
-
-	HDFAtom<std::string> movieNameAtom;
-	HDFAtom<std::string> runCodeAtom;
-
-	HDFAtom<std::string> bindingKitAtom;
-	HDFAtom<std::string> sequencingKitAtom;
-
-	HDFAtom<unsigned int> platformIdAtom;
-	HDFAtom<std::string> platformNameAtom;
-
-    void CreateAcqParamsGroup();
-
-    void CreateDyeSetGroup();
-
-    void CreateRunInfoGroup();
-
+class HDFRegionsWriter: public HDFWriterBase {
 public:
-	HDFScanDataWriter(HDFFile & _outFile);
+    /// \name Constructor and destructor
+    /// \{
+    /// \param[in] filename, hdf file name
+    /// \param[in] parentGroup, parent hdf group in hirarchy
+    HDFRegionsWriter(const std::string & filename, 
+                     HDFGroup & parentGroup,
+                     const std::vector<std::string> & regionTypes = PacBio::AttributeValues::Regions::regiontypes);
+    ~HDFRegionsWriter(void);
+    /// \}
 
-    HDFScanDataWriter(HDFGroup & _rootGroup);
-
-    ~HDFScanDataWriter();
-    
-    int Initialize(HDFGroup & _rootGroup);
-      
-    void Write(const ScanData & scanData);
-   
-	void WriteFrameRate(const float frameRate);
-
-    void WriteNumFrames(const unsigned int numFrames);
-
-    void WriteWhenStarted(const std::string whenStarted);
-
-	void Close();
-  
 private:
-    void WriteBaseMap(const std::string baseMapStr);
-   
-    void WriteNumAnalog(const unsigned int numAnalog);
+    /// \name Private variables for hdf IO. 
+    /// \{
+    HDFGroup & parentGroup_; //< parent hdf group
 
-    void WritePlatformId(const PlatformId id);
-   
-    void WriteMovieName(const std::string movieName);
+    /// A vector of strings of region types for RegionTypeIndex to look up. Order matters!
+    std::vector<std::string> regionTypes_; 
 
-    void WriteRunCode(const std::string runCode);
+	HDF2DArray<int> regionsArray_; //< HDF2DArray for writing regions to hdf
 
-    void WriteBindingKit(const std::string & bindingKit);
+	int curRow_; //< which row to write
 
-    void WriteSequencingKit(const std::string & sequencingKit);
+    static const int NCOLS = 5; //< number of columns in Regions table.
+
+    /// \brief Write attributes of the 'regions' group
+    bool WriteAttributes(void);
+    /// \}
+       
+public:
+    /// \name Method to write region annotations. 
+    /// \{
+    /// \brief Append a vector of region annotations to 'regions'
+    /// \param[in] annotations - region annotations to append. 
+    /// \returns true if succeeded.
+    bool Write(const std::vector<RegionAnnotation> &annotations);
+
+    /// \brief Append a region annotation to 'regions' 
+    /// \param[in] annotation - region annotation to append
+    /// \returns true if succeeded.
+    bool Write(const RegionAnnotation &annotation);
+
+    void Flush(void);
+
+    void Close(void);
 };
 
 #endif

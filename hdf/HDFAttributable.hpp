@@ -12,11 +12,11 @@ public:
     std::vector<std::string> attributeNameList;
 
     void StoreAttributeNames(H5::H5Location &thisobject, 
-        std::vector<std::string> &attributeNames); 
+        const std::vector<std::string> &attributeNames); 
 
     virtual H5::H5Location* GetObject(); 
 
-    int ContainsAttribute(std::string attributeName); 
+    int ContainsAttribute(const std::string & attributeName); 
 
 };
 

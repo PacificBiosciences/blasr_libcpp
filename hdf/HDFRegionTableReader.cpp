@@ -70,10 +70,7 @@ void HDFRegionTableReader::RegionTypesToMap(RegionTable &table) {
     size_t i;
     table.regionTypeEnums.resize(table.regionTypes.size());
     for (i = 0;i < table.regionTypes.size(); i++) {
-        if (table.regionTypes[i] == "GlobalAccuracy") {
-            table.regionTypeEnums[i] = GlobalAccuracy;
-        }
-        else if (table.regionTypes[i] == "HQRegion") {
+        if (table.regionTypes[i] == "HQRegion") {
             table.regionTypeEnums[i] = HQRegion;
         }
         else if (table.regionTypes[i] == "Adapter") {
@@ -84,9 +81,6 @@ void HDFRegionTableReader::RegionTypesToMap(RegionTable &table) {
         }
         else if (table.regionTypes[i] == "Accuracy") {
             table.regionTypeEnums[i] = Insert;
-        }
-        else if (table.regionTypes[i] == "ArtifactRegion") {
-            table.regionTypeEnums[i] = ArtifactRegion;
         }
         else {
             cout << "ERROR! Region Type " << table.regionTypes[i] << " is not supported.  Check Enumerations.h" << endl;

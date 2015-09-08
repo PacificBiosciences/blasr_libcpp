@@ -1,7 +1,7 @@
 #include "HDFAtom.hpp"
 
 template<>
-void HDFAtom<std::string>::Create(H5::H5Location &object, std::string atomName) {
+void HDFAtom<std::string>::Create(H5::H5Location &object, const std::string & atomName) {
     H5::StrType strType(0, H5T_VARIABLE);
     hsize_t defaultDims[] = {1};
     H5::DataSpace defaultDataSpace(1, defaultDims);
@@ -11,7 +11,7 @@ void HDFAtom<std::string>::Create(H5::H5Location &object, std::string atomName) 
 
 
 #define DEFINE_TYPED_CREATE_ATOM(T, predtype) template<> \
-	void HDFAtom<T>::TypedCreate(H5::H5Location &object, std::string &atomName, H5::DataSpace &defaultDataSpace) {				\
+	void HDFAtom<T>::TypedCreate(H5::H5Location &object, const std::string &atomName, H5::DataSpace &defaultDataSpace) {				\
   attribute = object.createAttribute(atomName.c_str(), (predtype), defaultDataSpace );	\
 }
 
