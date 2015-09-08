@@ -30,21 +30,21 @@ public:
         return NULL;
     }
 
-    int Initialize(H5::H5Location &object, std::string attributeName, bool createIfMissing=false) {
+    int Initialize(H5::H5Location &object, const std::string & attributeName, bool createIfMissing=false) {
         attribute = object.openAttribute(attributeName.c_str());
         initialized = true;
         return 1;
     }
 
-    int Initialize(HDFGroup &group, std::string attributeName, bool createIfMissing=false) {
+    int Initialize(HDFGroup &group, const std::string & attributeName, bool createIfMissing=false) {
         return Initialize(group.group, attributeName);
     }
 
-    int Initialize(HDFData &data, std::string attributeName, bool createIfMissing=false) {
+    int Initialize(HDFData &data, const std::string & attributeName, bool createIfMissing=false) {
         return Initialize(data.dataset, attributeName);
     }
 
-    int Initialize(H5::Group &object, std::string attributeName, bool createIfMissing=false) {
+    int Initialize(H5::Group &object, const std::string & attributeName, bool createIfMissing=false) {
         try {
             attribute = object.openAttribute(attributeName.c_str());
         }
@@ -56,7 +56,7 @@ public:
         return 1;
     }
 
-    int Initialize(H5::H5File &hdfFile, std::string groupName, std::string attributeName) {
+    int Initialize(H5::H5File &hdfFile, const std::string & groupName, const std::string & attributeName) {
         HDFGroup group;
         group.Initialize(hdfFile, groupName);
         attribute = group.group.openAttribute(attributeName.c_str());
@@ -68,28 +68,28 @@ public:
     // This handles creation of all non-std::string types.  A specialization
     // for std::strings is provided below.
     //
-    void Create(H5::H5Location &object, std::string atomName) {
+    void Create(H5::H5Location &object, const std::string & atomName) {
         hsize_t defaultDims[] = {1};
         H5::DataSpace defaultDataSpace(1, defaultDims);
         TypedCreate(object, atomName, defaultDataSpace);
     }
 
 
-    void Create(H5::H5Location &object, std::string name, std::string value) {
+    void Create(H5::H5Location &object, const std::string & name, const std::string & value) {
         H5::StrType strType(0, value.size());
         attribute = object.createAttribute(name.c_str(), strType, H5::DataSpace(0,NULL));
         initialized = true;
         attribute.write(strType, value.c_str());
     }
 
-    void Create(H5::H5Location &object, std::string name, std::vector<int> &vect) {
+    void Create(H5::H5Location &object, const std::string & name, std::vector<int> &vect) {
         hsize_t length = vect.size();
         H5::ArrayType arrayDataType(H5::PredType::NATIVE_INT, 1, &length);
         attribute = object.createAttribute(name.c_str(), H5::PredType::NATIVE_INT, H5::DataSpace(1, &length));
         attribute.write(H5::PredType::NATIVE_INT, &((vect)[0]));    
     }
 
-    void Create(H5::H5Location &object, std::string name, std::vector<std::string> &vect) {
+    void Create(H5::H5Location &object, const std::string & name, const std::vector<std::string> &vect) {
         hsize_t length = vect.size();
         H5::StrType strType(0,H5T_VARIABLE);
         H5::ArrayType arrayDataType(strType, 1, &length);
@@ -97,7 +97,7 @@ public:
         attribute.write(strType, &((vect)[0]));    
     }
 
-    void TypedCreate(H5::H5Location &object, std::string &atomName, H5::DataSpace &dataSpace) {
+    void TypedCreate(H5::H5Location &object, const std::string &atomName, H5::DataSpace &dataSpace) {
         assert("Calling HDFAtom<T>::typedCreate on an unsupported type" == 0);
     }
 
@@ -118,10 +118,10 @@ public:
 //
 
 template<>
-void HDFAtom<std::string>::Create(H5::H5Location &object, std::string atomName);
+void HDFAtom<std::string>::Create(H5::H5Location &object, const std::string & atomName);
 
 #define DECLARE_TYPED_CREATE_ATOM(T, predtype) template<> \
-	void HDFAtom<T>::TypedCreate(H5::H5Location &object, std::string &atomName, H5::DataSpace &defaultDataSpace);
+	void HDFAtom<T>::TypedCreate(H5::H5Location &object, const std::string & atomName, H5::DataSpace &defaultDataSpace);
 
 DECLARE_TYPED_CREATE_ATOM(int, H5::PredType::NATIVE_INT)
 DECLARE_TYPED_CREATE_ATOM(unsigned int, H5::PredType::NATIVE_UINT)

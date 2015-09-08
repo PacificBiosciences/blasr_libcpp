@@ -1,49 +1,82 @@
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+//
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted (subject to the limitations in the
+// disclaimer below) provided that the following conditions are met:
+//
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+//  * Redistributions in binary form must reproduce the above
+//    copyright notice, this list of conditions and the following
+//    disclaimer in the documentation and/or other materials provided
+//    with the distribution.
+//
+//  * Neither the name of Pacific Biosciences nor the names of its
+//    contributors may be used to endorse or promote products derived
+//    from this software without specific prior written permission.
+//
+// NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+// GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY PACIFIC
+// BIOSCIENCES AND ITS CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL PACIFIC BIOSCIENCES OR ITS
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
+
+// Author: Mark Chaisson
+
+
 #include <algorithm>
+#include <iostream>
+#include <ostream>
 #include "RegionTable.hpp"
 
 using namespace std;
 
-RegionAnnotation& RegionAnnotation::operator=(const RegionAnnotation &rhs) {
-    memcpy(row, rhs.row, sizeof(int)*NCOLS);
-    return *this;
-}
-int RegionAnnotation::GetHoleNumber() {
-    return row[HoleNumber];
+std::string RegionTypeMap::ToString(RegionType rt) {
+    assert(RegionTypeToString.find(rt) != RegionTypeToString.end());
+    return RegionTypeToString.find(rt)->second;
 }
 
-void RegionAnnotation::SetHoleNumber(int holeNumber) {
-    row[HoleNumber] = holeNumber;
+RegionType RegionTypeMap::ToRegionType(const std::string & str) {
+    if (StringToRegionType.find(str) == StringToRegionType.end()) {
+        std::cout << "Unsupported RegionType " << str << std::endl;
+        assert(false);
+    }
+    return StringToRegionType.find(str)->second;
 }
 
-int RegionAnnotation::GetType() const {
-    return row[RegionType];
-}
+const std::map<RegionType, std::string> RegionTypeMap::RegionTypeToString = {
+    {Adapter,  "Adapter"},
+    {Insert,   "Insert"},
+    {HQRegion, "HQRegion"},
+    {BarCode,  "Barcode"}
+};
 
-void RegionAnnotation::SetType(int regionType) {
-    row[RegionType] = regionType;
-}
+const std::map<std::string, RegionType> RegionTypeMap::StringToRegionType = {
+    {"Adapter",  Adapter},
+    {"Insert",   Insert},
+    {"HQRegion", HQRegion}, 
+    {"Barcode",  BarCode},
+};
 
-int RegionAnnotation::GetStart() {
-    return row[RegionStart];
-}
-
-void RegionAnnotation::SetStart(int start) {
-    row[RegionStart] = start;
-}
-int RegionAnnotation::GetEnd() {
-    return row[RegionEnd];
-}
-
-void RegionAnnotation::SetEnd(int end) {
-    row[RegionEnd] = end;
-}
-
-int RegionAnnotation::GetScore() {
-    return row[RegionScore];
-}
-
-void RegionAnnotation::SetScore(int score) {
-    row[RegionScore] = score;
+std::ostream & operator << (std::ostream & os, const RegionAnnotation& ra) {
+    os << "ZMW " << ra.GetHoleNumber() 
+       << ", region type index " << ra.GetTypeIndex() 
+       << " [" << ra.GetStart() 
+       << ", " << ra.GetEnd()
+       << "), " << ra.GetScore();
+    return os;
 }
 
 int RegionTable::LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) const {
@@ -68,10 +101,10 @@ int RegionTable::LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) 
 RegionType RegionTable::GetType(int regionIndex) const {
     assert(regionIndex < table.size());
     assert(regionIndex >= 0);
-    return (RegionType) regionTypeEnums[table[regionIndex].GetType()];
+    return regionTypeEnums[table[regionIndex].GetTypeIndex()];
 }
 
-int RegionTable::GetStart(int regionIndex) {
+int RegionTable::GetStart(const int regionIndex) const {
     assert(regionIndex < table.size());
     assert(regionIndex >= 0);
     return table[regionIndex].GetStart();
@@ -83,7 +116,7 @@ void RegionTable::SetStart(int regionIndex, int start) {
     table[regionIndex].SetStart(start);
 }
 
-int RegionTable::GetEnd(int regionIndex) {
+int RegionTable::GetEnd(const int regionIndex) const {
     assert(regionIndex < table.size());
     assert(regionIndex >= 0);
     return table[regionIndex].GetEnd();
@@ -95,7 +128,7 @@ void RegionTable::SetEnd(int regionIndex, int end) {
     table[regionIndex].SetEnd(end);
 }
 
-int RegionTable::GetHoleNumber(int regionIndex) {
+int RegionTable::GetHoleNumber(int regionIndex) const{
     assert(regionIndex < table.size());
     assert(regionIndex >= 0);
     return table[regionIndex].GetHoleNumber();
@@ -107,20 +140,28 @@ void RegionTable::SetHoleNumber(int regionIndex, int holeNumber) {
     table[regionIndex].SetHoleNumber(holeNumber);
 }
 
-int RegionTable::GetScore(int regionIndex) {
+int RegionTable::GetScore(int regionIndex) const{
     assert(regionIndex < table.size());
     assert(regionIndex >= 0);
-    return table[regionIndex].row[RegionAnnotation::RegionScore];
+    return table[regionIndex].GetScore();//row[RegionAnnotationColumn::RegionScore];
 }
 
 void RegionTable::SetScore(int regionIndex, int score) {
     assert(regionIndex < table.size());
     assert(regionIndex >= 0);
-    table[regionIndex].row[RegionAnnotation::RegionScore] = score;
+    table[regionIndex].SetScore(score);//.row[RegionAnnotationColumn::RegionScore] = score;
 }
 
 void RegionTable::SortTableByHoleNumber() {
     std::stable_sort(table.begin(), table.end());
+}
+
+std::vector<RegionType> RegionTable::DefaultRegionTypes(void) {
+    std::vector<RegionType> ret;
+    for (std::string regionTypeString: PacBio::AttributeValues::Regions::regiontypes) {
+        ret.push_back(RegionTypeMap::ToRegionType(regionTypeString));
+    }
+    return ret;
 }
 
 void RegionTable::Reset() {
@@ -133,27 +174,9 @@ void RegionTable::Reset() {
 }
 
 void RegionTable::CreateDefaultAttributes() {
-    columnNames.clear();
-    columnNames.push_back("HoleNumber");
-    columnNames.push_back("Region type index");
-    columnNames.push_back("Region start in bases");
-    columnNames.push_back("Region end in bases");
-    columnNames.push_back("Region score");
-
-    regionTypes.push_back("Adapter");
-    regionTypes.push_back("Insert");
-    regionTypes.push_back("HQRegion");
-
-    regionDescriptions.push_back("Adapter Hit");
-    regionDescriptions.push_back("Insert Region");
-    regionDescriptions.push_back("High Quality bases region. Score is 1000 * "
-            "predicted accuracy, where predicted accuary is 0 to 1.0"); 
-
-    regionSources.push_back("AdapterFinding");
-    regionSources.push_back("AdapterFinding");
-    regionSources.push_back("PulseToBase Region classifer");
-
-    regionTypeEnums.push_back(Adapter);
-    regionTypeEnums.push_back(Insert);
-    regionTypeEnums.push_back(HQRegion);
+    columnNames        = PacBio::AttributeValues::Regions::columnnames;
+    regionTypes        = PacBio::AttributeValues::Regions::regiontypes;
+    regionDescriptions = PacBio::AttributeValues::Regions::regiondescriptions;
+    regionSources      = PacBio::AttributeValues::Regions::regionsources;
+    regionTypeEnums    = DefaultRegionTypes();
 }

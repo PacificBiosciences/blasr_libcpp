@@ -1,3 +1,40 @@
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
+//
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted (subject to the limitations in the
+// disclaimer below) provided that the following conditions are met:
+//
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+//  * Redistributions in binary form must reproduce the above
+//    copyright notice, this list of conditions and the following
+//    disclaimer in the documentation and/or other materials provided
+//    with the distribution.
+//
+//  * Neither the name of Pacific Biosciences nor the names of its
+//    contributors may be used to endorse or promote products derived
+//    from this software without specific prior written permission.
+//
+// NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+// GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY PACIFIC
+// BIOSCIENCES AND ITS CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL PACIFIC BIOSCIENCES OR ITS
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+// USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+// SUCH DAMAGE.
+
+// Author: Mark Chaisson
+
 #ifndef _BLASR_SMRT_SEQUENCE_HPP_
 #define _BLASR_SMRT_SEQUENCE_HPP_
 
@@ -12,14 +49,20 @@
 #include "reads/RegionTable.hpp"
 #include "reads/ZMWGroupEntry.hpp"
 
+
 class SMRTSequence : public FASTQSequence {
+private:
+    enum SnrIndex4Base {A=0, C=1, G=2, T=3};
+    float hqRegionSnr_[4]; // Always saved as 'ACGT'
+ 
 public:
     int16_t xy[2];
     UInt holeNumber;
-    float hqRegionSnr[4];
+
     float readScore;
     ZMWGroupEntry zmwData;
     PlatformId platform;
+
     HalfWord *preBaseFrames;
     HalfWord *widthInFrames;
     //
@@ -49,6 +92,11 @@ public:
 
     SMRTSequence();
     inline ~SMRTSequence();
+
+    // Access to HQRegion SNRs must be done via public API.
+    inline float HQRegionSnr(const char base) const;
+
+    inline SMRTSequence & HQRegionSnr(const char base, float v);
 
     void Allocate(DNALength length); 
 
@@ -88,6 +136,8 @@ public:
 
     bool GetHoleNumber(UInt & holeNumberP);   
 
+    inline UInt HoleNumber(void) const;
+
     // Get read group id for this sequence.
     std::string GetReadGroupId();
 
@@ -98,7 +148,9 @@ public:
 public:
     // Copy read sequence, title, holeNumber, readGroupId, and QVs
     // (iq, dq, sq, mq, st, dt) from BamRecord to this SMRTSequence.
-    void Copy(const PacBio::BAM::BamRecord & record);
+    // If copyAllQVs is false, also copy all QVs.
+    void Copy(const PacBio::BAM::BamRecord & record, 
+              bool copyAllQVs = false);
 
     // Keep track of BamRecord from which this SMRTSequence is 
     // originally copied. However, one should NOT assume
@@ -111,5 +163,26 @@ public:
 
 inline SMRTSequence::~SMRTSequence(){
     SMRTSequence::Free();
+}
+
+inline UInt SMRTSequence::HoleNumber(void) const {
+    return holeNumber;
+}
+
+inline float SMRTSequence::HQRegionSnr(const char base) const {
+    if (::toupper(base) == 'A')      return hqRegionSnr_[SMRTSequence::SnrIndex4Base::A];
+    else if (::toupper(base) == 'C') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::C];
+    else if (::toupper(base) == 'G') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::G];
+    else if (::toupper(base) == 'T') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::T];
+    else assert("Base must be in A, C, G, T" == 0);
+}
+
+inline SMRTSequence & SMRTSequence::HQRegionSnr(const char base, float v) {
+    if (::toupper(base) == 'A')      hqRegionSnr_[SMRTSequence::SnrIndex4Base::A] = v;
+    else if (::toupper(base) == 'C') hqRegionSnr_[SMRTSequence::SnrIndex4Base::C] = v;
+    else if (::toupper(base) == 'G') hqRegionSnr_[SMRTSequence::SnrIndex4Base::G] = v;
+    else if (::toupper(base) == 'T') hqRegionSnr_[SMRTSequence::SnrIndex4Base::T] = v;
+    else assert("Base must be in A, C, G, T" == 0);
+    return *this;
 }
 #endif  // _BLASR_SMRT_SEQUENCE_HPP_

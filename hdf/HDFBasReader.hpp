@@ -388,65 +388,110 @@ public:
             }
         }
 
+
     int InitializeSequenceFields(HDFGroup &baseCallsGroup) {
-        //
         // The only field that is absoultely required is Basecall
         if (baseArray.InitializeForReading(baseCallsGroup, "Basecall")        == false) return 0;
-        if (includedFields["QualityValue"] and qualArray.InitializeForReading(baseCallsGroup, "QualityValue")    == false) return 0;
-        if (includedFields["InsertionQV"] and insertionQVArray.InitializeForReading(baseCallsGroup, "InsertionQV")     == false) return 0;
-        if (includedFields["DeletionQV"] and deletionQVArray.InitializeForReading(baseCallsGroup, "DeletionQV")      == false) return 0;
-        if (includedFields["DeletionTag"] and deletionTagArray.InitializeForReading(baseCallsGroup, "DeletionTag")     == false) return 0;
-        if (includedFields["SubstitutionQV"] and substitutionQVArray.InitializeForReading(baseCallsGroup, "SubstitutionQV")  == false) return 0;
-        if (includedFields["SubstitutionTag"] and substitutionTagArray.InitializeForReading(baseCallsGroup, "SubstitutionTag") == false) return 0;
-        // if (includedFields["PreBaseFrames"] and preBaseFramesArray.InitializeForReading(baseCallsGroup, "PreBaseFrames")   == false) return 0;
-
-        if (baseCallsGroup.ContainsObject("PreBaseFrames")) {
-            if (preBaseFramesArray.InitializeForReading(baseCallsGroup, "PreBaseFrames") == false) return 0;
-        } else {
-            includedFields["PreBaseFrames"] = false;
-        }
 
         //
         // These fields are not always present in bas.h5 files.
         //
-        if (baseCallsGroup.ContainsObject("PulseIndex")) {
-            if (pulseIndexArray.InitializeForReading(baseCallsGroup,        "PulseIndex")      == false) return 0;
-        }
-        else {
-            includedFields["PulseIndex"] = false;
-        }
+        //
+        std::string fieldName = "QualityValue";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not qualArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
 
-        if (baseCallsGroup.ContainsObject("WidthInFrames")) {    
-            if (basWidthInFramesArray.InitializeForReading(baseCallsGroup,  "WidthInFrames")   == false) return 0;
-        }
-        else {
-            includedFields["WidthInFrames"] = false;
-        }
+        fieldName = "InsertionQV";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not insertionQVArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
 
-        if (baseCallsGroup.ContainsObject("MergeQV")) {
-            if (includedFields["MergeQV"] and mergeQVArray.InitializeForReading(baseCallsGroup, "MergeQV") == false) return false;
-        }
-        else {
-            includedFields["MergeQV"] = false;
-        }
+        fieldName = "DeletionQV";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not deletionQVArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
 
-        if ((includedFields["HQRegionSNR"] or includedFields["ReadScore"]) and
-                (baseCallsGroup.ContainsObject(zmwMetricsGroupName) == 0 or
-                zmwMetricsGroup.Initialize(baseCallsGroup.group, zmwMetricsGroupName) == 0)) {
+        fieldName = "DeletionTag";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not deletionTagArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
+
+        fieldName = "SubstitutionQV";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not substitutionQVArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
+
+        fieldName = "SubstitutionTag";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not substitutionTagArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
+
+        fieldName = "PreBaseFrames";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not preBaseFramesArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
+
+        fieldName = "PulseIndex";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not pulseIndexArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
+
+        fieldName = "WidthInFrames";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not basWidthInFramesArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
+
+        fieldName = "MergeQV";
+        if (baseCallsGroup.ContainsObject(fieldName)) {
+            if (includedFields[fieldName] and
+                not mergeQVArray.InitializeForReading(baseCallsGroup, fieldName))
+                return 0;
+        } else includedFields[fieldName] = false;
+
+
+        if (not baseCallsGroup.ContainsObject(zmwMetricsGroupName) or 
+            not zmwMetricsGroup.Initialize(baseCallsGroup.group, zmwMetricsGroupName)) {
             includedFields["HQRegionSNR"] = false;
             includedFields["ReadScore"] = false;
-        }
-        if (includedFields["HQRegionSNR"] and (zmwMetricsGroup.ContainsObject("HQRegionSNR") == 0 or
-                GetDatasetNDim(zmwMetricsGroup.group, "HQRegionSNR") != 2 or
-                hqRegionSNRMatrix.InitializeForReading(zmwMetricsGroup, "HQRegionSNR") == false or
-                hqRegionSNRMatrix.GetNCols() != 4)) {
-            includedFields["HQRegionSNR"] = false;
-        }
-        if (includedFields["ReadScore"] and (zmwMetricsGroup.ContainsObject("ReadScore") == 0 or
-                readScoreArray.InitializeForReading(zmwMetricsGroup, "ReadScore")) == false) {
-            includedFields["ReadScore"] = false;
-        }
+        } else {
+            if (includedFields["HQRegionSNR"]) {
+                if (not zmwMetricsGroup.ContainsObject("HQRegionSNR") or
+                    not hqRegionSNRMatrix.InitializeForReading(zmwMetricsGroup, "HQRegionSNR") or
+                    GetDatasetNDim(zmwMetricsGroup.group, "HQRegionSNR") != 2 or 
+                    hqRegionSNRMatrix.GetNCols() != 4) {
+                    includedFields["HQRegionSNR"] = false;
+                } else if (not useScanData) {
+                    includedFields["HQRegionSNR"] = false;
+                    std::cerr << "WARNING: could not read HQRegionSNR because ScanData is absent!" << std::endl;
+                }
+            } 
 
+            if (includedFields["ReadScore"] and
+                (not zmwMetricsGroup.ContainsObject("ReadScore") or
+                 not readScoreArray.InitializeForReading(zmwMetricsGroup, "ReadScore"))) {
+                includedFields["ReadScore"] = false;
+            }
+
+        }
         return 1;
     }
 
@@ -487,8 +532,6 @@ public:
         // number indices to keep track of reads, etc..
         //
         nReads = zmwReader.numEventArray.arrayLength;
-
-
 
         if (scanDataReader.platformId == Astro) {
             if (InitializeAstro() == 0) {
@@ -882,7 +925,16 @@ public:
         return seq.length;
     }
     int GetNextHQRegionSNR(SMRTSequence &seq) {
-        hqRegionSNRMatrix.Read(curRead, curRead + 1, seq.hqRegionSnr);
+        float snrs[4];
+        hqRegionSNRMatrix.Read(curRead, curRead + 1, snrs);
+
+        // Get BaseMap from ScanData.
+        std::map<char, size_t> baseMap = scanDataReader.BaseMap();
+        assert(ScanData::IsValidBaseMap(baseMap));
+        seq.HQRegionSnr('A', snrs[baseMap['A']])
+           .HQRegionSnr('C', snrs[baseMap['C']])
+           .HQRegionSnr('G', snrs[baseMap['G']])
+           .HQRegionSnr('T', snrs[baseMap['T']]);
         return 4;
     }
     int GetNextReadScore(SMRTSequence &seq) {

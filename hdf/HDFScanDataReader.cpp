@@ -89,7 +89,7 @@ int HDFScanDataReader::Initialize(HDFGroup *pulseDataGroup) {
     // Load baseMap which maps bases (ATGC) to channel orders.
     // This should always be present.
     //
-    if (LoadBaseMap(baseMap) == 0)
+    if (LoadBaseMap(baseMap_) == 0)
         return 0;
 
     //
@@ -194,7 +194,7 @@ int HDFScanDataReader::LoadMovieName(string &movieNameP) {
     }
 }
 
-int HDFScanDataReader::LoadBaseMap(map<char, int> & baseMap) {
+int HDFScanDataReader::LoadBaseMap(map<char, size_t> & baseMap) {
     // Map bases to channel order in hdf pls file.
     if (dyeSetGroup.ContainsAttribute("BaseMap") and
             baseMapAtom.Initialize(dyeSetGroup, "BaseMap")) {
@@ -208,8 +208,8 @@ int HDFScanDataReader::LoadBaseMap(map<char, int> & baseMap) {
         baseMap.clear();
         for(size_t i = 0; i < baseMapStr.size(); i++) {
             baseMap[toupper(baseMapStr[i])] = i;
-            baseMap[tolower(baseMapStr[i])] = i;
         }
+        this->baseMap_ = baseMap;
         return 1;
     }
     return 0;

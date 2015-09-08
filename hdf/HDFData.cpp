@@ -7,7 +7,7 @@ H5Location* HDFData::GetObject() {
     return &dataset;
 }
 
-HDFData::HDFData(CommonFG* _container, string _datasetName) {
+HDFData::HDFData(CommonFG* _container, const string & _datasetName) {
     container   = _container;
     datasetName = _datasetName;
     fileDataSpaceInitialized = false;
@@ -20,7 +20,7 @@ HDFData::HDFData() {
     isInitialized = false;
 }
 
-bool HDFData::IsInitialized() {
+bool HDFData::IsInitialized() const {
     return isInitialized;
 }
 
@@ -32,18 +32,18 @@ int HDFData::Initialize(HDFGroup &parentGroup, const string &datasetName) {
     exit(1);
 }
 
-int HDFData::BaseInitializeDataset(CommonFG &hdfFile, string _datasetName) {
+int HDFData::BaseInitializeDataset(CommonFG &hdfFile, const string & _datasetName) {
     dataset   = hdfFile.openDataSet(_datasetName.c_str());
     isInitialized = true;
     fileDataSpaceInitialized = true;
     return 1;
 }
 
-int HDFData::InitializeDataset(HDFGroup &group, string _datasetName) {
+int HDFData::InitializeDataset(HDFGroup &group, const string & _datasetName) {
     return InitializeDataset(group.group, _datasetName);
 }
 
-int HDFData::InitializeDataset(CommonFG &hdfFile, string _datasetName) {
+int HDFData::InitializeDataset(CommonFG &hdfFile, const string & _datasetName) {
     try {
         datasetName = _datasetName;
         dataset   = hdfFile.openDataSet(_datasetName.c_str());

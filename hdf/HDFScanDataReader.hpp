@@ -38,7 +38,6 @@ public:
     //
     bool   useMovieName;
     std::string movieName, runCode;
-    std::map<char, int> baseMap;
     PlatformId platformId;
 
     HDFScanDataReader(); 
@@ -81,11 +80,15 @@ public:
 
     int LoadMovieName(std::string &movieName); 
 
-    int LoadBaseMap(map<char, int> & baseMap); 
+    int LoadBaseMap(map<char, size_t> & baseMap); 
+
+    std::map<char, size_t> BaseMap(void) const {return baseMap_;} 
 
     void Close(); 
 
 private:
+    std::map<char, size_t> baseMap_;
+
     /// Reads value of a string attribute within a HDFGroup.
     /// \returns 1 if succesfully read value of the string attribute, 0 otherwise.
     /// \param[out] attributeValue, value of a string attribute.
