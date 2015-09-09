@@ -40,7 +40,7 @@
 #define _BLASR_HDF_BAX_WRITER_HPP_
 
 #include <sstream>
-#include <boost/scoped_ptr.hpp>
+//#include <boost/scoped_ptr.hpp>
 #include "Enumerations.h"
 #include "SMRTSequence.hpp"
 #include "HDFFile.hpp"
@@ -99,11 +99,14 @@ private:
 
 private:
     /// Points to scan data writer.
-    boost::scoped_ptr<HDFScanDataWriter>  scandataWriter_;
+    std::unique_ptr<HDFScanDataWriter>  scandataWriter_;
+    //boost::scoped_ptr<HDFScanDataWriter>  scandataWriter_;
     /// Points to base caller writer.
-    boost::scoped_ptr<HDFBaseCallsWriter> basecallsWriter_;
+    std::unique_ptr<HDFBaseCallsWriter> basecallsWriter_;
+    //boost::scoped_ptr<HDFBaseCallsWriter> basecallsWriter_;
     /// Points to region table writer.
-    boost::scoped_ptr<HDFRegionsWriter>   regionsWriter_;
+    std::unique_ptr<HDFRegionsWriter>   regionsWriter_;
+    //boost::scoped_ptr<HDFRegionsWriter>   regionsWriter_;
     /// \}
 
 public:

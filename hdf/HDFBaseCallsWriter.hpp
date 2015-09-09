@@ -38,7 +38,7 @@
 #ifndef _BLASR_HDF_BASECALLS_WRITER_HPP_
 #define _BLASR_HDF_BASECALLS_WRITER_HPP_
 
-#include <boost/scoped_ptr.hpp>
+//#include <boost/scoped_ptr.hpp>
 #include <algorithm>
 #include "HDFAtom.hpp"
 #include "HDFWriterBase.hpp"
@@ -113,8 +113,10 @@ private:
     HDFGroup & parentGroup_;
     std::map<char, size_t> baseMap_;
     std::vector<string> qvsToWrite_;
-    boost::scoped_ptr<HDFZMWWriter> zmwWriter_;
-    boost::scoped_ptr<HDFZMWMetricsWriter> zmwMetricsWriter_;
+    std::unique_ptr<HDFZMWWriter> zmwWriter_;
+    std::unique_ptr<HDFZMWMetricsWriter> zmwMetricsWriter_;
+    //boost::scoped_ptr<HDFZMWWriter> zmwWriter_;
+    //boost::scoped_ptr<HDFZMWMetricsWriter> zmwMetricsWriter_;
 	HDFGroup basecallsGroup_;
 
 private:
