@@ -1,6 +1,10 @@
 #ifndef _BLASR_UTIL_IMPL_HPP_
 #define _BLASR_UTIL_IMPL_HPP_
 #include <stdlib.h>
+#include <cstdlib>   // abort()
+#include <new>       // bad_alloc
+#include <iostream>  // cout/cerr
+
 
 template<typename t_file>
 void CrucialOpen(std::string &fileName, t_file &file, std::ios_base::openmode mode) {
