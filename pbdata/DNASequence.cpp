@@ -139,7 +139,7 @@ void DNASequence::ShallowCopy(const DNASequence &rhs) {
     deleteOnExit = false;
 }
 
-int DNASequence::GetStorageSize() {
+int DNASequence::GetStorageSize() const {
     return (length * sizeof(Nucleotide));
 }
 
@@ -151,11 +151,11 @@ DNASequence &DNASequence::operator=(const DNASequence &rhs){
 //
 // synonym for printseq
 //
-void DNASequence::Print(std::ostream &out, int lineLength) {
+void DNASequence::Print(std::ostream &out, int lineLength) const {
     PrintSeq(out, lineLength);
 }
 
-void DNASequence::PrintSeq(std::ostream &out, int lineLength) {
+void DNASequence::PrintSeq(std::ostream &out, int lineLength) const {
     if (lineLength == 0) {
         std::string line;
         line.assign((char*)seq, length);
@@ -350,11 +350,11 @@ void DNASequence::CleanupASCII() {
     }
 }
 
-Nucleotide DNASequence::GetNuc(DNALength i) {
+Nucleotide DNASequence::GetNuc(DNALength i) const {
     return seq[i];
 }
 
-DNALength DNASequence::GetRepeatContent() {
+DNALength DNASequence::GetRepeatContent() const {
     DNALength i;
     DNALength nRepeat = 0;
     for (i =0 ; i < length;i++) {
@@ -389,7 +389,7 @@ void DNASequence::Resize(DNALength newLength) {
     deleteOnExit = true;
 }
 
-DNALength DNASequence::GetSeqStorage() {
+DNALength DNASequence::GetSeqStorage() const{
     return length;
 }
 

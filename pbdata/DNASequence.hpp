@@ -42,15 +42,15 @@ public:
 
     DNASequence & Copy(const std::string & rhs);
 
-    int GetStorageSize();
+    int GetStorageSize() const;
 
     DNASequence &operator=(const DNASequence &rhs);
 
     DNASequence &operator=(const std::string &rhs);
 
-    void Print(std::ostream &out, int lineLength = 50);
+    void Print(std::ostream &out, int lineLength = 50) const;
 
-    void PrintSeq(std::ostream &out, int lineLength = 50);
+    void PrintSeq(std::ostream &out, int lineLength = 50) const;
 
     void Allocate(DNALength plength);
 
@@ -100,9 +100,9 @@ public:
         return seq[i];
     }
 
-    Nucleotide GetNuc(DNALength i); 
+    Nucleotide GetNuc(DNALength i) const; 
 
-    DNALength GetRepeatContent(); 
+    DNALength GetRepeatContent() const; 
 
     void CleanupOnFree();
 
@@ -110,7 +110,7 @@ public:
 
     void Resize(DNALength newLength);
 
-    DNALength GetSeqStorage();
+    DNALength GetSeqStorage() const;
 
 #ifdef USE_PBBAM
     /// Copies a BamRecord as a DNASequence.
