@@ -12,14 +12,14 @@ FASTASequence::FASTASequence() : DNASequence() {
     // regardless of deleteOnExit.
 }
 
-void FASTASequence::PrintSeq(ostream &out, int lineLength, char delim) {
+void FASTASequence::PrintSeq(ostream &out, int lineLength, char delim) const {
     out << delim;
     if (title) out << title;
     out << endl;
-    static_cast<DNASequence*>(this)->PrintSeq(out, lineLength); 
+    static_cast<const DNASequence*>(this)->PrintSeq(out, lineLength); 
 }
 
-int FASTASequence::GetStorageSize() {
+int FASTASequence::GetStorageSize() const {
     if (!title) 
         return DNASequence::GetStorageSize();
     return strlen(title) + DNASequence::GetStorageSize();
@@ -41,36 +41,6 @@ string FASTASequence::GetName() const {
     }
     return name;
 }
-
-//
-// Define  some no-ops to satisfy instantiating templates that
-// expect these to exist.
-//
-bool FASTASequence::StoreHoleNumber(int holeNumber) {return false;}
-bool FASTASequence::StoreHoleStatus(unsigned char holeStatus) {return false;}
-bool FASTASequence::StorePlatformId(PlatformId platformId) { return false;}
-bool FASTASequence::StoreZMWData(ZMWGroupEntry &data) { return false;}
-bool GetHoleNumber (int &holeNumberP) {
-    //
-    // There is no notion of a hole number for a fasta sequence.
-    //
-    return false;
-}
-
-bool FASTASequence::StoreXY(int16_t xy[]) {return false;}
-
-bool FASTASequence::GetXY(int xyP[]) {
-    //
-    // Although the xyP is stored in the fasta title for astro reads
-    // this class is more general than an astro read, so do not assume 
-    // that it may be found in the title.
-    //
-    // So, this function is effectively a noop.
-    //
-    xyP[0] = xyP[1] = 0;
-    return false;
-}
-
 
 void FASTASequence::ShallowCopy(const FASTASequence &rhs) {
     CheckBeforeCopyOrReference(rhs, "FASTASequence");
@@ -124,7 +94,7 @@ void FASTASequence::CopyTitle(string str) {
     FASTASequence::CopyTitle(str.c_str(), str.size());
 }
 
-void FASTASequence::GetFASTATitle(string& fastaTitle) {
+void FASTASequence::GetFASTATitle(string& fastaTitle) const {
     // look for the first space, and return the string until there.
     int i;
     for (i = 0; i < titleLength; i++ ){
