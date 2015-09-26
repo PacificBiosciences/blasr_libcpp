@@ -80,6 +80,10 @@ public:
     DNALength lowQualityPrefix, lowQualitySuffix;
     int highQualityRegionScore; // High quality region score in region table.
 
+public:
+    DNALength subreadStart;
+    DNALength subreadEnd;
+
 protected:
     // read group id associated with each SMRTSequence
     std::string readGroupId; 

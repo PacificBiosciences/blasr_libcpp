@@ -22,7 +22,6 @@ public:
     QualityValueVector<QualityValue> mergeQV;
     Nucleotide *deletionTag;
     Nucleotide *substitutionTag;
-    int subreadStart, subreadEnd;
     QualityValue deletionQVPrior, insertionQVPrior, substitutionQVPrior, preBaseDeletionQVPrior;
 
     QVScale qvScale;
