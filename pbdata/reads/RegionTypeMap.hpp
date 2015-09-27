@@ -33,66 +33,32 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 
-// Author: Mark Chaisson
+// Author: Yuan Li
 
-#ifndef _BLASR_REGION_TABLE_HPP_
-#define _BLASR_REGION_TABLE_HPP_
+#ifndef _BLASR_REGION_TYPE_MAP_HPP_
+#define _BLASR_REGION_TYPE_MAP_HPP_
 
 #include <cassert>
-#include <cstring>
 #include <string>
 #include <iostream>
 #include <vector>
 #include <map>
-#include <ostream>
 #include "Types.h"
 #include "Enumerations.h"
-#include "PacBioDefs.h"
-#include "RegionAnnotation.hpp"
 
 
-class RegionTable {
+class RegionTypeMap {
 public:
-    std::vector<RegionAnnotation> table;
-    std::vector<std::string> columnNames;
-    std::vector<std::string> regionTypes;
-    std::vector<std::string> regionDescriptions;
-    std::vector<std::string> regionSources;
-    std::vector<RegionType>  regionTypeEnums;
-    // Different region tables have different ways of encoding regions.
-    // This maps from the way they are encoded in the rgn table to a
-    // standard encoding.
+    static std::string ToString(RegionType rt);
 
-    // Return default region types used in a region table 
-    // Note that the ORDER of region types does matter.
-    static std::vector<RegionType> DefaultRegionTypes(void);
+    static RegionType ToRegionType(const std::string & str);
 
-    int LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) const; 
+private:
+    // Map region type to string
+    static const std::map<RegionType, std::string> RegionTypeToString;
 
-    // Define a bunch of accessor functions.
-    RegionType GetType(int regionIndex) const; 
-
-    int GetStart(const int regionIndex) const; 
-
-    void SetStart(int regionIndex, int start); 
-
-    int GetEnd(const int regionIndex) const; 
-
-    void SetEnd(int regionIndex, int end); 
-
-    int GetHoleNumber(int regionIndex) const;
-
-    void SetHoleNumber(int regionIndex, int holeNumber); 
-
-    int GetScore(int regionIndex) const; 
-
-    void SetScore(int regionIndex, int score); 
-
-    void SortTableByHoleNumber(); 
-
-    void Reset(); 
-
-    void CreateDefaultAttributes(); 
+    // Map string to region type 
+    static const std::map<std::string, RegionType> StringToRegionType;
 };
 
-#endif // _BLASR_REGION_TABLE_HPP_
+#endif // _BLASR_REGION_TYPE_MAP_HPP_

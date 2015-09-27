@@ -33,66 +33,33 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 
-// Author: Mark Chaisson
+// Author: Yuan Li
 
-#ifndef _BLASR_REGION_TABLE_HPP_
-#define _BLASR_REGION_TABLE_HPP_
+#include "RegionTypeMap.hpp"
 
-#include <cassert>
-#include <cstring>
-#include <string>
-#include <iostream>
-#include <vector>
-#include <map>
-#include <ostream>
-#include "Types.h"
-#include "Enumerations.h"
-#include "PacBioDefs.h"
-#include "RegionAnnotation.hpp"
+std::string RegionTypeMap::ToString(RegionType rt) {
+    assert(RegionTypeToString.find(rt) != RegionTypeToString.end());
+    return RegionTypeToString.find(rt)->second;
+}
 
+RegionType RegionTypeMap::ToRegionType(const std::string & str) {
+    if (StringToRegionType.find(str) == StringToRegionType.end()) {
+        std::cout << "Unsupported RegionType " << str << std::endl;
+        assert(false);
+    }
+    return StringToRegionType.find(str)->second;
+}
 
-class RegionTable {
-public:
-    std::vector<RegionAnnotation> table;
-    std::vector<std::string> columnNames;
-    std::vector<std::string> regionTypes;
-    std::vector<std::string> regionDescriptions;
-    std::vector<std::string> regionSources;
-    std::vector<RegionType>  regionTypeEnums;
-    // Different region tables have different ways of encoding regions.
-    // This maps from the way they are encoded in the rgn table to a
-    // standard encoding.
-
-    // Return default region types used in a region table 
-    // Note that the ORDER of region types does matter.
-    static std::vector<RegionType> DefaultRegionTypes(void);
-
-    int LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) const; 
-
-    // Define a bunch of accessor functions.
-    RegionType GetType(int regionIndex) const; 
-
-    int GetStart(const int regionIndex) const; 
-
-    void SetStart(int regionIndex, int start); 
-
-    int GetEnd(const int regionIndex) const; 
-
-    void SetEnd(int regionIndex, int end); 
-
-    int GetHoleNumber(int regionIndex) const;
-
-    void SetHoleNumber(int regionIndex, int holeNumber); 
-
-    int GetScore(int regionIndex) const; 
-
-    void SetScore(int regionIndex, int score); 
-
-    void SortTableByHoleNumber(); 
-
-    void Reset(); 
-
-    void CreateDefaultAttributes(); 
+const std::map<RegionType, std::string> RegionTypeMap::RegionTypeToString = {
+    {Adapter,  "Adapter"},
+    {Insert,   "Insert"},
+    {HQRegion, "HQRegion"},
+    {BarCode,  "Barcode"}
 };
 
-#endif // _BLASR_REGION_TABLE_HPP_
+const std::map<std::string, RegionType> RegionTypeMap::StringToRegionType = {
+    {"Adapter",  Adapter},
+    {"Insert",   Insert},
+    {"HQRegion", HQRegion}, 
+    {"Barcode",  BarCode},
+};

@@ -35,64 +35,15 @@
 
 // Author: Mark Chaisson
 
-#ifndef _BLASR_REGION_TABLE_HPP_
-#define _BLASR_REGION_TABLE_HPP_
 
-#include <cassert>
-#include <cstring>
-#include <string>
-#include <iostream>
-#include <vector>
-#include <map>
 #include <ostream>
-#include "Types.h"
-#include "Enumerations.h"
-#include "PacBioDefs.h"
 #include "RegionAnnotation.hpp"
 
-
-class RegionTable {
-public:
-    std::vector<RegionAnnotation> table;
-    std::vector<std::string> columnNames;
-    std::vector<std::string> regionTypes;
-    std::vector<std::string> regionDescriptions;
-    std::vector<std::string> regionSources;
-    std::vector<RegionType>  regionTypeEnums;
-    // Different region tables have different ways of encoding regions.
-    // This maps from the way they are encoded in the rgn table to a
-    // standard encoding.
-
-    // Return default region types used in a region table 
-    // Note that the ORDER of region types does matter.
-    static std::vector<RegionType> DefaultRegionTypes(void);
-
-    int LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) const; 
-
-    // Define a bunch of accessor functions.
-    RegionType GetType(int regionIndex) const; 
-
-    int GetStart(const int regionIndex) const; 
-
-    void SetStart(int regionIndex, int start); 
-
-    int GetEnd(const int regionIndex) const; 
-
-    void SetEnd(int regionIndex, int end); 
-
-    int GetHoleNumber(int regionIndex) const;
-
-    void SetHoleNumber(int regionIndex, int holeNumber); 
-
-    int GetScore(int regionIndex) const; 
-
-    void SetScore(int regionIndex, int score); 
-
-    void SortTableByHoleNumber(); 
-
-    void Reset(); 
-
-    void CreateDefaultAttributes(); 
-};
-
-#endif // _BLASR_REGION_TABLE_HPP_
+std::ostream & operator << (std::ostream & os, const RegionAnnotation& ra) {
+    os << "ZMW " << ra.GetHoleNumber() 
+       << ", region type index " << ra.GetTypeIndex() 
+       << " [" << ra.GetStart() 
+       << ", " << ra.GetEnd()
+       << "), " << ra.GetScore();
+    return os;
+}
