@@ -27,8 +27,8 @@ void SAMOutput::SetAlignedSequence(T_AlignmentCandidate &alignment, T_Sequence &
         clippedStartPos = read.lowQualityPrefix;
     }
     else if (clipping == subread) {
-        clippedReadLength = read.subreadEnd - read.subreadStart;
-        clippedStartPos = read.subreadStart;
+        clippedReadLength = read.SubreadLength();
+        clippedStartPos = read.SubreadStart();
     }
     else {
         std::cout <<" ERROR! The clipping must be none, hard, subread, or soft when setting the aligned sequence." << std::endl;
@@ -130,8 +130,8 @@ void SAMOutput::CreateCIGARString(T_AlignmentCandidate &alignment,
           suffixHardClip = read.lowQualitySuffix;
       }
       else if (clipping == subread) {
-          prefixHardClip = std::max((DNALength) read.subreadStart, read.lowQualityPrefix);
-          suffixHardClip = std::max((DNALength)(read.length - read.subreadEnd), read.lowQualitySuffix);
+          prefixHardClip = std::max((DNALength) read.SubreadStart(), read.lowQualityPrefix);
+          suffixHardClip = std::max((DNALength)(read.length - read.SubreadEnd()), read.lowQualitySuffix);
       }
 
       SetSoftClip(alignment, read, prefixHardClip, suffixHardClip, prefixSoftClip, suffixSoftClip);
@@ -280,9 +280,9 @@ void SAMOutput::PrintAlignment(T_AlignmentCandidate &alignment,
         assert(read.length - suffixHardClip == prefixHardClip + alignedSequence.length);
         samFile << "XE:i:" << xe + 1 << "\t";
     }
-    samFile << "YS:i:" << read.subreadStart << "\t";
-    samFile << "YE:i:" << read.subreadEnd << "\t";
-    samFile << "ZM:i:" << read.zmwData.holeNumber << "\t";
+    samFile << "YS:i:" << read.SubreadStart() << "\t";
+    samFile << "YE:i:" << read.SubreadEnd() << "\t";
+    samFile << "ZM:i:" << read.HoleNumber() << "\t";
     samFile << "XL:i:" << alignment.qAlignedSeq.length << "\t";
     samFile << "XT:i:1\t"; // reads are allways continuous reads, not
                         // referenced based circular consensus when

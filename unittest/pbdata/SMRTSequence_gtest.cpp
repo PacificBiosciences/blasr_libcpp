@@ -30,9 +30,9 @@ public:
         smrt.seq = seqnt;
         int len = sizeof(seqnt) / sizeof(Nucleotide) - 1;
         smrt.length = len; 
-        smrt.zmwData.holeNumber = 1;
-        smrt.subreadStart = 0;
-        smrt.subreadEnd = 19;
+        smrt.HoleNumber(1);
+        smrt.SubreadStart(0);
+        smrt.SubreadEnd  (19);
         smrt.AllocateDeletionQVSpace(len);
         for(int i=0; i < 19; i ++) {
             smrt.deletionQV[i] = i;

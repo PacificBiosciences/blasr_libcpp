@@ -357,8 +357,8 @@ int ReaderAgglomerate::GetNext(SMRTSequence &seq) {
     // and should be empty, use this->readGroupId instead. Otherwise, 
     // read group id should be loaded from BamRecord to SMRTSequence, 
     // update this->readGroupId accordingly.
-    if (fileType != PBBAM) seq.SetReadGroupId(readGroupId);
-    else readGroupId = seq.GetReadGroupId();
+    if (fileType != PBBAM) seq.ReadGroupId(readGroupId);
+    else readGroupId = seq.ReadGroupId();
 
     if (stride > 1)
         Advance(stride-1);
@@ -402,8 +402,8 @@ int ReaderAgglomerate::GetNextBases(SMRTSequence &seq, bool readQVs) {
             break;
     }
 
-    if (fileType != PBBAM) seq.SetReadGroupId(readGroupId);
-    else readGroupId = seq.GetReadGroupId();
+    if (fileType != PBBAM) seq.ReadGroupId(readGroupId);
+    else readGroupId = seq.ReadGroupId();
 
     if (stride > 1)
         Advance(stride-1);
@@ -420,13 +420,11 @@ int ReaderAgglomerate::GetNext(CCSSequence &seq) {
         case Fasta:
             // This just reads in the fasta sequence as if it were a ccs sequence
             numRecords = fastaReader.GetNext(seq);
-            seq.subreadStart = 0;
-            seq.subreadEnd   = 0;
+            seq.SubreadStart(0).SubreadEnd(0);
             break;
         case Fastq:
             numRecords = fastqReader.GetNext(seq);
-            seq.subreadStart = 0;
-            seq.subreadEnd   = 0;
+            seq.SubreadStart(0).SubreadEnd(0);
             break;
         case HDFPulse:
         case HDFBase:
@@ -446,8 +444,8 @@ int ReaderAgglomerate::GetNext(CCSSequence &seq) {
             break;
     }
 
-    if (fileType != PBBAM) seq.SetReadGroupId(readGroupId);
-    else readGroupId = seq.GetReadGroupId();
+    if (fileType != PBBAM) seq.ReadGroupId(readGroupId);
+    else readGroupId = seq.ReadGroupId();
 
     if (stride > 1)
         Advance(stride-1);

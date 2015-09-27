@@ -31,14 +31,14 @@ int LocateAnchorBoundsInSuffixArray(T_RefSequence &reference,
     // anything shorter than that.
     //
     if (minPrefixMatchLength > 0 and 
-        read.subreadEnd - read.subreadStart < minPrefixMatchLength) {
+        read.SubreadLength() < minPrefixMatchLength) {
         return 0;
     }
 
     DNALength p, m;
     DNALength alignEnd;
-    DNALength matchEnd = read.subreadEnd - minPrefixMatchLength + 1;
-    DNALength numSearchedPositions = matchEnd - read.subreadStart;
+    DNALength matchEnd = read.SubreadEnd() - minPrefixMatchLength + 1;
+    DNALength numSearchedPositions = matchEnd - read.SubreadStart();
 
     matchLength.resize(numSearchedPositions);
     matchLow.resize(numSearchedPositions);
@@ -49,7 +49,7 @@ int LocateAnchorBoundsInSuffixArray(T_RefSequence &reference,
     std::fill(matchHigh.begin(), matchHigh.end(), 0);
     vector<SAIndex> lowMatchBound, highMatchBound;	
 
-    for (m = 0, p = read.subreadStart; p < matchEnd; p++, m++) {
+    for (m = 0, p = read.SubreadStart(); p < matchEnd; p++, m++) {
         DNALength lcpLow, lcpHigh, lcpLength;
         lowMatchBound.clear(); highMatchBound.clear();
         lcpLow = 0;
@@ -212,7 +212,7 @@ int LocateAnchorBoundsInSuffixArray(T_RefSequence &reference,
 template<typename T_SuffixArray, 
          typename T_RefSequence, 
          typename T_Sequence, 
-        typename T_MatchPos>
+         typename T_MatchPos>
 int MapReadToGenome(T_RefSequence &reference,
     T_SuffixArray &sa, T_Sequence &read, 
     unsigned int minPrefixMatchLength,
@@ -222,7 +222,7 @@ int MapReadToGenome(T_RefSequence &reference,
     vector<DNALength> matchLow, matchHigh, matchLength;
 
     int minMatchLen = anchorParameters.minMatchLength;
-    if (read.subreadEnd - read.subreadStart < minMatchLen) {
+    if (read.SubreadLength() < minMatchLen) {
         matchPosList.clear();
         return 0;
     }
@@ -269,15 +269,15 @@ int MapReadToGenome(T_RefSequence &reference,
     // 
     DNALength endOfMapping;
     DNALength trim = MAX(minMatchLen + 1, sa.lookupPrefixLength + 1);
-    if (read.subreadEnd < trim) {
+    if (read.SubreadEnd() < trim) {
         endOfMapping = 0;
     }
     else {
-        endOfMapping = read.subreadEnd - trim;
+        endOfMapping = read.SubreadEnd() - trim;
     }
 
-    for (pos = read.subreadStart; pos < endOfMapping; pos++) {	
-        int matchIndex = pos - read.subreadStart;
+    for (pos = read.SubreadStart(); pos < endOfMapping; pos++) {	
+        int matchIndex = pos - read.SubreadStart();
         assert(matchIndex < matchHigh.size());
         if (matchHigh[matchIndex] - matchLow[matchIndex] <= 
             anchorParameters.maxAnchorsPerPosition) {

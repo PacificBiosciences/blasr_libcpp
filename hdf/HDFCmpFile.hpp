@@ -638,7 +638,7 @@ public:
         //
         int queryStart = cmpAlignment.GetQueryStart();
         int queryEnd   = cmpAlignment.GetQueryEnd();
-        read.holeNumber = cmpAlignment.GetHoleNumber();
+        read.HoleNumber(cmpAlignment.GetHoleNumber());
         int refGroupId = cmpAlignment.GetRefGroupId();
         int alnGroupId = cmpAlignment.GetAlnGroupId();
         int refGroupIndex  = refGroupIdToArrayIndex[refGroupId];

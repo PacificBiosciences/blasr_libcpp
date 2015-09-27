@@ -87,8 +87,8 @@ void AlignmentToBamRecord(T_AlignmentCandidate & alignment,
         PacBio::BAM::TagCollection tags;
         tags["RG"] = context.readGroupId;
         if (dynamic_cast<CCSSequence*>(&read) == NULL) { // subread
-            tags["qs"] = read.subreadStart;
-            tags["qe"] = read.subreadEnd;
+            tags["qs"] = read.SubreadStart();
+            tags["qe"] = read.SubreadEnd();
             /// Number of passes for a subread should always be 1.
             tags["np"] = 1;
         } else { // ccs read

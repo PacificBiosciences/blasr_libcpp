@@ -51,20 +51,26 @@
 
 
 class SMRTSequence : public FASTQSequence {
+friend class HDFZMWReader;
+friend class HDFZMWWriter;
+friend class HDFZMWMetricsWriter;
+
 private:
     enum SnrIndex4Base {A=0, C=1, G=2, T=3};
     float hqRegionSnr_[4]; // Always saved as 'ACGT'
- 
-public:
-    int16_t xy[2];
-    UInt holeNumber;
 
-    float readScore;
+    DNALength subreadStart_;
+    DNALength subreadEnd_;
+
+    // read group id associated with each SMRTSequence
+    std::string readGroupId_; 
+
+public:
     ZMWGroupEntry zmwData;
-    PlatformId platform;
 
     HalfWord *preBaseFrames;
     HalfWord *widthInFrames;
+
     //
     // The following are fields that are read in from the pulse file.
     // Because they are not standard in bas.h5 files, these fields
@@ -77,30 +83,82 @@ public:
     float *classifierQV;
     unsigned int *startFrame;
     int *pulseIndex;
+
     DNALength lowQualityPrefix, lowQualitySuffix;
     int highQualityRegionScore; // High quality region score in region table.
+    float readScore;
 
-public:
-    DNALength subreadStart;
-    DNALength subreadEnd;
-
-protected:
-    // read group id associated with each SMRTSequence
-    std::string readGroupId; 
-
-public:
     // Whether or not this is originally copied from a BamRecord.
     bool copiedFromBam;
 
-    void SetNull(); 
-
+public:
     SMRTSequence();
+
     inline ~SMRTSequence();
 
-    // Access to HQRegion SNRs must be done via public API.
-    inline float HQRegionSnr(const char base) const;
+    /// \name Sets and gets attributes.
+    /// \{
+    /// Set HoleNumber.
+    /// \returns this SMRTSequence
+    SMRTSequence & HoleNumber(UInt holeNumber);
 
-    inline SMRTSequence & HQRegionSnr(const char base, float v);
+    /// \reutrns HoleNumber
+    UInt HoleNumber(void) const;
+
+    /// Set HoleXY
+    SMRTSequence & HoleXY(const int x, const int y);
+
+    /// \returns HoleX
+    UInt HoleX(void) const;
+
+    /// \returns HoleY
+    UInt HoleY(void) const;
+
+    /// Set HoleStatus
+    SMRTSequence & HoleStatus(const unsigned char);
+
+    /// \returns HoleStatus
+    unsigned char HoleStatus(void) const;
+
+    /// \returns movie name parsed from sequence title
+    std::string MovieName(void) const;
+
+    /// \returns start pos of this sequence in coordinate of zmw polymerase sequence
+    DNALength SubreadStart(void) const; 
+
+    /// Sets subreadStart. 
+    SMRTSequence & SubreadStart(const DNALength start); 
+
+    /// \returns subread end pos of this sequence in coordinate of zmw polymerase sequence
+    DNALength SubreadEnd(void) const; 
+
+    /// Set subread end pos in coordinate of polymerase sequence.
+    SMRTSequence & SubreadEnd(const DNALength end);
+
+    /// A SMRTSequence's this->seq may point to sequence of a whole
+    /// polymerase read, but only represents a subread [subreadStart_,  subreadEnd_).
+    /// \returns subread length (SubreadEnd() - SubreadStart())
+    DNALength SubreadLength(void) const;
+
+    /// \returns read group id for this sequence.
+    std::string ReadGroupId(void) const;
+
+    /// Set readGroup Id for this sequence.
+    SMRTSequence & ReadGroupId(const std::string & rid);
+
+    /// Access to HQRegion SNRs must be done via public API.
+    float HQRegionSnr(const char base) const;
+
+    /// Set HQRegion SNR of base as v.
+    SMRTSequence & HQRegionSnr(const char base, float v);
+
+    /// \}
+
+public:
+    /// \name Clip subread
+    /// \{
+    SMRTSequence & Clip(const DNALength subreadStart, const DNALength subreadEnd);
+    /// \}
 
     void Allocate(DNALength length); 
 
@@ -120,33 +178,11 @@ public:
 
     void Copy(const SMRTSequence &rhs, int rhsPos, int rhsLength); 
 
-    void Print(std::ostream &out); 
+    void Print(std::ostream &out) const; 
 
     SMRTSequence& operator=(const SMRTSequence &rhs); 
 
     void Free(); 
-
-    bool StoreXY(int16_t xyP[]); 
-
-    bool StorePlatformId(PlatformId pid); 
-
-    bool StoreHoleNumber(UInt holeNumberP);
-
-    bool StoreHoleStatus(unsigned char s); 
-
-    bool StoreZMWData(ZMWGroupEntry &data); 
-
-    bool GetXY(int xyP[]); 
-
-    bool GetHoleNumber(UInt & holeNumberP);   
-
-    inline UInt HoleNumber(void) const;
-
-    // Get read group id for this sequence.
-    std::string GetReadGroupId();
-
-    // Set readGroup Id for this sequence.
-    void SetReadGroupId(const std::string & rid);
     
 #ifdef USE_PBBAM
 public:
@@ -169,24 +205,4 @@ inline SMRTSequence::~SMRTSequence(){
     SMRTSequence::Free();
 }
 
-inline UInt SMRTSequence::HoleNumber(void) const {
-    return holeNumber;
-}
-
-inline float SMRTSequence::HQRegionSnr(const char base) const {
-    if (::toupper(base) == 'A')      return hqRegionSnr_[SMRTSequence::SnrIndex4Base::A];
-    else if (::toupper(base) == 'C') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::C];
-    else if (::toupper(base) == 'G') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::G];
-    else if (::toupper(base) == 'T') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::T];
-    else assert("Base must be in A, C, G, T" == 0);
-}
-
-inline SMRTSequence & SMRTSequence::HQRegionSnr(const char base, float v) {
-    if (::toupper(base) == 'A')      hqRegionSnr_[SMRTSequence::SnrIndex4Base::A] = v;
-    else if (::toupper(base) == 'C') hqRegionSnr_[SMRTSequence::SnrIndex4Base::C] = v;
-    else if (::toupper(base) == 'G') hqRegionSnr_[SMRTSequence::SnrIndex4Base::G] = v;
-    else if (::toupper(base) == 'T') hqRegionSnr_[SMRTSequence::SnrIndex4Base::T] = v;
-    else assert("Base must be in A, C, G, T" == 0);
-    return *this;
-}
 #endif  // _BLASR_SMRT_SEQUENCE_HPP_
