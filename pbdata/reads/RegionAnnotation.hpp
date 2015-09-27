@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.
-//
+// Copyright (c) 2014-2015, Pacific Biosciences of California, Inc.  //
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -124,7 +123,14 @@ inline
 bool RegionAnnotation::operator<(const RegionAnnotation &rhs) const
 { 
     if (GetHoleNumber() == rhs.GetHoleNumber()) 
-        return GetStart() < rhs.GetStart();
+        if (GetStart() == rhs.GetStart()) {
+            if (GetEnd() == rhs.GetEnd()) 
+                return GetScore() < rhs.GetScore();
+            else
+                return GetEnd() < rhs.GetEnd();
+        } else {
+            return GetStart() < rhs.GetStart();
+        }
     else
         return GetHoleNumber() < rhs.GetHoleNumber();
 }
