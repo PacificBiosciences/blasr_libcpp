@@ -50,6 +50,30 @@ RegionType RegionTypeMap::ToRegionType(const std::string & str) {
     return StringToRegionType.find(str)->second;
 }
 
+int RegionTypeMap::ToIndex(const std::string & typeStr, const std::vector<std::string> & typeStrs) {
+    auto it = std::find(typeStrs.begin(), typeStrs.end(), typeStr);
+    if (it == typeStrs.end()) {
+        std::cout << "Could not find RegionType " << typeStr << std::endl;
+        assert(false);
+    } else {
+        return std::distance(typeStrs.begin(), it);
+    }
+}
+
+int RegionTypeMap::ToIndex(RegionType rt, const std::vector<std::string> & typeStrs) {
+    return RegionTypeMap::ToIndex(RegionTypeMap::ToString(rt), typeStrs);
+}
+
+int RegionTypeMap::ToIndex(RegionType rt, const std::vector<RegionType> & regionTypes) {
+    auto it = std::find(regionTypes.begin(), regionTypes.end(), rt);
+    if (it == regionTypes.end()) {
+        std::cout << "Could not find RegionType " << RegionTypeMap::ToString(rt) << std::endl;
+        assert(false);
+    } else {
+        return std::distance(regionTypes.begin(), it);
+    }
+}
+
 const std::map<RegionType, std::string> RegionTypeMap::RegionTypeToString = {
     {Adapter,  "Adapter"},
     {Insert,   "Insert"},
