@@ -467,7 +467,6 @@ public:
                 return 0;
         } else includedFields[fieldName] = false;
 
-
         if (not baseCallsGroup.ContainsObject(zmwMetricsGroupName) or 
             not zmwMetricsGroup.Initialize(baseCallsGroup.group, zmwMetricsGroupName)) {
             includedFields["HQRegionSNR"] = false;
@@ -623,25 +622,24 @@ public:
                     seq.AllocateQualitySpace(seqLength);
                     qualArray.Read((int)curBasePos, (int) curBasePos + seqLength, (unsigned char*) seq.qual.data);
                 }
-            }
-
-            if (includedFields["DeletionQV"]) {
-                GetNextDeletionQV(seq);
-            }
-            if (includedFields["DeletionTag"]) {
-                GetNextDeletionTag(seq);
-            }
-            if (includedFields["InsertionQV"]) {
-                GetNextInsertionQV(seq);
-            }
-            if (includedFields["SubstitutionQV"]) {
-                GetNextSubstitutionQV(seq);
-            }
-            if (includedFields["SubstitutionTag"]) {
-                GetNextSubstitutionTag(seq);
-            }
-            if (includedFields["MergeQV"]) {
-                GetNextMergeQV(seq);
+                if (includedFields["DeletionQV"]) {
+                    GetNextDeletionQV(seq);
+                }
+                if (includedFields["DeletionTag"]) {
+                    GetNextDeletionTag(seq);
+                }
+                if (includedFields["InsertionQV"]) {
+                    GetNextInsertionQV(seq);
+                }
+                if (includedFields["SubstitutionQV"]) {
+                    GetNextSubstitutionQV(seq);
+                }
+                if (includedFields["SubstitutionTag"]) {
+                    GetNextSubstitutionTag(seq);
+                }
+                if (includedFields["MergeQV"]) {
+                    GetNextMergeQV(seq);
+                }
             }
             seq.SetQVScale(qvScale);
             curBasePos += seqLength;
@@ -671,7 +669,6 @@ public:
             if (includedFields["ReadScore"]) {
                 GetNextReadScore(seq);
             }
-
             int seqLength = GetNextWithoutPosAdvance(seq);
             seq.length = seqLength;
             if(readQVs) {
@@ -710,6 +707,7 @@ public:
         int retVal;
 
         DNALength  curBasPosCopy = curBasePos;
+
         //
         // Getting next advances the curBasPos to the end of 
         // the current sequence. 
@@ -720,21 +718,21 @@ public:
                 return 0;
             }
 
-            // get ZMWMetrics fields, must be done before GetNext
-            // (which calls GetNextWithoutAdvancePos, which increments curRead)
-            if (includedFields["HQRegionSNR"]) {
-                GetNextHQRegionSNR(seq);
-            }
-            if (includedFields["ReadScore"]) {
-                GetNextReadScore(seq);
-            }
-
             //
             // Bail now if the file is already done
             //
             if ((retVal = this->GetNext((FASTQSequence&)seq)) == 0) {
                 return 0;
             }
+            // GetNext calls GetNextWithoutPosAdvance, which increments curRead
+            curRead--;
+            if (includedFields["HQRegionSNR"]) {
+                GetNextHQRegionSNR(seq);
+            }
+            if (includedFields["ReadScore"]) {
+                GetNextReadScore(seq);
+            }
+            curRead++;
 
             DNALength nextBasePos = curBasePos;
             curBasePos = curBasPosCopy;

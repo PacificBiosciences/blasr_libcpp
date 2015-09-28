@@ -52,9 +52,6 @@
 
 
 class RegionTable {
-friend HDFRegionTableReader;
-friend HDFRegionTableWriter;
-
 public:
     /// RegionTable reading from h5 file 'Regions' dataset.
     /// \name member variables
