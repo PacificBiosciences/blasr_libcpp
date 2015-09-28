@@ -1,9 +1,11 @@
+#include <cassert>
 #include "HDFRegionTableReader.hpp"
 
 using namespace std;
 
 int HDFRegionTableReader::Initialize(string &regionTableFileName, 
         const H5::FileAccPropList & fileAccPropList) {
+    isInitialized_ = true;
     /*
      * Initialize access to the HDF file.
      */
@@ -48,11 +50,20 @@ int HDFRegionTableReader::Initialize(string &regionTableFileName,
     return 1;
 }
 
+bool HDFRegionTableReader::IsInitialized(void) const {
+    return isInitialized_;
+}
+
+bool HDFRegionTableReader::HasRegionTable(void) const {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
+    return fileContainsRegionTable;
+}
+
 int HDFRegionTableReader::GetNext(RegionAnnotation &annotation) {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
     //
     // Bail with no-op if this is the last row.
     //
-
     if (fileContainsRegionTable == false) {
         return 0;
     }
@@ -90,6 +101,7 @@ void HDFRegionTableReader::RegionTypesToMap(RegionTable &table) {
 }
 
 int HDFRegionTableReader::ReadTableAttributes(RegionTable &table) {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
     if (fileContainsRegionTable == false) {
         return 0;
     }
@@ -103,12 +115,14 @@ int HDFRegionTableReader::ReadTableAttributes(RegionTable &table) {
 }
 
 void HDFRegionTableReader::Close() {
+    isInitialized_ = false;
     pulseDataGroup.Close();
     regions.Close();
     regionTableFile.Close();
 }
 
 void HDFRegionTableReader::ReadTable(RegionTable &table) {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
     if (fileContainsRegionTable == false) {
         return;
     }
@@ -120,9 +134,9 @@ void HDFRegionTableReader::ReadTable(RegionTable &table) {
     }
 }
 
-
 void HDFRegionTableReader::GetMinMaxHoleNumber(UInt &minHole,
                                                UInt &maxHole) {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
     // Hole numbers may not be sorted ascendingly, so do not
     // return the first and last hole numbers as the min and max.
     UInt saveCurRow = curRow;
