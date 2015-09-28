@@ -71,6 +71,7 @@ public:
     int row[NCOLS];
 
 public:
+    // FIXME: use regionType as a member varaible instead of regionTypeIndex 
     inline RegionAnnotation(UInt holeNumber = 0, 
                             int typeIndex = 0,
                             int start = 0, int end = 0,
@@ -78,9 +79,11 @@ public:
 
     inline bool operator<(const RegionAnnotation &rhs) const;
 
-    inline bool operator<(int holeNumber) const;
+    inline bool operator<(int holeNumber) const; 
 
     inline RegionAnnotation& operator=(const RegionAnnotation &rhs); 
+    
+    inline bool operator==(const RegionAnnotation &rhs) const;
 
     inline int GetHoleNumber(void) const;
 
@@ -108,6 +111,9 @@ public:
     friend std::ostream & operator << (std::ostream & os, const RegionAnnotation& ra);
 };
 
+inline 
+bool compare_region_annotation_by_type(const RegionAnnotation & lhs,
+                                       const RegionAnnotation & rhs);
 
 inline
 RegionAnnotation::RegionAnnotation(UInt holeNumber, 
@@ -127,7 +133,7 @@ bool RegionAnnotation::operator<(const RegionAnnotation &rhs) const
             if (GetEnd() == rhs.GetEnd()) 
                 return GetScore() < rhs.GetScore();
             else
-                return GetEnd() < rhs.GetEnd();
+                return GetEnd() > rhs.GetEnd();
         } else {
             return GetStart() < rhs.GetStart();
         }
@@ -144,6 +150,15 @@ inline
 RegionAnnotation& RegionAnnotation::operator=(const RegionAnnotation &rhs) {
     memcpy(row, rhs.row, sizeof(int)*NCOLS);
     return *this;
+}
+
+inline
+bool RegionAnnotation::operator==(const RegionAnnotation &rhs) const {
+    return (GetHoleNumber() == rhs.GetHoleNumber() and
+            GetTypeIndex() == rhs.GetTypeIndex() and
+            GetStart() == rhs.GetStart() and
+            GetEnd()   == rhs.GetEnd()   and
+            GetScore() == rhs.GetScore());
 }
 
 inline
@@ -205,4 +220,22 @@ RegionAnnotation & RegionAnnotation::SetScore(int score) {
     row[REGIONSCORECOL] = score;
     return *this;
 }
+
+inline
+bool compare_region_annotation_by_type(const RegionAnnotation & lhs, 
+                                       const RegionAnnotation & rhs)
+{
+    if (lhs.GetHoleNumber() == rhs.GetHoleNumber()) {
+        if (lhs.GetTypeIndex() == rhs.GetTypeIndex()) {
+            if (lhs.GetStart() == rhs.GetStart()) {
+                 if (lhs.GetEnd() == rhs.GetEnd())
+                     return lhs.GetScore() < rhs.GetScore();
+                 else return lhs.GetEnd() > rhs.GetEnd();
+            } else return lhs.GetStart() < rhs.GetStart();
+        } else return lhs.GetTypeIndex() < rhs.GetTypeIndex();
+    } else {
+        return lhs.GetHoleNumber() < rhs.GetHoleNumber();
+    }
+}
+
 #endif // _BLASR_REGION_ANNOTATION_HPP_
