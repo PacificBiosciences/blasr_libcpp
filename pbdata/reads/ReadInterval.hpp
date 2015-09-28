@@ -11,7 +11,12 @@ public:
     int end;
     int score;
 
-    ReadInterval(int s, int e, int sc=0) : start(s), end(e), score(sc) {};
+    ReadInterval(int s=0, int e=0, int sc=0) : start(s), end(e), score(sc) {};
+
+    ReadInterval(const RegionAnnotation & ra)
+    : start(ra.GetStart())
+    , end(ra.GetEnd())
+    , score(ra.GetScore()) {}
 
     ReadInterval& operator=(const ReadInterval &rhs) {
         start = rhs.start;
@@ -20,10 +25,11 @@ public:
         return *this;
     }
 
-    ReadInterval(const RegionAnnotation & ra)
-    : start(ra.GetStart())
-    , end(ra.GetEnd())
-    , score(ra.GetScore()) {}
+    bool operator==(const ReadInterval &rhs) const {
+        return (start == rhs.start and
+                end   == rhs.end   and
+                score == rhs.score);
+    }
 };
 
 #endif
