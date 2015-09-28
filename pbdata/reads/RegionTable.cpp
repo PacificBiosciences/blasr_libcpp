@@ -107,8 +107,19 @@ void RegionTable::SetScore(int regionIndex, int score) {
     table[regionIndex].SetScore(score);//.row[RegionAnnotationColumn::RegionScore] = score;
 }
 
-void RegionTable::SortTableByHoleNumber() {
+RegionTable & RegionTable::SortTableByHoleNumber() {
     std::stable_sort(table.begin(), table.end());
+    return *this;
+}
+
+RegionTable & RegionTable::Reset() {
+    table.clear();
+    columnNames.clear();
+    regionTypes.clear();
+    regionDescriptions.clear();
+    regionSources.clear();
+    regionTypeEnums.clear();
+    return *this;
 }
 
 std::vector<RegionType> RegionTable::DefaultRegionTypes(void) {
@@ -119,19 +130,28 @@ std::vector<RegionType> RegionTable::DefaultRegionTypes(void) {
     return ret;
 }
 
-void RegionTable::Reset() {
-    table.clear();
-    columnNames.clear();
-    regionTypes.clear();
-    regionDescriptions.clear();
-    regionSources.clear();
-    regionTypeEnums.clear();
+RegionTable & RegionTable::RegionTypes(const std::vector<std::string> & regionTypeStrs) {
+    regionTypes = regionTypeStrs;
+    for (std::string regionTypeString: regionTypeStrs) {
+        regionTypeEnums.push_back(RegionTypeMap::ToRegionType(regionTypeString));
+    }
+    return *this;
 }
 
-void RegionTable::CreateDefaultAttributes() {
-    columnNames        = PacBio::AttributeValues::Regions::columnnames;
-    regionTypes        = PacBio::AttributeValues::Regions::regiontypes;
-    regionDescriptions = PacBio::AttributeValues::Regions::regiondescriptions;
-    regionSources      = PacBio::AttributeValues::Regions::regionsources;
-    regionTypeEnums    = DefaultRegionTypes();
-}
+std::vector<std::string> RegionTable::ColumnNames(void) const
+{ return columnNames; }
+
+std::vector<std::string> RegionTable::RegionDescriptions(void) const
+{ return regionDescriptions; }
+
+std::vector<std::string> RegionTable::RegionSources(void) const
+{ return regionSources;}
+
+RegionTable & RegionTable::ColumnNames(const std::vector<std::string> & in)
+{ columnNames = in; return *this; }
+
+RegionTable & RegionTable::RegionDescriptions(const std::vector<std::string> & in)
+{ regionDescriptions = in; return *this; }
+
+RegionTable & RegionTable::RegionSources(const std::vector<std::string> & in)
+{ regionSources = in; return *this; }
