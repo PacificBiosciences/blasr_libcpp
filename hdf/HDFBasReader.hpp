@@ -242,7 +242,7 @@ public:
     }
 
     void GetChangeListID(std::string &changeListID) {
-        if (changeListIDAtom.initialized) {
+        if (changeListIDAtom.IsInitialized()) {
             changeListIDAtom.Read(changeListID);
         }
         else {

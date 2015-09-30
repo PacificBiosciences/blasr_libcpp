@@ -16,12 +16,11 @@ class HDFAtom : public HDFData {
 public:
     H5::Attribute attribute;
 
-    bool initialized;
     HDFAtom() {
-        initialized = false;
+        isInitialized = false;
     }
     ~HDFAtom() {
-        if (initialized) {
+        if (IsInitialized()) {
             attribute.close();
         }
     }
@@ -32,7 +31,7 @@ public:
 
     int Initialize(H5::H5Location &object, const std::string & attributeName, bool createIfMissing=false) {
         attribute = object.openAttribute(attributeName.c_str());
-        initialized = true;
+        isInitialized = true;
         return 1;
     }
 
@@ -52,7 +51,7 @@ public:
             cout << "ERROR. Could not open attribute " << attributeName << endl;
             exit(1);
         }
-        initialized  = true;
+        isInitialized  = true;
         return 1;
     }
 
@@ -60,7 +59,7 @@ public:
         HDFGroup group;
         group.Initialize(hdfFile, groupName);
         attribute = group.group.openAttribute(attributeName.c_str());
-        initialized = true;
+        isInitialized = true;
         return 1;
     }
 
@@ -78,7 +77,7 @@ public:
     void Create(H5::H5Location &object, const std::string & name, const std::string & value) {
         H5::StrType strType(0, value.size());
         attribute = object.createAttribute(name.c_str(), strType, H5::DataSpace(0,NULL));
-        initialized = true;
+        isInitialized = true;
         attribute.write(strType, value.c_str());
     }
 
