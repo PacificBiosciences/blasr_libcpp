@@ -106,7 +106,6 @@ static const std::vector<RegionAnnotation> REGIONS_SORTED_BY_TYPE = {
     RegionAnnotation(HOLENUMBER, 2, 50,  900, 900) // hqregion
 };
 
-/*
 TEST(RegionAnnotationTest, Sort_By_Pos) {
     std::vector<RegionAnnotation> ras = REGIONS;
     std::sort(ras.begin(), ras.end());
@@ -153,7 +152,6 @@ TEST(RegionAnnotationsTest, AdapterIntervals) {
     RegionAnnotations ras(HOLENUMBER, REGIONS, TYPES);
     EXPECT_EQ(ras.AdapterIntervals(), EXPECTED_ADAPTER_INTERVALS);
 }
-*/
 
 TEST(RegionAnnotationsTest, SubreadIntervals_2) {
     std::vector<RegionAnnotation> regions({
