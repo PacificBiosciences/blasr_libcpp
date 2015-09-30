@@ -34,6 +34,7 @@
 // SUCH DAMAGE.
 
 // Author: Mark Chaisson
+// Modified by: Yuan Li
 
 
 #include <algorithm>
@@ -43,83 +44,59 @@
 
 using namespace std;
 
-int RegionTable::LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) const {
-    std::vector<RegionAnnotation>::const_iterator lowIt, highIt;
-    lowIt  = std::lower_bound(table.begin(), table.end(), holeNumber);
-    highIt = std::lower_bound(table.begin(), table.end(), holeNumber+1);
-    low =  lowIt - table.begin();
-    high = highIt - table.begin();
-    return high-low;
-}
-
-
-RegionType RegionTable::GetType(int regionIndex) const {
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    return regionTypeEnums[table[regionIndex].GetTypeIndex()];
-}
-
-int RegionTable::GetStart(const int regionIndex) const {
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    return table[regionIndex].GetStart();
-}
-
-void RegionTable::SetStart(int regionIndex, int start) {
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    table[regionIndex].SetStart(start);
-}
-
-int RegionTable::GetEnd(const int regionIndex) const {
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    return table[regionIndex].GetEnd();
-}
-
-void RegionTable::SetEnd(int regionIndex, int end) {
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    table[regionIndex].SetEnd(end);
-}
-
-int RegionTable::GetHoleNumber(int regionIndex) const{
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    return table[regionIndex].GetHoleNumber();
-}
-
-void RegionTable::SetHoleNumber(int regionIndex, int holeNumber) {
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    table[regionIndex].SetHoleNumber(holeNumber);
-}
-
-int RegionTable::GetScore(int regionIndex) const{
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    return table[regionIndex].GetScore();//row[RegionAnnotationColumn::RegionScore];
-}
-
-void RegionTable::SetScore(int regionIndex, int score) {
-    assert(regionIndex < table.size());
-    assert(regionIndex >= 0);
-    table[regionIndex].SetScore(score);//.row[RegionAnnotationColumn::RegionScore] = score;
-}
-
-RegionTable & RegionTable::SortTableByHoleNumber() {
-    std::stable_sort(table.begin(), table.end());
-    return *this;
-}
 
 RegionTable & RegionTable::Reset() {
-    table.clear();
+    map_.clear();
     columnNames.clear();
     regionTypes.clear();
     regionDescriptions.clear();
     regionSources.clear();
     regionTypeEnums.clear();
     return *this;
+}
+
+std::vector<RegionType> RegionTable::RegionTypeEnums(void) const 
+{ return regionTypeEnums; }
+
+std::vector<std::string> RegionTable::RegionTypes(void) const
+{ return regionTypes; }
+
+std::vector<std::string> RegionTable::ColumnNames(void) const
+{ return columnNames; }
+
+std::vector<std::string> RegionTable::RegionDescriptions(void) const
+{ return regionDescriptions; }
+
+std::vector<std::string> RegionTable::RegionSources(void) const
+{ return regionSources;}
+
+RegionTable & RegionTable::ConstructTable(std::vector<RegionAnnotation> & table,
+                                          const std::vector<std::string> & regionTypeStrs) {
+    RegionTypes(regionTypeStrs); //< Set both regionTypes and regionTypeEnums. 
+
+    // Must sort region annotations by HoleNumber, RegionTypeIndex, Start, End, and Score
+    std::sort(table.begin(), table.end(), compare_region_annotation_by_type);
+
+    // Construct map_<holeNumber, RegionAnnotations>
+    if (table.size() > 0) {
+        UInt pre_hn = table[0].GetHoleNumber();
+        auto itBegin = table.begin();
+        for (auto it = table.begin(); it != table.end(); it++) {
+            if (it->GetHoleNumber() > pre_hn) {
+                map_.insert(std::pair<UInt, RegionAnnotations>(pre_hn, 
+                            RegionAnnotations(pre_hn, 
+                                              std::vector<RegionAnnotation>(itBegin, it),
+                                              regionTypeEnums)));
+                pre_hn = it->GetHoleNumber();
+                itBegin = it;
+            }
+        }
+
+        map_.insert(std::pair<UInt, RegionAnnotations>(pre_hn, 
+                    RegionAnnotations(pre_hn, 
+                                      std::vector<RegionAnnotation>(itBegin, table.end()),
+                                      regionTypeEnums)));
+    }
 }
 
 std::vector<RegionType> RegionTable::DefaultRegionTypes(void) {
@@ -138,15 +115,6 @@ RegionTable & RegionTable::RegionTypes(const std::vector<std::string> & regionTy
     return *this;
 }
 
-std::vector<std::string> RegionTable::ColumnNames(void) const
-{ return columnNames; }
-
-std::vector<std::string> RegionTable::RegionDescriptions(void) const
-{ return regionDescriptions; }
-
-std::vector<std::string> RegionTable::RegionSources(void) const
-{ return regionSources;}
-
 RegionTable & RegionTable::ColumnNames(const std::vector<std::string> & in)
 { columnNames = in; return *this; }
 
@@ -155,3 +123,14 @@ RegionTable & RegionTable::RegionDescriptions(const std::vector<std::string> & i
 
 RegionTable & RegionTable::RegionSources(const std::vector<std::string> & in)
 { regionSources = in; return *this; }
+
+bool RegionTable::HasHoleNumber(const UInt holeNumber) const {
+    return (map_.find(holeNumber) != map_.end());
+}
+
+RegionAnnotations RegionTable::operator [] (const UInt holeNumber) const {
+    // Must check whether a zmw exists or not first.
+    assert (HasHoleNumber(holeNumber) or 
+            false == "Could not find zmw in region table.");
+    return map_.find(holeNumber)->second;
+}

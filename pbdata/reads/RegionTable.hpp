@@ -49,14 +49,19 @@
 #include "Enumerations.h"
 #include "PacBioDefs.h"
 #include "RegionAnnotation.hpp"
+#include "RegionAnnotations.hpp"
 
 
 class RegionTable {
-public:
+private:
     /// RegionTable reading from h5 file 'Regions' dataset.
     /// \name member variables
     /// \{
-    std::vector<RegionAnnotation> table;
+    /// Map zmw hole number to zmw RegionAnnotations.
+    std::map<UInt, RegionAnnotations> map_;
+    /// \}
+    
+    /// \name Region table attributes.
     std::vector<std::string> columnNames;
     std::vector<std::string> regionTypes;
     std::vector<std::string> regionDescriptions;
@@ -65,10 +70,17 @@ public:
     /// \}
 
 public:
+    /// \name Constructor & destructor & reset
+    /// \{
     RegionTable() {}
 
     ~RegionTable() {}
 
+    /// Clears member variables in region table.
+    /// \returns *this
+    RegionTable& Reset();
+    /// \}
+    
     // Different region tables have different ways of encoding regions.
     // This maps from the way they are encoded in the rgn table to a
     // standard encoding.
@@ -94,6 +106,13 @@ public:
     /// \returns region sources.
     std::vector<std::string> RegionSources(void) const;
 
+    /// Construct map_ (holeNumber --> RegionAnnotations) from table.
+    /// \params[in] region table containing region annotations of all zmws
+    /// \params[in] ordered region type strings, which maps region types
+    ///             to region type indice.
+    RegionTable & ConstructTable(std::vector<RegionAnnotation> & table,
+                                 const std::vector<std::string> & regionTypeStrs);
+
     /// Note that the ORDER of region types does matter.
     /// Set region types (order matters).
     RegionTable & RegionTypes(const std::vector<std::string> & in);
@@ -111,55 +130,15 @@ public:
     RegionTable & RegionSources(const std::vector<std::string> & in);
     /// \}
 
-    /// \name Assessor functions to individual region annotations.
+    /// \name Assessor functions to zmw region annotations.
     /// \{
-    RegionType GetType(int regionIndex) const; 
+    /// \returns Whether or not this region table has regions of a zmw.
+    bool HasHoleNumber(const UInt holeNumber) const;
 
-    int GetStart(const int regionIndex) const; 
-
-    void SetStart(int regionIndex, int start); 
-
-    int GetEnd(const int regionIndex) const; 
-
-    void SetEnd(int regionIndex, int end); 
-
-    int GetHoleNumber(int regionIndex) const;
-
-    void SetHoleNumber(int regionIndex, int holeNumber); 
-
-    int GetScore(int regionIndex) const; 
-
-    void SetScore(int regionIndex, int score); 
-    /// \}
-
-    /// \name Sort and search functions
-    /// \{
-
-    /// \params[in] holeNumber - zmw hole number
-    /// \params[out] low - lower bound index of region annotations of zmw in table, inclusive
-    /// \params[out] upper - upper bound index of region annotations of zmw in table, exclusive
-    /// \returns  number of region annotaions
-    /// FIXME: deprecate this function
-    int LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) const; 
-
-    /// Note that there is NO GUARANTEE that region annotations in hdf5
-    /// `Regions` dataset be sorted in any order!
-    /// Sort region annotations in this->table by HoleNumber.
-    /// \returns *this
-    RegionTable& SortTableByHoleNumber(void);
-
-    /// Clears member variables in region table.
-    /// \returns *this
-    RegionTable& Reset();
-
-    /// Reset RegionTypeEnums according to RegionTypes.
-    /// \returns *this
-    RegionTable& AdjustRegionTypeEnums(void);
-
-    /// Overloads operator [].
-    /// \returns table_[index]
-    RegionAnnotation& operator[](const UInt regionIndex);
-
+    /// Get zmw region annotaions given its hole number.
+    /// Note that HasHoleNumber must be called first.
+    /// \returns RegionAnnotations of a zmw.
+    RegionAnnotations operator [] (const UInt holeNumber) const;
     /// \}
 };
 
