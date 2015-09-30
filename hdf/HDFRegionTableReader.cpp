@@ -5,7 +5,6 @@ using namespace std;
 
 int HDFRegionTableReader::Initialize(string &regionTableFileName, 
         const H5::FileAccPropList & fileAccPropList) {
-    isInitialized_ = true;
     /*
      * Initialize access to the HDF file.
      */
@@ -31,21 +30,21 @@ int HDFRegionTableReader::Initialize(string &regionTableFileName,
         return 0;
     }
 
+    if (columnNames.Initialize(regions, "ColumnNames") == 0) {
+        return 0;
+    }
+    if (regionTypes.Initialize(regions, "RegionTypes") == 0) {
+        return 0;
+    }
+    if (regionDescriptions.Initialize(regions, "RegionDescriptions") == 0) {
+        return 0;
+    }
+    if (regionSources.Initialize(regions,  "RegionSources") == 0) {
+        return 0;
+    }
+
     nRows = regions.GetNRows();
-
-    if (columnNames.Initialize(regions.dataset, "ColumnNames") == 0) {
-        return 0;
-    }
-    if (regionTypes.Initialize(regions.dataset, "RegionTypes") == 0) {
-        return 0;
-    }
-    if (regionDescriptions.Initialize(regions.dataset, "RegionDescriptions") == 0) {
-        return 0;
-    }
-    if (regionSources.Initialize(regions.dataset,  "RegionSources") == 0) {
-        return 0;
-    }
-
+    isInitialized_ = true;
     curRow = 0;
     return 1;
 }
@@ -116,6 +115,11 @@ int HDFRegionTableReader::ReadTableAttributes(RegionTable &table) {
 
 void HDFRegionTableReader::Close() {
     isInitialized_ = false;
+    fileContainsRegionTable = false;
+    columnNames.Close();
+    regionTypes.Close();
+    regionDescriptions.Close();
+    regionSources.Close();
     pulseDataGroup.Close();
     regions.Close();
     regionTableFile.Close();
