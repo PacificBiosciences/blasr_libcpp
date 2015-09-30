@@ -390,10 +390,20 @@ void SMRTSequence::Copy(const PacBio::BAM::BamRecord & record,
     // x = lower 16 bit, y = upper 16 bit
           HoleXY(hn & 0x0000FFFF, hn >> 16);
 
-    // Set hq region and read score
-    if (record.Impl().HasTag("rq")) {
-        highQualityRegionScore = record.Impl().TagValue("rq").ToInt32();
-        readScore = highQualityRegionScore / 1000.0;
+    // Set hq region read score
+    if (record.HasReadAccuracy()) {
+        // In pre 3.0.1 BAM, ReadAccuracy is in [0, 1000],
+        // in post 3.0.1 BAM, ReadAccuracy is a float in [0, 1]
+        // In blasr_libcpp, which supports both HDF5 and BAM,
+        // readScore should always be a float in [0, 1],
+        // and highQualityRegionScore always be a int in [0, 1000]
+        readScore = float(record.ReadAccuracy());
+        if (readScore <= 1.0) { 
+            highQualityRegionScore = int(readScore * 1000);
+        } else { 
+            highQualityRegionScore = int(readScore);
+            readScore /= 1000.0;
+        }
     }
 
     // Set HQRegionSNR if record has the 'sn' tag 
