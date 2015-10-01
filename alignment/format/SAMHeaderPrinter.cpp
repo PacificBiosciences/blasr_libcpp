@@ -2,7 +2,7 @@
 #include "format/SAMHeaderPrinter.hpp"
 
 const std::string SAMVERSION("1.5");
-const std::string PBBAMVERSION("3.0b7");
+const std::string PBBAMVERSION("3.0.1");
 const std::string PACBIOPL("PACBIO");
 
 std::vector<SAMHeaderItem> MakeSAMHeaderItems(const std::string & fromString){
