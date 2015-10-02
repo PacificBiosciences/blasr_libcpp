@@ -5,20 +5,20 @@ void CCSSequence::Free() {
     numConsensusBases = 0;
     SMRTSequence::Free();
     unrolledRead.Free();
-    /*
-    ClearMemory(passStartPulse);
-    ClearMemory(passNumPulses);
-    ClearMemory(passStartBase);
-    ClearMemory(passNumBases);
-    ClearMemory(passDirection);
-    ClearMemory(adapterHitBefore);
-    ClearMemory(adapterHitAfter);
-    ClearMemory(adapterHitConfidence);
-    */
 }
 
 int CCSSequence::GetStorageSize() {
     return SMRTSequence::GetStorageSize() + unrolledRead.GetStorageSize();
+}
+
+UInt CCSSequence::HoleNumber(void) const {
+    return SMRTSequence::HoleNumber();
+}
+
+CCSSequence & CCSSequence::HoleNumber(const UInt holeNumber) {
+    SMRTSequence::HoleNumber(holeNumber);
+    unrolledRead.HoleNumber(holeNumber);
+    return *this;
 }
 
 //
@@ -31,5 +31,6 @@ void CCSSequence::Explode(std::vector<SMRTSequence> &subreads) {
     int subreadIndex;
     for (subreadIndex = 0; subreadIndex < numPasses; subreadIndex++) {
         subreads[subreadIndex].ReferenceSubstring(this->unrolledRead, passStartBase[subreadIndex], passNumBases[subreadIndex]);
+        subreads[subreadIndex].zmwData = unrolledRead.zmwData;
     }
 }
