@@ -5,11 +5,17 @@
 #include "SMRTSequence.hpp"
 #include "VectorUtils.hpp"
 
+
 //
 // A CCS Sequence is both a SMRTSequence itself, and contains a list of SMRTSequences.
 //
 class CCSSequence : public SMRTSequence {
- public:
+private:
+    void UNDEFINED(const std::string & msg) const {
+        std::cout << msg  << " is not defined in CCSSequence." << std::endl; exit(1);
+    }
+
+public:
 	UInt numPasses;
 	UInt numConsensusBases;
 	std::vector<DNALength> passStartPulse, passNumPulses, passStartBase, passNumBases;
@@ -23,17 +29,30 @@ class CCSSequence : public SMRTSequence {
 	//
 	SMRTSequence      unrolledRead;
 
+public:
     inline ~CCSSequence();
 	void Free(); 
 
+    UInt HoleNumber(void) const;
+
+    CCSSequence & HoleNumber(const UInt holeNumber);
+
+    DNALength SubreadStart(void) const {UNDEFINED("SubreadStart");}
+
+    DNALength SubreadEnd(void) const {UNDEFINED("SubreadEnd");}
+
+    DNALength SubreadLength(void) const {UNDEFINED("SubreadLength");}
+
 	int GetStorageSize(); 
-	//
-	//
-	// In the first iteration, Explode simply pulls the subreads out
-	// that are used in the ccs.   Eventually, it will pull out all
-	// high-quality subreads.
-	// 
+	
+    /// \name 
+    /// \{
+	/// In the first iteration, Explode simply pulls the subreads out
+	/// that are used in the ccs.   Eventually, it will pull out all
+	/// high-quality subreads.
+	/// 
 	void Explode(std::vector<SMRTSequence> &subreads); 
+    /// \}
 };
 
 inline CCSSequence::~CCSSequence() {
