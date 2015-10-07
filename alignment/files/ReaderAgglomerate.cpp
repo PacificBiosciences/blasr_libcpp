@@ -15,6 +15,7 @@ void ReaderAgglomerate::InitializeParameters() {
 #ifdef USE_PBBAM
     bamFilePtr = NULL;
     entireFileQueryPtr = NULL;
+    zmwGroupQueryPtr = NULL;
 #endif
 }
 
@@ -156,7 +157,8 @@ bool ReaderAgglomerate::HasRegionTable() {
 
 #define RESET_PBBAM_PTRS() \
     if (bamFilePtr != NULL) {delete bamFilePtr; bamFilePtr = NULL;} \
-    if (entireFileQueryPtr != NULL) {delete entireFileQueryPtr; entireFileQueryPtr = NULL;}
+    if (zmwGroupQueryPtr != NULL) {delete zmwGroupQueryPtr; zmwGroupQueryPtr = NULL;} \
+    if (entireFileQueryPtr != NULL) {delete entireFileQueryPtr; entireFileQueryPtr = NULL;} 
 
 #endif
 
@@ -211,6 +213,9 @@ int ReaderAgglomerate::Initialize() {
             entireFileQueryPtr = new PacBio::BAM::EntireFileQuery(*bamFilePtr);
             assert(entireFileQueryPtr != nullptr);
             bamIterator = entireFileQueryPtr->begin();
+            zmwGroupQueryPtr = new PacBio::BAM::QNameQuery(*bamFilePtr);
+            assert(zmwGroupQueryPtr != nullptr);
+            zmwGroupIterator = zmwGroupQueryPtr->begin();
             break;
 #endif
         case HDFCCS:
@@ -317,6 +322,32 @@ int ReaderAgglomerate::GetNext(FASTQSequence &seq) {
     return numRecords;
 }
 
+int ReaderAgglomerate::GetNext(vector<SMRTSequence> & reads) {
+    int numRecords = 0;
+    reads.clear();
+
+    if (Subsample(subsample) == 0) {
+        return 0;
+    }
+    if (fileType == PBBAM) {
+#ifdef USE_PBBAM
+        if (zmwGroupIterator != zmwGroupQueryPtr->end()) {
+            const vector<PacBio::BAM::BamRecord> & records = *zmwGroupIterator;
+            numRecords = records.size();
+            reads.resize(numRecords);
+            for (size_t i=0; i < records.size(); i++) {
+                reads[i].Copy(records[i]);
+            }
+            zmwGroupIterator++;
+        }
+#endif
+    } else {
+        UNREACHABLE();
+    }
+    if (numRecords >= 1) readGroupId = reads[0].ReadGroupId();
+    return numRecords;
+}
+
 int ReaderAgglomerate::GetNext(SMRTSequence &seq) {
     int numRecords = 0;
 
@@ -364,6 +395,7 @@ int ReaderAgglomerate::GetNext(SMRTSequence &seq) {
         Advance(stride-1);
     return numRecords;
 }
+
 
 int ReaderAgglomerate::GetNextBases(SMRTSequence &seq, bool readQVs) {
     int numRecords = 0;
@@ -417,15 +449,6 @@ int ReaderAgglomerate::GetNext(CCSSequence &seq) {
     }
 
     switch(fileType) {
-        case Fasta:
-            // This just reads in the fasta sequence as if it were a ccs sequence
-            numRecords = fastaReader.GetNext(seq);
-            seq.SubreadStart(0).SubreadEnd(0);
-            break;
-        case Fastq:
-            numRecords = fastqReader.GetNext(seq);
-            seq.SubreadStart(0).SubreadEnd(0);
-            break;
         case HDFPulse:
         case HDFBase:
             numRecords = hdfBasReader.GetNext(seq);
@@ -438,6 +461,8 @@ int ReaderAgglomerate::GetNext(CCSSequence &seq) {
 #ifdef USE_PBBAM
             cout << "ERROR! Could not read BamRecord as CCSSequence" << endl;
 #endif
+        case Fasta:
+        case Fastq:
         case Fourbit:
         case None:
             UNREACHABLE();
