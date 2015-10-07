@@ -236,7 +236,8 @@ void SMRTSequence::Free() {
     // Reset member variables
     subreadStart_ = subreadEnd_ = 0;
     lowQualityPrefix = lowQualitySuffix = 0;
-    readScore = highQualityRegionScore = 0;
+    readScore = 0;
+    highQualityRegionScore = 0;
     readGroupId_ = "";
     copiedFromBam = false;
 #ifdef USE_PBBAM
