@@ -127,3 +127,19 @@ TEST_F(ReaderAgglomerateTest, ReadFromBam) {
 
     reader->Close();
 }
+
+TEST_F(ReaderAgglomerateTest, ReadsFromBam) {
+    string fn (bamFile1);
+    reader->SetReadFileName(fn);
+    EXPECT_EQ(reader->Initialize(), 1);
+
+    vector<SMRTSequence> seqs;
+    int ret, count=0;
+    while (ret = reader->GetNext(seqs) and ret != 0) { 
+        count+ = seqs.size();
+    }
+
+    EXPECT_EQ(count, 116);
+
+    reader->Close();
+}
