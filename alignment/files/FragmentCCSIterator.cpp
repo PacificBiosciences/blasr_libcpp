@@ -23,8 +23,7 @@ Initialize(CCSSequence *_seqPtr, RegionTable *_regionTablePtr) {
     //
     // Since this iterator covers all passes, and not just those
     // included in the ccs, the the regions need to be loaded.
-    //
-    CollectSubreadIntervals(*seqPtr, regionTablePtr, subreadIntervals);
+    subreadIntervals = (*regionTablePtr)[seqPtr->HoleNumber()].SubreadIntervals(seqPtr->unrolledRead.length, true);
     if (subreadIntervals.size() == 0) { return;}
 
     readIntervalDirection.resize(subreadIntervals.size());

@@ -22,35 +22,34 @@ public:
     QualityValueVector<QualityValue> mergeQV;
     Nucleotide *deletionTag;
     Nucleotide *substitutionTag;
-    int subreadStart, subreadEnd;
     QualityValue deletionQVPrior, insertionQVPrior, substitutionQVPrior, preBaseDeletionQVPrior;
 
     QVScale qvScale;
 
-    QVScale GetQVScale(); 
+    QVScale GetQVScale() const; 
 
     void SetQVScale(QVScale qvScaleP); 
 
     QualityValueVector<QualityValue>* GetQVPointerByIndex(int index);
 
-    int GetStorageSize(); 
+    int GetStorageSize() const; 
 
     FASTQSequence();
     inline ~FASTQSequence();
 
-    QualityValue GetDeletionQV(DNALength pos); 
+    QualityValue GetDeletionQV(DNALength pos) const; 
 
-    QualityValue GetMergeQV(DNALength pos); 
+    QualityValue GetMergeQV(DNALength pos) const; 
 
-    Nucleotide GetSubstitutionTag(DNALength pos); 
+    Nucleotide GetSubstitutionTag(DNALength pos) const; 
 
-    Nucleotide GetDeletionTag(DNALength pos); 
+    Nucleotide GetDeletionTag(DNALength pos) const; 
 
-    QualityValue GetInsertionQV(DNALength pos); 
+    QualityValue GetInsertionQV(DNALength pos) const; 
 
-    QualityValue GetSubstitutionQV(DNALength pos); 
+    QualityValue GetSubstitutionQV(DNALength pos) const; 
 
-    QualityValue GetPreBaseDeletionQV(DNALength pos, Nucleotide nuc); 
+    QualityValue GetPreBaseDeletionQV(DNALength pos, Nucleotide nuc) const; 
 
     void ShallowCopy(const FASTQSequence &rhs); 
 
@@ -90,40 +89,40 @@ public:
 
     void Assign(FASTQSequence &rhs); 
 
-    void PrintFastq(std::ostream &out, int lineLength=50); 
+    void PrintFastq(std::ostream &out, int lineLength=50) const; 
 
-    void PrintFastqQuality(std::ostream &out, int lineLength=50); 
+    void PrintFastqQuality(std::ostream &out, int lineLength=50) const; 
 
-    QVIndex GetQVIndex(const std::string & qvName);
+    QVIndex GetQVIndex(const std::string & qvName) const;
 
     /// Get QVs in vector<uint8_t> associated with the given QVIndex.
     /// \returns true if qvs are available, false otherwise
     /// \param [in] qvIndex - enum QVIndex
     /// \param [out] qvs - obtained QVs.
     /// \param [in] reverse - reverse orders of QVs or not
-    bool GetQVs(const QVIndex & qvIndex, std::vector<uint8_t> & qvs, bool reverse=false);
+    bool GetQVs(const QVIndex & qvIndex, std::vector<uint8_t> & qvs, bool reverse=false) const;
 
     /// Get QVs in vector<uint8_t>, given with QV Name.
     /// \returns true if qvs are available, false, otherwise
     /// \param [in] qvName - InsertionQV, DeletionQV, SubstitionQV, MergeQV, SubstitutionTag, DeletionTag
     /// \param [out] qvs - obtians QVs.
     /// \param [in] reverse - reverse orders of QVs or not.
-    bool GetQVs(const std::string & qvName, std::vector<uint8_t> & qvs, bool reverse=false);
+    bool GetQVs(const std::string & qvName, std::vector<uint8_t> & qvs, bool reverse=false) const;
 
     /// Get QVs in string, given with QV Name.
     /// \returns true if qvs are available, false, otherwise
     /// \param [in] qvName - InsertionQV, DeletionQV, SubstitionQV, MergeQV, SubstitutionTag, DeletionTag
     /// \param [out] qvs - obtians QVs.
     /// \param [in] reverse - reverse order of QVs or not
-    bool GetQVs(const std::string & qvName, std::string & qvs, bool reverse=false);
+    bool GetQVs(const std::string & qvName, std::string & qvs, bool reverse=false) const;
 
-    void PrintAsciiRichQuality(std::ostream &out, int whichQuality, int lineLength=50);
+    void PrintAsciiRichQuality(std::ostream &out, int whichQuality, int lineLength=50) const;
 
-    void PrintAsciiQual(std::ostream &out, int lineLength=50) ;
+    void PrintAsciiQual(std::ostream &out, int lineLength=50) const;
 
-    void PrintQual(std::ostream &out, int lineLength = 50); 
+    void PrintQual(std::ostream &out, int lineLength = 50) const;
 
-    void PrintQualSeq(std::ostream &out, int lineLength = 50);
+    void PrintQualSeq(std::ostream &out, int lineLength = 50) const;
 
     void MakeRC(FASTQSequence &rc); 
 
@@ -131,7 +130,7 @@ public:
 
     void LowerCaseMask(int qThreshold); 
 
-    float GetAverageQuality(); 
+    float GetAverageQuality() const; 
 
 #ifdef USE_PBBAM
     /// Copy name, sequence, and QVs from BamRecord.

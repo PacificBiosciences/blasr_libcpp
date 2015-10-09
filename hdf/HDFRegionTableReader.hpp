@@ -14,7 +14,7 @@
 
 
 class HDFRegionTableReader {
-public:
+private:
     HDFFile regionTableFile;
     HDFGroup pulseDataGroup;
     HDF2DArray<int> regions;
@@ -23,24 +23,36 @@ public:
     HDFAtom<std::vector<std::string> > regionDescriptions;
     HDFAtom<std::vector<std::string> > regionSources;
     HDFAtom<std::vector<std::string> > columnNames;
+
     int curRow;
-    int nRows;
+
+    bool isInitialized_; // whether or not this reader is initialized.
+
     bool fileContainsRegionTable;
 
+    int nRows;
+
+public:
+
+    HDFRegionTableReader(void) 
+    : curRow(0), nRows(0), isInitialized_(false) 
+    , fileContainsRegionTable(false) {}
+
     int Initialize(std::string &regionTableFileName, 
-            const H5::FileAccPropList & fileAccPropList = H5::FileAccPropList::DEFAULT); 
+                   const H5::FileAccPropList & fileAccPropList = H5::FileAccPropList::DEFAULT); 
 
-    int GetNext(RegionAnnotation &annotation); 
+    bool IsInitialized(void) const;
 
-    void RegionTypesToMap(RegionTable &table); 
+    bool HasRegionTable(void) const;
 
-    int ReadTableAttributes(RegionTable &table); 
+    void GetMinMaxHoleNumber(UInt &minHole, UInt &maxHole);
+
+    void ReadTable(RegionTable &table); 
 
     void Close(); 
 
-    void ReadTable(RegionTable &table); 
-    
-    void GetMinMaxHoleNumber(UInt &minHole, UInt &maxHole);
+private:
+    int GetNext(RegionAnnotation &annotation);
 };
 
 

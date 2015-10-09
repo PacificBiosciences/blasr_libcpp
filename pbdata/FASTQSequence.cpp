@@ -18,7 +18,7 @@ using namespace std;
 //
 int FASTQSequence::charToQuality = FASTQ_CHAR_TO_QUALITY;
 
-QVScale FASTQSequence::GetQVScale() {
+QVScale FASTQSequence::GetQVScale() const {
     return qvScale;
 }
 
@@ -42,7 +42,7 @@ FASTQSequence::GetQVPointerByIndex(int index) {
     return NULL;
 }
 
-int FASTQSequence::GetStorageSize() {
+int FASTQSequence::GetStorageSize() const {
     int total = 0;
     int nQV = 0;
     int nTag =0;
@@ -88,12 +88,10 @@ FASTQSequence::FASTQSequence() : FASTASequence() {
     insertionQVPrior = 0;
     substitutionQVPrior = 0;
     preBaseDeletionQVPrior = 0;
-
-    subreadStart = subreadEnd = 0;
     qvScale = PHRED;
 }
 
-QualityValue FASTQSequence::GetDeletionQV(DNALength pos) {
+QualityValue FASTQSequence::GetDeletionQV(DNALength pos) const {
     assert(pos < ((unsigned int)-1));
     assert(pos < length);
     if (deletionQV.Empty()) {
@@ -104,7 +102,7 @@ QualityValue FASTQSequence::GetDeletionQV(DNALength pos) {
     }
 }
 
-QualityValue FASTQSequence::GetMergeQV(DNALength pos) {
+QualityValue FASTQSequence::GetMergeQV(DNALength pos) const {
     assert(pos < ((unsigned int)-1));
     assert(pos < length);
     if (mergeQV.Empty()) {
@@ -115,7 +113,7 @@ QualityValue FASTQSequence::GetMergeQV(DNALength pos) {
     }
 }
 
-Nucleotide FASTQSequence::GetSubstitutionTag(DNALength pos) {
+Nucleotide FASTQSequence::GetSubstitutionTag(DNALength pos) const {
     if (substitutionTag == NULL) {
         return 'N';
     }
@@ -124,7 +122,7 @@ Nucleotide FASTQSequence::GetSubstitutionTag(DNALength pos) {
     return substitutionTag[pos];
 }
 
-Nucleotide FASTQSequence::GetDeletionTag(DNALength pos) {
+Nucleotide FASTQSequence::GetDeletionTag(DNALength pos) const {
     if (deletionTag == NULL) {
         return 'N';
     }
@@ -133,7 +131,7 @@ Nucleotide FASTQSequence::GetDeletionTag(DNALength pos) {
     return deletionTag[pos];
 }
 
-QualityValue FASTQSequence::GetInsertionQV(DNALength pos) {
+QualityValue FASTQSequence::GetInsertionQV(DNALength pos) const {
     if (insertionQV.Empty()) {
         return insertionQVPrior;
     }
@@ -142,7 +140,7 @@ QualityValue FASTQSequence::GetInsertionQV(DNALength pos) {
     return insertionQV[pos];
 }
 
-QualityValue FASTQSequence::GetSubstitutionQV(DNALength pos) {
+QualityValue FASTQSequence::GetSubstitutionQV(DNALength pos) const {
     if (substitutionQV.Empty()) {
         return substitutionQVPrior;
     }
@@ -151,7 +149,7 @@ QualityValue FASTQSequence::GetSubstitutionQV(DNALength pos) {
     return substitutionQV[pos];
 }
 
-QualityValue FASTQSequence::GetPreBaseDeletionQV(DNALength pos, Nucleotide nuc) {
+QualityValue FASTQSequence::GetPreBaseDeletionQV(DNALength pos, Nucleotide nuc) const {
     if (preBaseDeletionQV.Empty()) {
         return preBaseDeletionQVPrior;
     }
@@ -335,7 +333,7 @@ void FASTQSequence::Assign(FASTQSequence &rhs) {
     FASTQSequence::CopyQualityValues(rhs);
 }
 
-void FASTQSequence::PrintFastq(ostream &out, int lineLength) {
+void FASTQSequence::PrintFastq(ostream &out, int lineLength) const {
     PrintSeq(out, lineLength, '@');
     if (lineLength == 0) { 
         out << endl;
@@ -346,12 +344,12 @@ void FASTQSequence::PrintFastq(ostream &out, int lineLength) {
     }
 }
 
-void FASTQSequence::PrintFastqQuality(ostream &out, int lineLength) {
+void FASTQSequence::PrintFastqQuality(ostream &out, int lineLength) const {
     out << "+" << endl;
     PrintAsciiQual(out, lineLength);
 }
 
-bool FASTQSequence::GetQVs(const QVIndex & qvIndex, std::vector<uint8_t> & qvs, bool reverse) {
+bool FASTQSequence::GetQVs(const QVIndex & qvIndex, std::vector<uint8_t> & qvs, bool reverse) const {
     qvs.clear();
     uint8_t *  qualPtr;
     int charOffset = charToQuality;
@@ -391,7 +389,7 @@ bool FASTQSequence::GetQVs(const QVIndex & qvIndex, std::vector<uint8_t> & qvs, 
     return true;
 }
 
-QVIndex FASTQSequence::GetQVIndex(const std::string & qvName) {
+QVIndex FASTQSequence::GetQVIndex(const std::string & qvName) const {
     if (qvName == "QualityValue") {
         return I_QualityValue;
     } else if (qvName == "InsertionQV") {
@@ -412,11 +410,11 @@ QVIndex FASTQSequence::GetQVIndex(const std::string & qvName) {
     }
 }
 
-bool FASTQSequence::GetQVs(const std::string & qvName, std::vector<uint8_t> & qvs, bool reverse){
+bool FASTQSequence::GetQVs(const std::string & qvName, std::vector<uint8_t> & qvs, bool reverse) const {
     return GetQVs(GetQVIndex(qvName), qvs, reverse);
 }
 
-bool FASTQSequence::GetQVs(const std::string & qvName, std::string & qvsStr, bool reverse) {
+bool FASTQSequence::GetQVs(const std::string & qvName, std::string & qvsStr, bool reverse) const {
     std::vector<uint8_t> qvs;
     bool OK = GetQVs(qvName, qvs, reverse);
     qvsStr = string(qvs.begin(), qvs.end());
@@ -424,7 +422,7 @@ bool FASTQSequence::GetQVs(const std::string & qvName, std::string & qvsStr, boo
 }
 
 void FASTQSequence::PrintAsciiRichQuality(ostream &out, 
-        int whichQuality, int lineLength) {
+        int whichQuality, int lineLength) const {
     vector<uint8_t> qvs;
     bool OK = GetQVs(static_cast<QVIndex>(whichQuality), qvs);
     
@@ -460,11 +458,11 @@ void FASTQSequence::PrintAsciiRichQuality(ostream &out,
     }
 }
 
-void FASTQSequence::PrintAsciiQual(ostream &out, int lineLength) {
+void FASTQSequence::PrintAsciiQual(ostream &out, int lineLength) const {
     PrintAsciiRichQuality(out, 0, lineLength);
 }
 
-void FASTQSequence::PrintQual(ostream &out, int lineLength) {
+void FASTQSequence::PrintQual(ostream &out, int lineLength) const {
     out << ">" << this->title << endl;
     DNALength i;
     for (i = 0; i < length; i++ ){
@@ -479,7 +477,7 @@ void FASTQSequence::PrintQual(ostream &out, int lineLength) {
     }
 }
 
-void FASTQSequence::PrintQualSeq(ostream &out, int lineLength) {
+void FASTQSequence::PrintQualSeq(ostream &out, int lineLength) const {
     FASTASequence::PrintSeq(out, lineLength);
     lineLength /= 4;
     PrintQual(out, lineLength);
@@ -593,7 +591,7 @@ void FASTQSequence::LowerCaseMask(int qThreshold) {
     }
 }
 
-float FASTQSequence::GetAverageQuality() {
+float FASTQSequence::GetAverageQuality() const {
     DNALength p;
     float totalQ;
     if (qual.Empty() == true) { return 0.0; }
@@ -642,14 +640,6 @@ void FASTQSequence::Copy(const PacBio::BAM::BamRecord & record) {
         std::string qvs = record.DeletionTag();
         AllocateDeletionTagSpace(static_cast<DNALength>(qvs.size()));
         std::memcpy(deletionTag, qvs.c_str(), qvs.size() * sizeof(char));
-    }
-    // preBaseQVs are not included in BamRecord, and will not be copied.
-    if (record.Type() != PacBio::BAM::RecordType::CCS) { 
-        subreadStart = static_cast<int>(record.QueryStart());
-        subreadEnd = static_cast<int>(record.QueryEnd());
-    } else {
-        subreadStart = 0;
-        subreadEnd =  static_cast<int>(record.Sequence().length());;
     }
 }
 #endif

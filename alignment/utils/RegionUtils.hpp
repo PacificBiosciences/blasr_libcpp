@@ -21,54 +21,6 @@ bool GetReadTrimCoordinates(T_Sequence &fastaRead,
 	ZMWGroupEntry &zmwData,	RegionTable &regionTable,
 	DNALength &readStart ,DNALength &readEnd, int &score);
 
-template<typename T_Sequence>
-bool TrimRead(T_Sequence &fastaRead, ZMWGroupEntry &zmwData,
-    RegionTable &regionTable, T_Sequence &trimmedRead);
-
-
-class CompareRegionIndicesByStart {
-public:
-	RegionTable *regionTablePtr;
-	int operator()(const int a, const int b) const;
-};
-
-		
-int SortRegionIndicesByStart(RegionTable &regionTable, 
-    std::vector<int> &indices);
-
-class OrderRegionsByReadStart {
-public:
-    int operator()(const ReadInterval &lhs, const ReadInterval &rhs) const;
-};
-
-int FindRegionIndices(unsigned int holeNumber, RegionTable *regionTablePtr,
-    int &regionLowIndex, int &regionHighIndex);
-
-int FindRegionIndices(SMRTSequence &read, RegionTable *regionTablePtr, 
-    int &regionLowIndex, int &regionHighIndex);
-
-//
-// Collect region indices for either all region types, or just a few 
-// specific region types.
-//
-int CollectRegionIndices(SMRTSequence &read, RegionTable &regionTable, 
-    std::vector<int> &regionIndices, RegionType *regionTypes=NULL,
-    int numRegionTypes = 0);
-
-
-template<typename T_Sequence>
-void CollectSubreadIntervals(T_Sequence &read, RegionTable *regionTablePtr, 
-    std::vector<ReadInterval> &subreadIntervals, bool byAdapter=false);
-
-// Get all adapter intervals of a ZMW.
-// Input:
-//   read - read.zmwData.holeNumber specifies the zmw.
-//   regionTablePtr - a pointer to a region table.
-// Output:
-//   adapterIntervals - where to assign all adapter intervals of the zmw
-template<typename T_Sequence>
-void CollectAdapterIntervals(T_Sequence &read, RegionTable *regionTablePtr,
-    std::vector<ReadInterval> &adapterIntervals);
 
 // Given a vecotr of ReadInterval objects and their corresponding 
 // directions, intersect each object with an interval 

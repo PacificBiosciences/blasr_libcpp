@@ -63,16 +63,17 @@ HDFZMWWriter::~HDFZMWWriter() {
 
 bool HDFZMWWriter::WriteOneZmw(const SMRTSequence & read) {
     int length_ = static_cast<int> (read.length);
-
     numEventArray_.Write(&length_, 1);
 
-    holeNumberArray_.Write(&read.zmwData.holeNumber, 1);
+    UInt hn_ = read.HoleNumber(); 
+    holeNumberArray_.Write(&hn_, 1);
 
-    holeStatusArray_.Write(&read.zmwData.holeStatus, 1);
+    unsigned char hs_ = read.HoleStatus();
+    holeStatusArray_.Write(&hs_, 1);
 
     if (HasHoleXY()) {
-        int16_t xy[2] = {static_cast<int16_t>(read.zmwData.x), 
-            static_cast<int16_t>(read.zmwData.y)};
+        int16_t xy[2] = {static_cast<int16_t>(read.HoleX()), 
+                         static_cast<int16_t>(read.HoleY())};
         holeXYArray_.WriteRow(xy, 2);
     }
     return true;

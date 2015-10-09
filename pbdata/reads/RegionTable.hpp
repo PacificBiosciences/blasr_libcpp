@@ -48,213 +48,98 @@
 #include "Types.h"
 #include "Enumerations.h"
 #include "PacBioDefs.h"
+#include "RegionAnnotation.hpp"
+#include "RegionAnnotations.hpp"
 
-
-class HDFRegionTableReader;
-class HDFRegionTableWriter;
-
-class RegionTypeMap {
-public:
-    static std::string ToString(RegionType rt);
-
-    static RegionType ToRegionType(const std::string & str);
-
-private:
-    static const std::map<RegionType, std::string> RegionTypeToString ;
-
-    static const std::map<std::string, RegionType> StringToRegionType;
-};
-
-class RegionAnnotation {
-friend class HDFRegionTableReader;
-friend class HDFRegionTableWriter;
-friend class HDFRegionsWriter;
-
-public:
-    static const int HOLENUMBERCOL = 0;
-    static const int REGIONTYPEINDEXCOL = 1;
-    static const int REGIONSTARTCOL = 2;
-    static const int REGIONENDCOL = 3;
-    static const int REGIONSCORECOL = 4;
-    static const int NCOLS=5;
-
-    int row[NCOLS];
-
-public:
-    inline RegionAnnotation(UInt holeNumber = 0, 
-                            int typeIndex = 0,
-                            int start = 0, int end = 0,
-                            int score = -1);
-
-    inline bool operator<(const RegionAnnotation &rhs) const;
-
-    inline bool operator<(int holeNumber) const;
-
-    inline RegionAnnotation& operator=(const RegionAnnotation &rhs); 
-
-    inline int GetHoleNumber(void) const;
-
-    inline RegionAnnotation & SetHoleNumber(int holeNumber); 
-
-    inline int GetTypeIndex(void) const; 
-
-    inline std::string GetTypeString(const std::vector<RegionType> & types) const; 
-
-    inline RegionAnnotation & SetTypeIndex(int typeIndex); 
-
-    inline int GetStart(void) const; 
-
-    inline RegionAnnotation & SetStart(int start); 
-
-    inline int GetEnd(void) const; 
-
-    inline RegionAnnotation & SetEnd(int end); 
-
-    inline int GetScore(void) const; 
-
-    inline RegionAnnotation & SetScore(int score); 
-
-public:
-    friend std::ostream & operator << (std::ostream & os, const RegionAnnotation& ra);
-};
 
 class RegionTable {
-public:
-    std::vector<RegionAnnotation> table;
+private:
+    /// RegionTable reading from h5 file 'Regions' dataset.
+    /// \name member variables
+    /// \{
+    /// Map zmw hole number to zmw RegionAnnotations.
+    std::map<UInt, RegionAnnotations> map_;
+    /// \}
+    
+    /// \name Region table attributes.
     std::vector<std::string> columnNames;
     std::vector<std::string> regionTypes;
     std::vector<std::string> regionDescriptions;
     std::vector<std::string> regionSources;
-    std::vector<RegionType> regionTypeEnums;
+    std::vector<RegionType>  regionTypeEnums;
+    /// \}
 
-    // Return default region types used in a region table 
-    // Note that the ORDER of region types does matter.
-    static std::vector<RegionType> DefaultRegionTypes(void);
+public:
+    /// \name Constructor & destructor & reset
+    /// \{
+    RegionTable() {}
 
-    int LookupRegionsByHoleNumber(int holeNumber, int &low, int &high) const; 
+    ~RegionTable() {}
 
-    //
-    // Define a bunch of accessor functions.
-    //
-
-    //
+    /// Clears member variables in region table.
+    /// \returns *this
+    RegionTable& Reset();
+    /// \}
+    
     // Different region tables have different ways of encoding regions.
     // This maps from the way they are encoded in the rgn table to a
     // standard encoding.
     //
-    RegionType GetType(int regionIndex) const; 
+    /// \name Accessor functions to region table attributes.
+    /// \{
 
-    int GetStart(const int regionIndex) const; 
+    /// \returns *default PacBio* region types (order matters).
+    static std::vector<RegionType> DefaultRegionTypes(void);
 
-    void SetStart(int regionIndex, int start); 
+    /// \returns RegionType enums (order matters).
+    std::vector<RegionType> RegionTypeEnums(void) const;
 
-    int GetEnd(const int regionIndex) const; 
+    /// \returns RegionType strings in order
+    std::vector<std::string> RegionTypes(void) const;
 
-    void SetEnd(int regionIndex, int end); 
+    /// \returns column names.
+    std::vector<std::string> ColumnNames(void) const;
 
-    int GetHoleNumber(int regionIndex) const;
+    /// \returns region descriptions.
+    std::vector<std::string> RegionDescriptions(void) const;
 
-    void SetHoleNumber(int regionIndex, int holeNumber); 
+    /// \returns region sources.
+    std::vector<std::string> RegionSources(void) const;
 
-    int GetScore(int regionIndex) const; 
+    /// Construct map_ (holeNumber --> RegionAnnotations) from table.
+    /// \params[in] region table containing region annotations of all zmws
+    /// \params[in] ordered region type strings, which maps region types
+    ///             to region type indice.
+    RegionTable & ConstructTable(std::vector<RegionAnnotation> & table,
+                                 const std::vector<std::string> & regionTypeStrs);
 
-    void SetScore(int regionIndex, int score); 
+    /// Note that the ORDER of region types does matter.
+    /// Set region types (order matters).
+    RegionTable & RegionTypes(const std::vector<std::string> & in);
 
-    void SortTableByHoleNumber(); 
+    /// Set column names, e.g., 
+    /// {"HoleNumber", "TypeIndex", "Start", "End", "Score"}
+    RegionTable & ColumnNames(const std::vector<std::string> & in);
 
-    void Reset(); 
+    /// Set region descriptions. e.g., 
+    /// {"desc of holenumber", "desc of index", "desc of start", "desc of end", "desc of score"}
+    RegionTable & RegionDescriptions(const std::vector<std::string> & in);
 
-    void CreateDefaultAttributes(); 
+    /// Set region sources, e.g., 
+    /// {"source of holenumber", "source of index", "source of start", "source of end", "source of score"}
+    RegionTable & RegionSources(const std::vector<std::string> & in);
+    /// \}
+
+    /// \name Assessor functions to zmw region annotations.
+    /// \{
+    /// \returns Whether or not this region table has regions of a zmw.
+    bool HasHoleNumber(const UInt holeNumber) const;
+
+    /// Get zmw region annotaions given its hole number.
+    /// Note that HasHoleNumber must be called first.
+    /// \returns RegionAnnotations of a zmw.
+    RegionAnnotations operator [] (const UInt holeNumber) const;
+    /// \}
 };
 
-
-inline
-RegionAnnotation::RegionAnnotation(UInt holeNumber, 
-        int typeIndex, int start, int end, int score) {
-    SetHoleNumber(static_cast<int>(holeNumber));
-    SetTypeIndex(typeIndex);
-    SetStart(start);
-    SetEnd(end);
-    SetScore(score);
-}
-
-inline
-bool RegionAnnotation::operator<(const RegionAnnotation &rhs) const
-{ 
-    if (GetHoleNumber() == rhs.GetHoleNumber()) 
-        return GetStart() < rhs.GetStart();
-    else
-        return GetHoleNumber() < rhs.GetHoleNumber();
-}
-
-inline
-bool RegionAnnotation::operator<(int holeNumber) const
-{ return GetHoleNumber() < holeNumber; }
-
-
-inline
-RegionAnnotation& RegionAnnotation::operator=(const RegionAnnotation &rhs) {
-    memcpy(row, rhs.row, sizeof(int)*NCOLS);
-    return *this;
-}
-
-inline
-int RegionAnnotation::GetHoleNumber(void) const {
-    return row[HOLENUMBERCOL];
-}
-
-inline
-RegionAnnotation & RegionAnnotation::SetHoleNumber(int holeNumber) {
-    row[HOLENUMBERCOL] = holeNumber;
-    return *this;
-}
-
-inline
-int RegionAnnotation::GetTypeIndex(void) const {
-    return row[REGIONTYPEINDEXCOL];
-}
-
-inline std::string RegionAnnotation::GetTypeString(const std::vector<RegionType> & typesTable) const {
-    assert(GetTypeIndex() >= 0 and GetTypeIndex() < static_cast<int>(typesTable.size()));
-    return RegionTypeMap::ToString(typesTable[GetTypeIndex()]);
-}
-
-inline
-RegionAnnotation & RegionAnnotation::SetTypeIndex(int regionTypeIndex) {
-    row[REGIONTYPEINDEXCOL] = regionTypeIndex;
-    return *this;
-}
-
-inline
-int RegionAnnotation::GetStart(void) const {
-    return row[REGIONSTARTCOL];
-}
-
-inline
-RegionAnnotation & RegionAnnotation::SetStart(int start) {
-    row[REGIONSTARTCOL] = start;
-    return *this;
-}
-
-inline
-int RegionAnnotation::GetEnd(void) const {
-    return row[REGIONENDCOL];
-}
-
-inline
-RegionAnnotation & RegionAnnotation::SetEnd(int end) {
-    row[REGIONENDCOL] = end;
-    return *this;
-}
-
-inline
-int RegionAnnotation::GetScore(void) const {
-    return row[REGIONSCORECOL];
-}
-
-inline
-RegionAnnotation & RegionAnnotation::SetScore(int score) {
-    row[REGIONSCORECOL] = score;
-    return *this;
-}
 #endif // _BLASR_REGION_TABLE_HPP_

@@ -27,11 +27,11 @@ bool BaseFile::LookupReadIndexByXY(uint16_t x, uint16_t y, int &index) {
 
 void BaseFile::CopyReadAt(uint32_t readIndex, SMRTSequence &read) {
     assert(holeNumbers.size() > readIndex);
-    read.zmwData.holeNumber = holeNumbers[readIndex];
+    read.HoleNumber(holeNumbers[readIndex]);
     if (holeXY.size() > 0) {
         assert(holeXY.size() > readIndex);
-        read.zmwData.x = holeXY[readIndex].xy[0];
-        read.zmwData.y = holeXY[readIndex].xy[1];
+        read.HoleXY(holeXY[readIndex].xy[0],
+                    holeXY[readIndex].xy[1]);
     }
 
     int startPos = readStartPositions[readIndex];

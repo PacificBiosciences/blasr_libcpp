@@ -41,8 +41,6 @@ public:
         EXPECT_TRUE(rev);
         reader->ReadTable(*rgn);
         reader->Close();
-
-        rgn->SortTableByHoleNumber();
     }
 
     void TearDown() {
@@ -64,7 +62,8 @@ public:
 
 TEST_F(FragmentCCSIteratorTestFixture, Initialize) {
     // void Initialize(CCSSequence *_seqPtr, RegionTable *_regionTablePtr) {
-    ccs->zmwData.holeNumber = 10;
+    ccs->HoleNumber(10);
+    ccs->unrolledRead.Allocate(7000);
     it.Initialize(ccs, rgn);
 
     int numPasses = it.GetNumPasses();

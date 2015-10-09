@@ -4,109 +4,18 @@
 bool LookupHQRegion(int holeNumber, RegionTable &regionTable, 
     int &start, int &end, int &score) {
 
-	int regionLowIndex, regionHighIndex;
-	regionLowIndex = regionHighIndex = 0;
-
-	regionTable.LookupRegionsByHoleNumber(holeNumber,
-        regionLowIndex, regionHighIndex);
-
-	bool readHasGoodRegion = true;
-	int  regionIndex = regionLowIndex;
-	while (regionIndex < regionHighIndex and 
-		   regionTable.GetType(regionIndex) != HQRegion) {
-		regionIndex++;
-	}
-	
-	if (regionIndex == regionHighIndex) {
-    start = end = score = 0;
-		return false;
-	}
-	else {
-		start = regionTable.GetStart(regionIndex);
-		end   = regionTable.GetEnd(regionIndex);
-        score = regionTable.GetScore(regionIndex);
-		return true;
-	}
-}
-
-// Functions of class CompareRegionIndicesByStart.
-int CompareRegionIndicesByStart::
-operator()(const int a, const int b) const {
-    if (regionTablePtr->GetStart(a) == regionTablePtr->GetStart(b)) {
-        return (regionTablePtr->GetEnd(a) < regionTablePtr->GetEnd(b));
-    }
-    else {
-        return (regionTablePtr->GetStart(a) < regionTablePtr->GetStart(b));
-    }
-}
-
-// General functions.
-int SortRegionIndicesByStart(RegionTable &regionTable, 
-    std::vector<int> &indices) {
-
-    CompareRegionIndicesByStart cmpFctr;
-    cmpFctr.regionTablePtr = &regionTable;
-    std::sort(indices.begin(), indices.end(), cmpFctr);
-    return indices.size();
-}
-
-
-// Functions of OrderRegionsByReadStart:
-int OrderRegionsByReadStart::
-operator()(const ReadInterval &lhs, const ReadInterval &rhs) const {
-    return lhs.start < rhs.start;
-}
-
-
-// General functions.
-int FindRegionIndices(unsigned int holeNumber, RegionTable *regionTablePtr,
-    int &regionLowIndex, int &regionHighIndex) {
-
-    int regionIndex;						 
-    regionLowIndex = regionHighIndex = 0;
-
-    regionTablePtr->LookupRegionsByHoleNumber(holeNumber, 
-        regionLowIndex, regionHighIndex);  
-
-    return regionHighIndex - regionLowIndex;
-}
-
-
-int FindRegionIndices(SMRTSequence &read, RegionTable *regionTablePtr, 
-    int &regionLowIndex, int &regionHighIndex) {
-    return FindRegionIndices(read.zmwData.holeNumber, 
-        regionTablePtr, regionLowIndex, regionHighIndex);
-}
-
-
-//
-// Collect region indices for either all region types, or just a few specific region types.
-//
-//
-int CollectRegionIndices(SMRTSequence &read, RegionTable &regionTable, 
-    std::vector<int> &regionIndices, RegionType *regionTypes,
-    int numRegionTypes) {
-
-    int regionLow, regionHigh;
-    int prevNumRegionIndices = regionIndices.size();
-    if (FindRegionIndices(read, &regionTable, regionLow, regionHigh)) {
-        int i;
-        for (i = regionLow; i < regionHigh; i++) {
-            if (regionTypes == NULL) {
-                regionIndices.push_back(i);
-            }
-            else {
-                int t;
-                for (t = 0; t < numRegionTypes; t++) {
-                    if (regionTable.GetType(i) == regionTypes[t]) {
-                        regionIndices.push_back(i);
-                        break;
-                    }
-                }
-            }
+    if (regionTable.HasHoleNumber(holeNumber)) {
+        RegionAnnotations zmwRegions = regionTable[holeNumber];
+        if (zmwRegions.HasHQRegion()) {
+            start = zmwRegions.HQStart();
+            end   = zmwRegions.HQEnd();
+            score = zmwRegions.HQScore();
+            return true;
         }
     }
-    return regionIndices.size() - prevNumRegionIndices;
+
+    start = end = score = 0;
+    return false;
 }
 
 

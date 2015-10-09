@@ -233,4 +233,3 @@ TEST_F(RegionUtilTestFixture, GetTypicalFullSubreadIndex) {
     EXPECT_EQ(idx, 22); 
     // Typical = the second longest full pass subread (6647, 7145)
 }
-

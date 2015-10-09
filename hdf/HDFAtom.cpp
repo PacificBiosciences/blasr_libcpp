@@ -6,7 +6,6 @@ void HDFAtom<std::string>::Create(H5::H5Location &object, const std::string & at
     hsize_t defaultDims[] = {1};
     H5::DataSpace defaultDataSpace(1, defaultDims);
     attribute = object.createAttribute(atomName.c_str(), strType, H5::DataSpace(H5S_SCALAR));
-    initialized= true;
 }
 
 
@@ -130,7 +129,6 @@ void HDFAtom<std::vector<std::string> >::Read(std::vector<std::string> &values) 
 	hsize_t nPoints;
 	nPoints = attributeSpace.getSelectNpoints();
 	H5::DataType attrType = attribute.getDataType(); // necessary for attr.read()
-
 	// Declare and initialize std::vector of pointers to std::string attribute list.
 	std::vector<char*> ptrsToHDFControlledMemory;
 	ptrsToHDFControlledMemory.resize(nPoints);
@@ -140,7 +138,7 @@ void HDFAtom<std::vector<std::string> >::Read(std::vector<std::string> &values) 
 	unsigned int i;
 	for (i = 0; i < ptrsToHDFControlledMemory.size(); i++ ){
 		values.push_back(ptrsToHDFControlledMemory[i]);
-		free(ptrsToHDFControlledMemory[i]);
+        free(ptrsToHDFControlledMemory[i]);
 	}
 }
 

@@ -242,7 +242,7 @@ public:
     }
 
     void GetChangeListID(std::string &changeListID) {
-        if (changeListIDAtom.initialized) {
+        if (changeListIDAtom.IsInitialized()) {
             changeListIDAtom.Read(changeListID);
         }
         else {
@@ -467,7 +467,6 @@ public:
                 return 0;
         } else includedFields[fieldName] = false;
 
-
         if (not baseCallsGroup.ContainsObject(zmwMetricsGroupName) or 
             not zmwMetricsGroup.Initialize(baseCallsGroup.group, zmwMetricsGroupName)) {
             includedFields["HQRegionSNR"] = false;
@@ -606,7 +605,6 @@ public:
             exit(1);
         }
         curBasePos += seqLength;
-        seq.StorePlatformId(scanDataReader.platformId);
         return 1;
     }
 
@@ -624,25 +622,24 @@ public:
                     seq.AllocateQualitySpace(seqLength);
                     qualArray.Read((int)curBasePos, (int) curBasePos + seqLength, (unsigned char*) seq.qual.data);
                 }
-            }
-
-            if (includedFields["DeletionQV"]) {
-                GetNextDeletionQV(seq);
-            }
-            if (includedFields["DeletionTag"]) {
-                GetNextDeletionTag(seq);
-            }
-            if (includedFields["InsertionQV"]) {
-                GetNextInsertionQV(seq);
-            }
-            if (includedFields["SubstitutionQV"]) {
-                GetNextSubstitutionQV(seq);
-            }
-            if (includedFields["SubstitutionTag"]) {
-                GetNextSubstitutionTag(seq);
-            }
-            if (includedFields["MergeQV"]) {
-                GetNextMergeQV(seq);
+                if (includedFields["DeletionQV"]) {
+                    GetNextDeletionQV(seq);
+                }
+                if (includedFields["DeletionTag"]) {
+                    GetNextDeletionTag(seq);
+                }
+                if (includedFields["InsertionQV"]) {
+                    GetNextInsertionQV(seq);
+                }
+                if (includedFields["SubstitutionQV"]) {
+                    GetNextSubstitutionQV(seq);
+                }
+                if (includedFields["SubstitutionTag"]) {
+                    GetNextSubstitutionTag(seq);
+                }
+                if (includedFields["MergeQV"]) {
+                    GetNextMergeQV(seq);
+                }
             }
             seq.SetQVScale(qvScale);
             curBasePos += seqLength;
@@ -672,7 +669,6 @@ public:
             if (includedFields["ReadScore"]) {
                 GetNextReadScore(seq);
             }
-
             int seqLength = GetNextWithoutPosAdvance(seq);
             seq.length = seqLength;
             if(readQVs) {
@@ -689,11 +685,8 @@ public:
             seq.SetQVScale(qvScale);
             curBasePos += seqLength;
 
-            seq.subreadStart = 0;
-            seq.subreadEnd   = seq.length;
+            seq.SubreadStart(0).SubreadEnd(seq.length);
             zmwReader.GetNext(seq.zmwData);
-            seq.xy[0] = seq.zmwData.x;
-            seq.xy[1] = seq.zmwData.y;
         } catch (H5::DataSetIException e) {
             cout << "ERROR, could not read bases or QVs for SMRTSequence "
                 << seq.GetName() << endl;
@@ -714,6 +707,7 @@ public:
         int retVal;
 
         DNALength  curBasPosCopy = curBasePos;
+
         //
         // Getting next advances the curBasPos to the end of 
         // the current sequence. 
@@ -724,21 +718,21 @@ public:
                 return 0;
             }
 
-            // get ZMWMetrics fields, must be done before GetNext
-            // (which calls GetNextWithoutAdvancePos, which increments curRead)
+            //
+            // Bail now if the file is already done
+            //
+            if ((retVal = this->GetNext((FASTQSequence&)seq)) == 0) {
+                return 0;
+            }
+            // GetNext calls GetNextWithoutPosAdvance, which increments curRead
+            curRead--;
             if (includedFields["HQRegionSNR"]) {
                 GetNextHQRegionSNR(seq);
             }
             if (includedFields["ReadScore"]) {
                 GetNextReadScore(seq);
             }
-
-        //
-        // Bail now if the file is already done
-        //
-        if ((retVal = this->GetNext((FASTQSequence&)seq)) == 0) {
-            return 0;
-        }
+            curRead++;
 
             DNALength nextBasePos = curBasePos;
             curBasePos = curBasPosCopy;
@@ -759,11 +753,8 @@ public:
             // By default, the subread of a read without subread information is
             // the whole read.
             //
-            seq.subreadStart = 0;
-            seq.subreadEnd   = seq.length;
+            seq.SubreadStart(0).SubreadEnd(seq.length);
             zmwReader.GetNext(seq.zmwData);
-            seq.xy[0] = seq.zmwData.x;
-            seq.xy[1] = seq.zmwData.y;
         } catch(H5::DataSetIException e) {
             cout << "ERROR, could not read pulse metrics for SMRTSequence " 
                 << seq.GetName() << endl;
@@ -771,16 +762,7 @@ public:
         }
         return retVal;
     }
-    /*
-       int16_t xy[2];
-       if (zmwReader.readHoleXY) {
-       zmwReader.xyArray.Read(curRead, curRead+1, 0, 2, xy);
-       }
-       else {
-       xy[0] = xy[1] = 0;
-       }
-       seq.StoreXY(xy);
-       */
+
     void GetAllPulseIndex(std::vector<int> &pulseIndex) {
         CheckMemoryAllocation(pulseIndexArray.arrayLength, maxAllocNElements, "PulseIndex");
         pulseIndex.resize(pulseIndexArray.arrayLength);
@@ -842,12 +824,10 @@ public:
 
         std::string readTitle;
         unsigned int holeNumber;
-        unsigned char holeStatus;
         zmwReader.holeNumberArray.Read(curRead, curRead+1, &holeNumber);
-        seq.StoreHoleNumber(holeNumber);
 
+        unsigned char holeStatus;
         zmwReader.holeStatusArray.Read(curRead, curRead+1, &holeStatus);
-        seq.StoreHoleStatus(holeStatus);
 
         DNALength simIndex=0, simCoordinate=0;
 

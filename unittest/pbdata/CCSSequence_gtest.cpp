@@ -44,9 +44,9 @@ public:
         smrt.length = size;
         smrt.deleteOnExit = false;
 
-        smrt.zmwData.holeNumber = holeNumber;
-        smrt.subreadStart = start;
-        smrt.subreadEnd = end;
+        smrt.HoleNumber  (holeNumber);
+        smrt.SubreadStart(start);
+        smrt.SubreadEnd  (end);
 
         stringstream ss;
     }
@@ -74,7 +74,7 @@ public:
         ccs.passDirection.resize(numSubreads);
         s = 0;
         for(int i=0; i < ccs.numPasses; i++) {
-            ccs.passStartBase[i] = subreads[i].subreadStart;
+            ccs.passStartBase[i] = subreads[i].SubreadStart();
             ccs.passDirection[i] = (i%2==0)?(0):(1);
             ccs.passNumBases[i] = subreads[i].length;
         }

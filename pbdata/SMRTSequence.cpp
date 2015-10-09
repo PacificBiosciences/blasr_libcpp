@@ -36,38 +36,37 @@
 // Author: Mark Chaisson
 
 #include <stdlib.h> 
+#include "utils/SMRTTitle.hpp"
 #include "SMRTSequence.hpp"
 
 using namespace std;
 
-void SMRTSequence::SetNull() {
-    pulseIndex    = NULL;
-    preBaseFrames = NULL;
-    widthInFrames = NULL;
-    xy[0] = 0; xy[1] = 0;
-    // These are not allocted by default.
-    meanSignal = maxSignal = midSignal = NULL;
-    classifierQV = NULL;
-    startFrame   = NULL;
-    platform     = NoPlatform;
-    // By default, allow the entire read.
-    lowQualityPrefix = lowQualitySuffix = 0;
-    highQualityRegionScore = 0;
+SMRTSequence::SMRTSequence()
+    : FASTQSequence() 
+    , subreadStart_(0)      // subread start
+    , subreadEnd_(0)        // subread end 
+    , preBaseFrames(nullptr)
+    , widthInFrames(nullptr)
+    , pulseIndex(nullptr) 
+    , startFrame(nullptr)   // not allocated by default
+    , meanSignal(nullptr)   // not allocated by default
+    , maxSignal(nullptr)    // not allocated by default
+    , midSignal(nullptr)    // not allocated by default
+    , classifierQV(nullptr) // not allocated by default
+    , lowQualityPrefix(0)   // By default, allow the entire read.
+    , lowQualitySuffix(0)   // By default, allow the entire read.
+    , highQualityRegionScore(0) // HQ read score
+    , readScore(0)          // read score
+    , readGroupId_("")      // read group id
+    , copiedFromBam(false)
+#ifdef USE_PBBAM
+    , bamRecord(PacBio::BAM::BamRecord())
+#endif
+{
     // ZMWMetrics
     for (size_t i = 0; i < 4; i++) {
         hqRegionSnr_[i] = -1;
     }
-    readScore = -1;
-    holeNumber = static_cast<UInt>(-1);
-    readGroupId = "";
-    copiedFromBam = false;
-#ifdef USE_PBBAM
-    bamRecord = PacBio::BAM::BamRecord();
-#endif
-}
-
-SMRTSequence::SMRTSequence() : FASTQSequence() {
-    SetNull();
 }
 
 void SMRTSequence::Allocate(DNALength length) {
@@ -85,7 +84,7 @@ void SMRTSequence::Allocate(DNALength length) {
     preBaseFrames = ProtectedNew<HalfWord>(length);
     widthInFrames = ProtectedNew<HalfWord>(length);
     pulseIndex    = ProtectedNew<int>(length);
-    subreadEnd    = length;
+    subreadEnd_   = length;
     deleteOnExit  = true;
 }
 
@@ -100,8 +99,8 @@ void SMRTSequence::SetSubreadBoundaries(SMRTSequence &subread, DNALength subread
         subreadEnd = length;
     }
     assert(subreadEnd - subreadStart <= length);
-    subread.subreadStart= subreadStart;
-    subread.subreadEnd  = subreadEnd;
+    subread.subreadStart_ = subreadStart;
+    subread.subreadEnd_  = subreadEnd;
     SetSubreadTitle(subread, subreadStart, subreadEnd);
 }
 
@@ -180,8 +179,8 @@ void SMRTSequence::Copy(const SMRTSequence &rhs, int rhsPos, int rhsLength) {
     }
 
     // Copy other member variables from rhs
-    subreadStart = rhs.subreadStart;
-    subreadEnd   = rhs.subreadEnd;
+    subreadStart_ = rhs.subreadStart_;
+    subreadEnd_   = rhs.subreadEnd_;
     lowQualityPrefix = rhs.lowQualityPrefix;
     lowQualitySuffix = rhs.lowQualitySuffix;
     highQualityRegionScore = rhs.highQualityRegionScore;
@@ -196,9 +195,9 @@ void SMRTSequence::Copy(const SMRTSequence &rhs, int rhsPos, int rhsLength) {
 #endif
 }
 
-void SMRTSequence::Print(ostream &out) {
-    out << "SMRTSequence for zmw " << zmwData.holeNumber
-        << ", [" << subreadStart << ", " << subreadEnd << ")" << endl;
+void SMRTSequence::Print(ostream &out) const {
+    out << "SMRTSequence for zmw " << HoleNumber()
+        << ", [" << SubreadStart() << ", " << SubreadEnd() << ")" << endl;
     DNASequence::Print(out);
 }
 
@@ -221,6 +220,9 @@ void SMRTSequence::Free() {
         if (startFrame) {
             delete[] startFrame;
         }
+        // FIXME: memory of QVs should be handled within class
+        //        in a consistent way.
+        // Comments from Mark Chaisson:
         // meanSignal, maxSignal, midSignal and classifierQV
         // need to be handled separatedly.
     }
@@ -230,66 +232,110 @@ void SMRTSequence::Free() {
     widthInFrames = NULL;
     pulseIndex = NULL;
     startFrame = NULL;
-
+    
     // Reset member variables
-    xy[0] = 0; xy[1] = 0;
+    subreadStart_ = subreadEnd_ = 0;
     lowQualityPrefix = lowQualitySuffix = 0;
+    readScore = 0;
     highQualityRegionScore = 0;
-    holeNumber = static_cast<UInt>(-1);
-    readGroupId = "";
+    readGroupId_ = "";
     copiedFromBam = false;
 #ifdef USE_PBBAM
     bamRecord = PacBio::BAM::BamRecord();
 #endif 
+
+    // ZMWMetrics
+    for (size_t i = 0; i < 4; i++) {
+        hqRegionSnr_[i] = -1;
+    }
 
     // Free seq, title and FASTQ QVs, also reset deleteOnExit.
     // Don't call FASTQSequence::Free() before freeing SMRT QVs.
     FASTQSequence::Free();
 }
 
-bool SMRTSequence::StoreXY(int16_t xyP[]) {
-    xy[0] = xyP[0];
-    xy[1] = xyP[1];
-    return true;
+SMRTSequence & SMRTSequence::HoleNumber(UInt holeNumber) {
+    zmwData.holeNumber = holeNumber;
+    return *this;
 }
 
-bool SMRTSequence::StorePlatformId(PlatformId pid) {
-    platform = pid;
-    return true;
+UInt SMRTSequence::HoleNumber(void) const {
+    return zmwData.holeNumber;
 }
 
-bool SMRTSequence::StoreHoleNumber(UInt holeNumberP){ 
-    zmwData.holeNumber = holeNumber = holeNumberP;
-    return true;
+SMRTSequence & SMRTSequence::HoleXY(const int x, const int y) {
+    zmwData.x = x;
+    zmwData.y = y;
+    return *this;
 }
 
-bool SMRTSequence::StoreHoleStatus(unsigned char s) {
-    zmwData.holeStatus = s;
-    return true;
+UInt SMRTSequence::HoleX(void) const {
+    return zmwData.x;
 }
 
-bool SMRTSequence::StoreZMWData(ZMWGroupEntry &data) {
-    zmwData = data;
-    return true;
+UInt SMRTSequence::HoleY(void) const {
+    return zmwData.y;
 }
 
-bool SMRTSequence::GetXY(int xyP[]) {
-    xyP[0] = xy[0];
-    xyP[1] = xy[1];
-    return true;
+SMRTSequence & SMRTSequence::HoleStatus(const unsigned char holeStatus) {
+    zmwData.holeStatus = holeStatus;
+    return *this;
 }
 
-bool SMRTSequence::GetHoleNumber(UInt & holeNumberP) {
-    holeNumberP = holeNumber;
-    return true;
+unsigned char SMRTSequence::HoleStatus(void) const {
+    return zmwData.holeStatus;
 }
 
-std::string SMRTSequence::GetReadGroupId() {
-    return readGroupId;
+std::string SMRTSequence::MovieName(void) const {
+    return SMRTTitle(GetTitle()).MovieName();
 }
 
-void SMRTSequence::SetReadGroupId(const std::string & rid) {
-    readGroupId = rid;
+DNALength SMRTSequence::SubreadStart(void) const {
+    return subreadStart_;
+}
+
+SMRTSequence & SMRTSequence::SubreadStart(const DNALength start) {
+    subreadStart_ = start;
+    return *this;
+}
+
+DNALength SMRTSequence::SubreadEnd(void) const {
+    return subreadEnd_;
+}
+
+SMRTSequence & SMRTSequence::SubreadEnd(const DNALength end) {
+    subreadEnd_ = end;
+    return *this;
+}
+
+DNALength SMRTSequence::SubreadLength(void) const {
+    return subreadEnd_ - subreadStart_;
+}
+
+std::string SMRTSequence::ReadGroupId() const {
+    return readGroupId_;
+}
+
+SMRTSequence & SMRTSequence::ReadGroupId(const std::string & rid) {
+    readGroupId_ = rid;
+    return *this;
+}
+
+float SMRTSequence::HQRegionSnr(const char base) const {
+    if (::toupper(base) == 'A')      return hqRegionSnr_[SMRTSequence::SnrIndex4Base::A];
+    else if (::toupper(base) == 'C') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::C];
+    else if (::toupper(base) == 'G') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::G];
+    else if (::toupper(base) == 'T') return hqRegionSnr_[SMRTSequence::SnrIndex4Base::T];
+    else assert("Base must be in A, C, G, T" == 0);
+}
+
+SMRTSequence & SMRTSequence::HQRegionSnr(const char base, float v) {
+    if (::toupper(base) == 'A')      hqRegionSnr_[SMRTSequence::SnrIndex4Base::A] = v;
+    else if (::toupper(base) == 'C') hqRegionSnr_[SMRTSequence::SnrIndex4Base::C] = v;
+    else if (::toupper(base) == 'G') hqRegionSnr_[SMRTSequence::SnrIndex4Base::G] = v;
+    else if (::toupper(base) == 'T') hqRegionSnr_[SMRTSequence::SnrIndex4Base::T] = v;
+    else assert("Base must be in A, C, G, T" == 0);
+    return *this;
 }
 
 #ifdef USE_PBBAM
@@ -306,6 +352,16 @@ void SMRTSequence::Copy(const PacBio::BAM::BamRecord & record,
     // Do NOT copy other SMRTQVs such as startFrame, meanSignal...
     (static_cast<FASTQSequence*>(this))->Copy(record);
 
+    // Set subread start, subread end in coordinate of zmw.
+    if (record.Type() != PacBio::BAM::RecordType::CCS) { 
+        subreadStart_ = static_cast<int>(record.QueryStart());
+        subreadEnd_ = static_cast<int>(record.QueryEnd());
+    } else {
+        subreadStart_ = 0;
+        subreadEnd_ =  static_cast<int>(record.Sequence().length());;
+    }
+
+    // Shall we copy all pulse QVs including ipd and pw?
     if (copyAllQVs) {
         if (record.HasPreBaseFrames()) {
             std::vector<uint16_t> qvs = record.PreBaseFrames().DataRaw();
@@ -323,17 +379,17 @@ void SMRTSequence::Copy(const PacBio::BAM::BamRecord & record,
 
     // preBaseQVs are not included in BamRecord, and will not be copied.
     // Copy read group id from BamRecord.
-    SetReadGroupId(record.ReadGroupId());
+    ReadGroupId(record.ReadGroupId());
 
     // PacBio bam for secondary analysis does NOT carry zmw
     // info other than holeNumber, including holeStatus, holeX,
     // holeY, numEvents. 
-    zmwData.holeNumber = static_cast<UInt> (record.HoleNumber()); 
+    UInt hn = static_cast<UInt> (record.HoleNumber()); 
+    this->HoleNumber(hn).
     // Assumption: holeStatus of a bam record must be 'SEQUENCING'
-    zmwData.holeStatus = static_cast<unsigned char> (PacBio::AttributeValues::ZMW::HoleStatus::sequencingzmw);
-    // HoleXY.x = lower 16 bit, y = upper 16 bit
-    zmwData.x = zmwData.holeNumber & 0x0000FFFF;
-    zmwData.y = zmwData.holeNumber >> 16;
+          HoleStatus(static_cast<unsigned char> (PacBio::AttributeValues::ZMW::HoleStatus::sequencingzmw)).
+    // x = lower 16 bit, y = upper 16 bit
+          HoleXY(hn & 0x0000FFFF, hn >> 16);
 
     // Set hq region read score
     if (record.HasReadAccuracy()) {

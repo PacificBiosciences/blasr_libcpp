@@ -1,3 +1,4 @@
+#include <cassert>
 #include "HDFRegionTableReader.hpp"
 
 using namespace std;
@@ -29,30 +30,39 @@ int HDFRegionTableReader::Initialize(string &regionTableFileName,
         return 0;
     }
 
+    if (columnNames.Initialize(regions, "ColumnNames") == 0) {
+        return 0;
+    }
+    if (regionTypes.Initialize(regions, "RegionTypes") == 0) {
+        return 0;
+    }
+    if (regionDescriptions.Initialize(regions, "RegionDescriptions") == 0) {
+        return 0;
+    }
+    if (regionSources.Initialize(regions,  "RegionSources") == 0) {
+        return 0;
+    }
+
     nRows = regions.GetNRows();
-
-    if (columnNames.Initialize(regions.dataset, "ColumnNames") == 0) {
-        return 0;
-    }
-    if (regionTypes.Initialize(regions.dataset, "RegionTypes") == 0) {
-        return 0;
-    }
-    if (regionDescriptions.Initialize(regions.dataset, "RegionDescriptions") == 0) {
-        return 0;
-    }
-    if (regionSources.Initialize(regions.dataset,  "RegionSources") == 0) {
-        return 0;
-    }
-
+    isInitialized_ = true;
     curRow = 0;
     return 1;
 }
 
+bool HDFRegionTableReader::IsInitialized(void) const {
+    return isInitialized_;
+}
+
+bool HDFRegionTableReader::HasRegionTable(void) const {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
+    return fileContainsRegionTable;
+}
+
 int HDFRegionTableReader::GetNext(RegionAnnotation &annotation) {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
     //
     // Bail with no-op if this is the last row.
     //
-
     if (fileContainsRegionTable == false) {
         return 0;
     }
@@ -66,63 +76,58 @@ int HDFRegionTableReader::GetNext(RegionAnnotation &annotation) {
     return 1;
 }	
 
-void HDFRegionTableReader::RegionTypesToMap(RegionTable &table) {
-    size_t i;
-    table.regionTypeEnums.resize(table.regionTypes.size());
-    for (i = 0;i < table.regionTypes.size(); i++) {
-        if (table.regionTypes[i] == "HQRegion") {
-            table.regionTypeEnums[i] = HQRegion;
-        }
-        else if (table.regionTypes[i] == "Adapter") {
-            table.regionTypeEnums[i] = Adapter;
-        }
-        else if (table.regionTypes[i] == "Insert") {
-            table.regionTypeEnums[i] = Insert;
-        }
-        else if (table.regionTypes[i] == "Accuracy") {
-            table.regionTypeEnums[i] = Insert;
-        }
-        else {
-            cout << "ERROR! Region Type " << table.regionTypes[i] << " is not supported.  Check Enumerations.h" << endl;
-            assert(0);
-        }
-    }
-}
-
-int HDFRegionTableReader::ReadTableAttributes(RegionTable &table) {
-    if (fileContainsRegionTable == false) {
-        return 0;
-    }
-    columnNames.Read(table.columnNames);
-    regionTypes.Read(table.regionTypes);
-    RegionTypesToMap(table);
-    regionDescriptions.Read(table.regionDescriptions);
-    regionSources.Read(table.regionSources);
-    // All ok.
-    return 1;
-}
 
 void HDFRegionTableReader::Close() {
+    isInitialized_ = false;
+    fileContainsRegionTable = false;
+    columnNames.Close();
+    regionTypes.Close();
+    regionDescriptions.Close();
+    regionSources.Close();
     pulseDataGroup.Close();
     regions.Close();
     regionTableFile.Close();
 }
 
-void HDFRegionTableReader::ReadTable(RegionTable &table) {
-    if (fileContainsRegionTable == false) {
-        return;
-    }
-    ReadTableAttributes(table);
-    table.table.resize(nRows);
-    int i = 0;
-    while(GetNext(table.table[curRow])) {
-        i++;
+// Note that (1) there is NO GUARANTEE that region annotations in hdf5 
+// `Regions` dataset be sorted in any order, so we cannot iterate over
+// `Regions` in order to traverse zmws in order.
+// (2) region table of a million zmws is approximately 5M.
+void HDFRegionTableReader::ReadTable(RegionTable & table) {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
+    table.Reset();
+
+    if (fileContainsRegionTable) {
+        // Read attributes.
+        std::vector<std::string> names, types, descs, sources;
+        if (columnNames.IsInitialized()) columnNames.Read(names);
+        if (regionTypes.IsInitialized()) regionTypes.Read(types);
+        else {
+            cout << "ERROR MUST HAVE REGIONTYPES" << endl;
+            exit(1);
+        }
+        if (regionDescriptions.IsInitialized()) regionDescriptions.Read(descs);
+        if (regionSources.IsInitialized()) regionSources.Read(sources);
+
+        // Read region annotations
+        std::vector<RegionAnnotation> ras;
+        ras.resize(nRows);
+        assert(curRow == 0);
+        for (; curRow < nRows; curRow++) {
+            regions.Read(curRow, curRow+1, ras[curRow].row);
+        }
+
+        // Reconstruct table
+        table.ConstructTable(ras, types);
+        table.ColumnNames(names);
+        table.RegionDescriptions(descs);
+        table.RegionSources(sources);
     }
 }
 
-
 void HDFRegionTableReader::GetMinMaxHoleNumber(UInt &minHole,
                                                UInt &maxHole) {
+    assert(IsInitialized() or false == "HDFRegionTable is not initialize!");
     // Hole numbers may not be sorted ascendingly, so do not
     // return the first and last hole numbers as the min and max.
     UInt saveCurRow = curRow;

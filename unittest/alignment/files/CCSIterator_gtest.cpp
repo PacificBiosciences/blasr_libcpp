@@ -40,8 +40,6 @@ public:
         EXPECT_TRUE(rev);
         reader->ReadTable(*rgn);
         reader->Close();
-
-        rgn->SortTableByHoleNumber();
     }
 
     void TearDown() {

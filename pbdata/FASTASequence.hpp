@@ -29,21 +29,11 @@ public:
     FASTASequence();
     inline ~FASTASequence();
 
-    void PrintSeq(std::ostream &out, int lineLength = 50, char delim='>');
+    void PrintSeq(std::ostream &out, int lineLength = 50, char delim='>') const;
 
-    int GetStorageSize();
+    int GetStorageSize() const;
 
     std::string GetName() const;
-
-    virtual bool StoreHoleNumber(int holeNumber);
-    virtual bool StoreHoleStatus(unsigned char holeStatus);
-    virtual bool StorePlatformId(PlatformId platformId);
-    virtual bool StoreZMWData(ZMWGroupEntry &data);
-    virtual bool StoreXY(int16_t xy[]);
-
-    bool GetHoleNumber (int &holeNumberP); 
-
-    bool GetXY(int xyP[]); 
 
     void ShallowCopy(const FASTASequence &rhs); 
 
@@ -55,7 +45,7 @@ public:
 
     void CopyTitle(std::string str);
 
-    void GetFASTATitle(std::string& fastaTitle); 
+    void GetFASTATitle(std::string& fastaTitle) const; 
 
     void CopySubsequence(FASTASequence &rhs, int readStart, int readEnd=-1); 
 

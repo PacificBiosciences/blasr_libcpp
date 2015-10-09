@@ -19,6 +19,7 @@
 #ifdef USE_PBBAM
 #include "pbbam/BamFile.h"
 #include "pbbam/EntireFileQuery.h"
+#include "pbbam/GroupQuery.h"
 #include "pbbam/BamRecord.h"
 #endif
 
@@ -105,6 +106,7 @@ public:
   int GetNext(FASTQSequence &seq);
   int GetNext(SMRTSequence &seq);
   int GetNext(CCSSequence &seq);
+  int GetNext(vector<SMRTSequence> & reads);
 
   template<typename T_Sequence>
       int GetNext(T_Sequence & seq, int & randNum);
@@ -121,6 +123,8 @@ public:
   PacBio::BAM::BamFile * bamFilePtr;
   PacBio::BAM::EntireFileQuery * entireFileQueryPtr;
   PacBio::BAM::EntireFileQuery::iterator bamIterator;
+  PacBio::BAM::QNameQuery * zmwGroupQueryPtr;
+  PacBio::BAM::QNameQuery::iterator zmwGroupIterator;
 #endif
 };
 
