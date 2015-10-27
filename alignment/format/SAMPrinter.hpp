@@ -37,18 +37,23 @@ void CreateDNAString(DNASequence &seq, DNASequence &clippedSeq,
     int trimFront=0, int trimEnd=0); 
 
 void AddGaps(T_AlignmentCandidate &alignment, int gapIndex,
-        std::vector<int> &opSize, std::vector<char> &opChar); 
+        std::vector<int> &opSize, std::vector<char> &opChar);
 
 // Add sequence match/mismatch CIGAR string Ops for block b.
 void AddMatchBlockCigarOps(DNASequence & qSeq, DNASequence & tSeq, blasr::Block & b,
         DNALength & qSeqPos, DNALength & tSeqPos,
         std::vector<int> & opSize, std::vector<char> & opChar);
 
+// Merge adjacent indels and mismatches.
+void MergeAdjacentIndels(std::vector<int> &opSize, std::vector<char> &opChar,
+                         const char mismatchChar);
+
 // If cigarUseSeqMatch is true, cigar string uses '=' and 'X' 
 // instead of 'M' to represent sequence match and mismatch;
 void CreateNoClippingCigarOps(T_AlignmentCandidate &alignment, 
         std::vector<int> &opSize, std::vector<char> &opChar,
-        bool cigarUseSeqMatch = false); 
+        bool cigarUseSeqMatch = false, 
+        const bool allowAdjacentIndels = true); 
 //
 // 
 // The aligned sequence is either the sequence from the first
@@ -80,13 +85,15 @@ void CreateCIGARString(T_AlignmentCandidate &alignment, T_Sequence &read,
         std::string &cigarString, Clipping clipping, 
         DNALength &prefixSoftClip, DNALength &suffixSoftClip,
         DNALength &prefixHardClip, DNALength &suffixHardClip,
-        bool cigarUseSeqMatch = false); 
+        bool cigarUseSeqMatch = false,
+        const bool allowAdjacentIndels = true); 
 
 template<typename T_Sequence>
 void PrintAlignment(T_AlignmentCandidate &alignment, T_Sequence &read,
         std::ostream &samFile, AlignmentContext &context, 
         SupplementalQVList & qvList, Clipping clipping = none,
-        bool cigarUseSeqMatch = false); 
+        bool cigarUseSeqMatch = false,
+        const bool allowAdjacentIndels = true); 
 }
 
 #include "SAMPrinterImpl.hpp"

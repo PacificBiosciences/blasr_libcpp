@@ -11,7 +11,6 @@ space := $(null) $(null)
 
 broken_test_sources := \
 	${SRCDIR}/alignment/format/SAMHeaderPrinter_gtest.cpp \
-	${SRCDIR}/alignment/format/SAMPrinter_gtest.cpp \
 	$(null)
 
 

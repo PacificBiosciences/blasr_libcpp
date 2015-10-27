@@ -13,7 +13,8 @@ void AlignmentToBamRecord(T_AlignmentCandidate & alignment,
         T_Sequence & read, T_Sequence & subread, 
         PacBio::BAM::BamRecord & bamRecord, 
         AlignmentContext & context, SupplementalQVList & qvList,
-        Clipping clipping, bool cigarUseSeqMatch);
+        Clipping clipping,
+        bool cigarUseSeqMatch=false, const bool allowAdjacentIndels=true);
 
 namespace BAMOutput {
 
@@ -22,7 +23,7 @@ void PrintAlignment(T_AlignmentCandidate &alignment, T_Sequence &read,
         T_Sequence & subread,
         PacBio::BAM::BamWriter &bamWriter, AlignmentContext &context, 
         SupplementalQVList & qvList, Clipping clipping, 
-        bool cigarUseSeqMatch=false);
+        bool cigarUseSeqMatch=false, const bool allowAdjacentIndels=true);
 }
 
 #include "BAMPrinterImpl.hpp"

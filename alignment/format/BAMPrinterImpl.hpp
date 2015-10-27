@@ -14,7 +14,7 @@ template<typename T_Sequence>
 void AlignmentToBamRecord(T_AlignmentCandidate & alignment, 
         T_Sequence & read, T_Sequence & subread, PacBio::BAM::BamRecord & bamRecord,
         AlignmentContext & context, SupplementalQVList & qvList,
-        Clipping clipping, bool cigarUseSeqMatch) {
+        Clipping clipping, bool cigarUseSeqMatch, const bool allowAdjacentIndels) {
     assert(clipping == SAMOutput::soft or clipping == SAMOutput::subread);
 
     // Build from scratch if input reads are not from pbbam files.
@@ -38,7 +38,7 @@ void AlignmentToBamRecord(T_AlignmentCandidate & alignment,
     CreateCIGARString(alignment, read, cigarString, clipping,
                       prefixSoftClip, suffixSoftClip, 
                       prefixHardClip, suffixHardClip,
-                      cigarUseSeqMatch);
+                      cigarUseSeqMatch, allowAdjacentIndels);
     SetAlignedSequence(alignment, read, alignedSequence, clipping);
     PacBio::BAM::Cigar cigar = PacBio::BAM::Cigar::FromStdString(cigarString);
  
@@ -157,10 +157,11 @@ void AlignmentToBamRecord(T_AlignmentCandidate & alignment,
 template<typename T_Sequence>
 void BAMOutput::PrintAlignment(T_AlignmentCandidate &alignment, T_Sequence &read, T_Sequence & subread,
         PacBio::BAM::BamWriter &bamWriter, AlignmentContext &context, 
-        SupplementalQVList & qvList, Clipping clipping, bool cigarUseSeqMatch) {
+        SupplementalQVList & qvList, Clipping clipping,
+        bool cigarUseSeqMatch, const bool allowAdjacentIndels) {
 
     PacBio::BAM::BamRecord bamRecord;
-    AlignmentToBamRecord(alignment, read, subread, bamRecord, context, qvList, clipping, cigarUseSeqMatch);
+    AlignmentToBamRecord(alignment, read, subread, bamRecord, context, qvList, clipping, cigarUseSeqMatch, allowAdjacentIndels);
     bamWriter.Write(bamRecord);
 }
 #endif

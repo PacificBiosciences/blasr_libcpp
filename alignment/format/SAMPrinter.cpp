@@ -99,8 +99,43 @@ void SAMOutput::AddMatchBlockCigarOps(DNASequence & qSeq, DNASequence & tSeq,
     }
 }
 
+void SAMOutput::MergeAdjacentIndels(std::vector<int> &opSize, 
+                                    std::vector<char> &opChar,
+                                    const char mismatchChar) {
+    assert(opSize.size() == opChar.size());
+    int i, j;
+    for (i = 0, j = 1; i < opSize.size() and j < opSize.size(); j++) {
+        const int  ni = opSize[i], nj = opSize[j];
+        const char ci = opChar[i], cj = opChar[j];
+        if (ci == cj) {
+            opSize[i] = ni + nj; // merge i and j to i
+        } else {
+            if ((ci == 'I' and cj == 'D') or (ci == 'D' and cj == 'I')) {
+                opSize[i] = std::min(ni, nj);
+                opChar[i] = mismatchChar; // merge 'I' and 'D' to Mismatch
+                if (i != 0 and i != opSize.size() and opChar[i] == opChar[i - 1]) {
+                    opSize[i - 1] += opSize[i]; // merge with i - 1?
+                    i--;
+                }
+                if (ni != nj) {
+                    i++; // the remaining 'I' or 'D'
+                    opSize[i] = std::abs(ni - nj);
+                    opChar[i] = (ni > nj) ? ci: cj;
+                }
+            } else  {
+                i++; // move forward.
+                opSize[i] = nj;
+                opChar[i] = cj;
+            }
+        }
+    }
+    opSize.erase(opSize.begin() + i + 1, opSize.end());
+    opChar.erase(opChar.begin() + i + 1, opChar.end());
+}
+
 void SAMOutput::CreateNoClippingCigarOps(T_AlignmentCandidate &alignment, 
-        std::vector<int> &opSize, std::vector<char> &opChar, bool cigarUseSeqMatch) {
+        std::vector<int> &opSize, std::vector<char> &opChar,
+        bool cigarUseSeqMatch, const bool allowAdjacentIndels) {
     //
     // Create the cigar string for the aligned region of a read,
     // excluding the clipping.
@@ -173,6 +208,10 @@ void SAMOutput::CreateNoClippingCigarOps(T_AlignmentCandidate &alignment,
     if (alignment.tStrand == 1) {
         std::reverse(opSize.begin(), opSize.end());
         std::reverse(opChar.begin(), opChar.end());
+    }
+
+    if (not allowAdjacentIndels) {
+        MergeAdjacentIndels(opSize, opChar, (cigarUseSeqMatch?'X':'M'));
     }
 }
 
