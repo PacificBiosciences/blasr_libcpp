@@ -82,4 +82,20 @@ TEST(SAMPrinterTest, MergeAdjacentIndels) {
     opSize = std::vector<int >({1,  10 });
     opChar = std::vector<char>({'I','D'});
     EXPECT_EQ(merge_indels(opSize, opChar), "1X9D");
+
+    opSize = std::vector<int >({1  });
+    opChar = std::vector<char>({'='});
+    EXPECT_EQ(merge_indels(opSize, opChar), "1=");
+
+    opSize = std::vector<int >({1  });
+    opChar = std::vector<char>({'I'});
+    EXPECT_EQ(merge_indels(opSize, opChar), "1I");
+
+    opSize = std::vector<int >({1  , 10});
+    opChar = std::vector<char>({'X', '='});
+    EXPECT_EQ(merge_indels(opSize, opChar), "1X10=");
+
+    opSize = std::vector<int >({1  , 10});
+    opChar = std::vector<char>({'I', '='});
+    EXPECT_EQ(merge_indels(opSize, opChar), "1I10=");
 }
