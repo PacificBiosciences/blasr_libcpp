@@ -41,13 +41,13 @@ void BufferedHDFArray<T>::SetBufferSize(int _bufferSize) {
 }
 
 template<typename T>
-void BufferedHDFArray<T>::Write(const T *data, UInt dataLength, bool append, 
-    UInt writePos) {
+void BufferedHDFArray<T>::Write(const T *data, DSLength dataLength, bool append, 
+    DSLength writePos) {
 
     // Fill the buffer with data. When there is overflow, write
     // that out to disk.
     //
-    UInt dataIndex = 0;
+    DSLength dataIndex = 0;
     int bufferCapacity;
     int bufferFillSize = 0;
     bool flushBuffer;
@@ -71,7 +71,7 @@ void BufferedHDFArray<T>::Write(const T *data, UInt dataLength, bool append,
 }
 
 template<typename T>
-void BufferedHDFArray<T>::Flush(bool append, UInt writePos) {
+void BufferedHDFArray<T>::Flush(bool append, DSLength writePos) {
     //
     // Flush contents of current buffer to the file.
     //
@@ -239,7 +239,7 @@ int BufferedHDFArray<T>::Initialize(HDFGroup &parentGroup,
 
 template<typename T>
 int BufferedHDFArray<T>::Initialize(HDFGroup &parentGroup, 
-    const std::string &datasetName, bool createIfMissing, UInt newArrayLength) {
+    const std::string &datasetName, bool createIfMissing, DSLength newArrayLength) {
     //
     // For writing to this dataset, start at the first position in the
     // write buffer.
@@ -333,7 +333,7 @@ int BufferedHDFArray<T>::UpdateH5Dataspace() {
 }
 
 template<typename T>
-int BufferedHDFArray<T>::Resize(UInt newArrayLength) {
+int BufferedHDFArray<T>::Resize(const DSLength newArrayLength) {
     //
     // Resize this dataset. May or may not allocate space in file.
     // May or may not write fill value.
@@ -365,7 +365,7 @@ void BufferedHDFArray<T>::Close() {
 }
 
 template<typename T>
-UInt BufferedHDFArray<T>::size() {
+DSLength BufferedHDFArray<T>::size() {
     dataspace = dataset.getSpace();
     hsize_t dimSizeArray[1];
     dataspace.getSimpleExtentDims(dimSizeArray);
@@ -383,7 +383,7 @@ UInt BufferedHDFArray<T>::size() {
  */
 
 template<typename T>
-void BufferedHDFArray<T>::Read(UInt start, UInt end, T* dest) {
+void BufferedHDFArray<T>::Read(DSLength start, DSLength end, T* dest) {
     assert("ERROR, calling Read with an unsupported type. Use Read(start,end,datatype, dest) instead." == 0);
     exit(1); // this is in case the assert statement is removed.
 }
@@ -400,7 +400,7 @@ void BufferedHDFArray<T>::ReadDataset(std::vector<T> &dest) {
 }
 
 template<typename T>
-void BufferedHDFArray<T>::Read(UInt start, UInt end, H5::DataType typeID, T *dest) {
+void BufferedHDFArray<T>::Read(DSLength start, DSLength end, H5::DataType typeID, T *dest) {
     if (end - start == 0) {
         return;
     }
@@ -415,7 +415,7 @@ void BufferedHDFArray<T>::Read(UInt start, UInt end, H5::DataType typeID, T *des
 }
 
 template<typename T>
-void BufferedHDFArray<T>::ReadCharArray(UInt start, UInt end, std::string* dest) {
+void BufferedHDFArray<T>::ReadCharArray(DSLength start, DSLength end, std::string* dest) {
     hsize_t memSpaceSize[] = {0};
     memSpaceSize[0] = end - start;
     hsize_t sourceSpaceOffset[] = {0};
@@ -426,8 +426,7 @@ void BufferedHDFArray<T>::ReadCharArray(UInt start, UInt end, std::string* dest)
     std::vector<char*> tmpStringArray;
     tmpStringArray.resize(end-start);
     dataset.read(&tmpStringArray[0], strType, destSpace, fullSourceSpace);
-    UInt i;
-    for (i = 0; i < tmpStringArray.size(); i++) {
+    for (size_t i = 0; i < tmpStringArray.size(); i++) {
         dest[i] = tmpStringArray[i];
     }
     destSpace.close();

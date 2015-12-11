@@ -70,7 +70,7 @@ public:
 private:
     /// \name Private Data 
     /// ZMW/NumEvent
-    BufferedHDFArray<int>           numEventArray_;
+    BufferedHDFArray<uint32_t>      numEventArray_;
     /// ZMW/HoleNumber
     BufferedHDFArray<unsigned int>  holeNumberArray_;
     /// ZMW/HoleStatus

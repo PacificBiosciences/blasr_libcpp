@@ -65,12 +65,10 @@
 template<typename T_Sequence>
 class T_HDFBasReader : public DatasetCollection, public HDFPulseDataFile {
 public:
-    DNALength curBasePos;
-    int curRead;
-    unsigned int nBases;
+    DSLength curBasePos;
+    UInt curRead;
+    DSLength nBases;
 
-
-    //bool readPulseInformation;
     bool hasRegionTable;
 
     HDFArray<int> zmwXCoordArray;
@@ -125,7 +123,7 @@ public:
         return scanDataReader.GetMovieName();
     }
 
-    int GetReadAt(int index, SMRTSequence &read) {
+    DNALength GetReadAt(UInt index, SMRTSequence &read) {
         //
         // The first time this is called there may be no table of read
         // offset positions.  Check for that and build if it does not
@@ -581,11 +579,11 @@ public:
         return Initialize();
     }
 
-    int GetNumReads() {
+    UInt GetNumReads() {
         return nReads;
     }
 
-    void BuildReadTitle(std::string movieTitle, unsigned int holeNumber, std::string &readTitle, unsigned int simIndex=0, unsigned int simCoordinate=0) {
+    void BuildReadTitle(std::string movieTitle, UInt holeNumber, std::string &readTitle) {
         std::stringstream readTitleStrm;
         readTitleStrm << movieTitle << "/" << holeNumber;
         readTitle = readTitleStrm.str();
@@ -596,7 +594,7 @@ public:
             return 0;
         }
 
-        int seqLength;
+        DNALength seqLength;
         try {
             seqLength = GetNextWithoutPosAdvance(seq);
         } catch(H5::DataSetIException e) {
@@ -614,13 +612,13 @@ public:
             if (curRead == nReads) {
                 return 0;
             }
-            int seqLength = GetNextWithoutPosAdvance(seq);
+            DNALength seqLength = GetNextWithoutPosAdvance(seq);
             seq.length = seqLength;
 
             if (seqLength > 0 ) {
                 if (includedFields["QualityValue"]) {
                     seq.AllocateQualitySpace(seqLength);
-                    qualArray.Read((int)curBasePos, (int) curBasePos + seqLength, (unsigned char*) seq.qual.data);
+                    qualArray.Read(curBasePos, curBasePos + seqLength, (unsigned char*) seq.qual.data);
                 }
                 if (includedFields["DeletionQV"]) {
                     GetNextDeletionQV(seq);
@@ -669,14 +667,14 @@ public:
             if (includedFields["ReadScore"]) {
                 GetNextReadScore(seq);
             }
-            int seqLength = GetNextWithoutPosAdvance(seq);
+            DNALength seqLength = GetNextWithoutPosAdvance(seq);
             seq.length = seqLength;
             if(readQVs) {
                 if (seqLength > 0 ) {
                     if (includedFields["QualityValue"]) {
                         seq.AllocateQualitySpace(seqLength);
-                        qualArray.Read((int)curBasePos, 
-                                       (int) curBasePos + seqLength, 
+                        qualArray.Read(curBasePos, 
+                                       curBasePos + seqLength, 
                                        (unsigned char*) seq.qual.data);
                     }
                 }
@@ -781,25 +779,24 @@ public:
         basWidthInFramesArray.Read(0, nBases, &widthInFrames[0]);
     }
 
-    int GetAllHoleStatus(std::vector<unsigned char> &holeStatus) {
+    size_t GetAllHoleStatus(std::vector<unsigned char> &holeStatus) {
         CheckMemoryAllocation(zmwReader.holeStatusArray.arrayLength, maxAllocNElements, "HoleStatus (base)");
         holeStatus.resize(nReads);
         zmwReader.holeStatusArray.Read(0,nReads, (unsigned char*)&holeStatus[0]);
         return holeStatus.size();
     }
 
-    int GetAllReadLengths(std::vector<int> &readLengths) {
+    size_t GetAllReadLengths(std::vector<DNALength> &readLengths) {
         readLengths.resize(nReads);
         zmwReader.numEventArray.ReadDataset(readLengths);
         return readLengths.size();
     }
 
-    int Advance(int nSeq) {
-        int i;
+    UInt Advance(UInt nSeq) {
         // cannot advance past the end of this file
         if (curRead + nSeq >= nReads) { return 0; }
-        for (i = curRead; i < curRead + nSeq && i < nReads; i++ ) {
-            int seqLength;
+        for (UInt i = curRead; i < curRead + nSeq && i < nReads; i++ ) {
+            DNALength seqLength;
             zmwReader.numEventArray.Read(i, i+1, &seqLength);
             curBasePos += seqLength;
         }
@@ -808,10 +805,10 @@ public:
         return curRead;
     }
 
-    int GetNextWithoutPosAdvance(FASTASequence &seq) {
-        int seqLength;
-
+    DNALength GetNextWithoutPosAdvance(FASTASequence &seq) {
+        DNALength seqLength;
         zmwReader.numEventArray.Read(curRead, curRead+1, &seqLength);
+
         seq.length = 0;
         seq.seq = NULL;
 
@@ -823,7 +820,7 @@ public:
         }
 
         std::string readTitle;
-        unsigned int holeNumber;
+        UInt holeNumber;
         zmwReader.holeNumberArray.Read(curRead, curRead+1, &holeNumber);
 
         unsigned char holeStatus;
@@ -838,72 +835,76 @@ public:
             simulatedCoordinateArray.Read(curRead, curRead+1, &simCoordinate);
         }
 
-        BuildReadTitle(scanDataReader.GetMovieName(), holeNumber, readTitle, simIndex, simCoordinate);
+        BuildReadTitle(scanDataReader.GetMovieName(), holeNumber, readTitle);
 
         seq.CopyTitle(readTitle);
         curRead++;
+
+        //cout << holeNumber << "\t" << curRead - 1 << "\t" << curBasePos << "\t" << curBasePos + seqLength << endl;
         return seqLength;
     }
 
-    int GetNextDeletionQV(FASTQSequence &seq) {
+    DNALength GetNextDeletionQV(FASTQSequence &seq) {
         if (seq.length == 0) return 0;
         seq.AllocateDeletionQVSpace(seq.length);
-        deletionQVArray.Read((int)curBasePos, (int) curBasePos + seq.length, (unsigned char*) seq.deletionQV.data);
+        deletionQVArray.Read(curBasePos, curBasePos + seq.length, (unsigned char*) seq.deletionQV.data);
         return seq.length;
     }
 
-    int GetNextMergeQV(FASTQSequence &seq) {
+    DNALength GetNextMergeQV(FASTQSequence &seq) {
         if (seq.length == 0) return 0;
         seq.AllocateMergeQVSpace(seq.length);
-        mergeQVArray.Read((int)curBasePos, (int) curBasePos + seq.length, (unsigned char*) seq.mergeQV.data);
+        mergeQVArray.Read(curBasePos, curBasePos + seq.length, (unsigned char*) seq.mergeQV.data);
         return seq.length;
     }
 
-    int GetNextDeletionTag(FASTQSequence &seq) {
+    DNALength GetNextDeletionTag(FASTQSequence &seq) {
         if (seq.length == 0) return 0;
         seq.AllocateDeletionTagSpace(seq.length);
-        deletionTagArray.Read((int)curBasePos, (int) curBasePos + seq.length, (unsigned char*) seq.deletionTag);
+        deletionTagArray.Read(curBasePos, curBasePos + seq.length, (unsigned char*) seq.deletionTag);
         return seq.length;
     }
 
-    int GetNextInsertionQV(FASTQSequence &seq) {
+    DNALength GetNextInsertionQV(FASTQSequence &seq) {
         if (seq.length == 0) return 0;
         seq.AllocateInsertionQVSpace(seq.length);
-        insertionQVArray.Read((int)curBasePos, (int) curBasePos + seq.length, (unsigned char*) seq.insertionQV.data);
+        insertionQVArray.Read(curBasePos, curBasePos + seq.length, (unsigned char*) seq.insertionQV.data);
         return seq.length;
     }
 
-    int GetNextWidthInFrames(SMRTSequence &seq) {
+    DNALength GetNextWidthInFrames(SMRTSequence &seq) {
         if (seq.length == 0) return 0;
         if (seq.widthInFrames) {
             delete [] seq.widthInFrames;
             seq.widthInFrames = NULL;
         }
         seq.widthInFrames = ProtectedNew<HalfWord>(seq.length);
-        basWidthInFramesArray.Read((int)curBasePos, (int) curBasePos + seq.length, (HalfWord*) seq.widthInFrames);
+        basWidthInFramesArray.Read(curBasePos, curBasePos + seq.length, (HalfWord*) seq.widthInFrames);
         return seq.length;
     }
 
-    int GetNextPreBaseFrames(SMRTSequence &seq) {
+    DNALength GetNextPreBaseFrames(SMRTSequence &seq) {
         if (seq.length == 0) return 0;
         if (seq.preBaseFrames) {
             delete [] seq.preBaseFrames;
             seq.preBaseFrames = NULL;
         }
         seq.preBaseFrames = ProtectedNew<HalfWord>(seq.length);
-        preBaseFramesArray.Read((int)curBasePos, (int) curBasePos + seq.length, (HalfWord*) seq.preBaseFrames);
+        preBaseFramesArray.Read(curBasePos, curBasePos + seq.length, (HalfWord*) seq.preBaseFrames);
         return seq.length;
     }
-    int GetNextPulseIndex(SMRTSequence &seq) {
+
+    DNALength GetNextPulseIndex(SMRTSequence &seq) {
         if (seq.length == 0) return 0;
         if (seq.pulseIndex) {
             delete [] seq.pulseIndex;
             seq.pulseIndex = NULL;
         }
         seq.pulseIndex = ProtectedNew<int>(seq.length);
-        pulseIndexArray.Read((int)curBasePos, (int) curBasePos + seq.length, (int*) seq.pulseIndex);
+        pulseIndexArray.Read(curBasePos, curBasePos + seq.length, (int*) seq.pulseIndex);
         return seq.length;
     }
+
     int GetNextHQRegionSNR(SMRTSequence &seq) {
         float snrs[4];
         hqRegionSNRMatrix.Read(curRead, curRead + 1, snrs);
@@ -917,21 +918,23 @@ public:
            .HQRegionSnr('T', snrs[baseMap['T']]);
         return 4;
     }
+
     int GetNextReadScore(SMRTSequence &seq) {
         readScoreArray.Read(curRead, curRead + 1, &seq.readScore);
         return 1;
     }
-    int GetNextSubstitutionQV(FASTQSequence &seq) {
+
+    DNALength GetNextSubstitutionQV(FASTQSequence &seq) {
         if (seq.length == 0) return 0;
         seq.AllocateSubstitutionQVSpace(seq.length);
-        substitutionQVArray.Read((int)curBasePos, (int) curBasePos + seq.length, (unsigned char*) seq.substitutionQV.data);
+        substitutionQVArray.Read(curBasePos, curBasePos + seq.length, (unsigned char*) seq.substitutionQV.data);
         return seq.length;
     }
 
-    int GetNextSubstitutionTag(FASTQSequence &seq) {
+    DNALength GetNextSubstitutionTag(FASTQSequence &seq) {
         if (seq.length == 0) return 0;
         seq.AllocateSubstitutionTagSpace(seq.length);
-        substitutionTagArray.Read((int)curBasePos, (int) curBasePos + seq.length, (unsigned char*) seq.substitutionTag);		
+        substitutionTagArray.Read(curBasePos, curBasePos + seq.length, (unsigned char*) seq.substitutionTag);		
         return seq.length;
     }
 
@@ -987,16 +990,15 @@ public:
 
     void ReadAllHoleXY(BaseFile &baseFile) {
         baseFile.holeXY.resize(nReads);
-        int i;
-        for (i = 0; i < nReads; i++) {
-            zmwReader.xyArray.Read(i,i+1, baseFile.holeXY[i].xy);
+        for (UInt i = 0; i < nReads; i++) {
+            zmwReader.xyArray.Read(i, i+1, baseFile.holeXY[i].xy);
         }
     }
 
     //
     // Return size of an entire field.
     //
-    UInt GetFieldSize(const std::string & field) {
+    DSLength GetFieldSize(const std::string & field) {
         if (not includedFields[field]) {
             cout << "ERROR, field [" << field << "] is not included in the base file." << endl;
             exit(1);
@@ -1126,9 +1128,8 @@ public:
         baseFile.readStartPositions.resize(baseFile.readLengths.size()+1);
 
         if ( baseFile.readLengths.size() > 0 ) {
-            int i;
             baseFile.readStartPositions[0] = 0;
-            for (i = 1; i < baseFile.readLengths.size()+1; i++) {
+            for (size_t i = 1; i < baseFile.readLengths.size()+1; i++) {
                 baseFile.readStartPositions[i] = 
                     (baseFile.readStartPositions[i-1] +
                      baseFile.readLengths[i-1]);
@@ -1144,7 +1145,7 @@ public:
 
         if (includedFields["Basecall"]) {
             baseFile.baseCalls.resize(nBases);
-            baseArray.Read(0,nBases, &baseFile.baseCalls[0]);
+            baseArray.Read(0, nBases, &baseFile.baseCalls[0]);
         }
 
         /*
@@ -1196,11 +1197,6 @@ public:
             exit(1);
         }
     }
-};
-
-class HDFSmrtReader: public T_HDFBasReader<SMRTSequence> {
-public:
-    int Advance(int nSteps);
 };
 
 typedef T_HDFBasReader<FASTASequence> HDFBasReader;

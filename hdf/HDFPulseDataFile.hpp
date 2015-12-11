@@ -18,49 +18,52 @@ public:
     HDFScanDataReader scanDataReader;
     bool useScanData;
     bool closeFileOnExit;
+
+    // Max number of rows allowed to read into memory at a time.
     int  maxAllocNElements;
+
     HDFZMWReader zmwReader;
-    std::vector<unsigned int> eventOffset;
-    int nReads;
+    std::vector<DSLength> eventOffset;
+    UInt nReads;
     bool preparedForRandomAccess;
 
-    int GetAllReadLengths(std::vector<DNALength> &readLengths); 
+    DSLength GetAllReadLengths(std::vector<DNALength> &readLengths);
 
-    void CheckMemoryAllocation(long allocSize, long allocLimit, 
+    void CheckMemoryAllocation(long allocSize, long allocLimit,
         const char *fieldName = NULL); 
 
-    HDFPulseDataFile(); 
+    HDFPulseDataFile();
 
-    void PrepareForRandomAccess(); 
+    void PrepareForRandomAccess();
 
-    int OpenHDFFile(std::string fileName, 
-        const H5::FileAccPropList & fileAccPropList=H5::FileAccPropList::DEFAULT); 
+    int OpenHDFFile(std::string fileName,
+        const H5::FileAccPropList & fileAccPropList=H5::FileAccPropList::DEFAULT);
 
     //
     // All pulse data files contain the "PulseData" group name.
     // 
     //
-    int InitializePulseDataFile(std::string fileName, 
-        const H5::FileAccPropList & fileAccPropList=H5::FileAccPropList::DEFAULT); 
+    int InitializePulseDataFile(std::string fileName,
+        const H5::FileAccPropList & fileAccPropList=H5::FileAccPropList::DEFAULT);
 
     int Initialize(std::string fileName, 
-        const H5::FileAccPropList & fileAccPropList=H5::FileAccPropList::DEFAULT); 
+        const H5::FileAccPropList & fileAccPropList=H5::FileAccPropList::DEFAULT);
 
     //
     // Initialize inside another open group.
     //
-    int Initialize(HDFGroup *rootGroupP); 
+    int Initialize(HDFGroup *rootGroupP);
 
     //
-    // Initialize all fields 
+    // Initialize all fields
     //
-    int Initialize(); 
+    int Initialize();
 
-    int InitializePulseGroup(); 
+    int InitializePulseGroup();
 
-    int GetAllHoleNumbers(std::vector<unsigned int> &holeNumbers); 
+    size_t GetAllHoleNumbers(std::vector<unsigned int> &holeNumbers);
 
-    void Close(); 
+    void Close();
 
 };
 

@@ -20,7 +20,7 @@
 	hdfFile.openFile(hdfFileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 	BufferedHDF2DArray<uint16_t> xyArray;
 	xyArray.Initialize(hdfFile, "PulseData/BaseCalls/ZMW/HoleXY");
-	int curX = 0;
+	DSLength curX = 0;
 	xyArray.Read(curX, curX + 1, 0, 2, holeXY);
 
 	or, to read a row:
@@ -28,11 +28,11 @@
 
  */
 
-UInt GetDatasetNDim(H5::CommonFG &parentGroup, std::string datasetName) {
+DSLength GetDatasetNDim(H5::CommonFG &parentGroup, std::string datasetName) {
     HDFData tmpDataset;
     tmpDataset.InitializeDataset(parentGroup, datasetName);
     H5::DataSpace dataspace = tmpDataset.dataset.getSpace();
-    UInt nDims = dataspace.getSimpleExtentNdims();
+    DSLength nDims = dataspace.getSimpleExtentNdims();
     dataspace.close();
     tmpDataset.dataset.close();
     return nDims;
@@ -52,7 +52,7 @@ DEFINE_TYPED_WRITE_ROW(float, H5::PredType::NATIVE_FLOAT)
 
 
 #define DEFINE_TYPED_READ_ROW(T, Pred) template<>\
-void BufferedHDF2DArray<T>::Read(int startX, int endX, int startY, int endY, T* dest) {\
+void BufferedHDF2DArray<T>::Read(DSLength startX, DSLength endX, DSLength startY, DSLength endY, T* dest) {\
 	Read(startX, endX, startY, endY, Pred, dest);\
 }
 

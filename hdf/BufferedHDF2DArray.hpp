@@ -48,8 +48,8 @@ class BufferedHDF2DArray : public HDFData, public HDFWriteBuffer<T> {
 private:
     hsize_t   nDims;
     hsize_t   *dimSize;
-    int       maxDims;
-    int       rowLength, colLength;
+    DSLength  maxDims;
+    DSLength  rowLength,  colLength;
 
 public:
 
@@ -57,9 +57,9 @@ public:
 
     BufferedHDF2DArray();
 
-    unsigned int GetNRows();
+    DSLength GetNRows();
 
-    unsigned int GetNCols(); 
+    DSLength GetNCols(); 
 
     void Close(); 
 
@@ -72,29 +72,28 @@ public:
      * required.  The assumption is that the dataspace is in two
      * dimensions, and this exits without grace if it is not. 
      */
-    int Initialize(HDFGroup &group, std::string datasetName, unsigned int _rowLength=0, 
+    int Initialize(HDFGroup &group, std::string datasetName, DSLength _rowLength=0, 
         int _bufferSize=0, bool createIfMissing=true); 
 
-    int size(); 
+    DSLength size(); 
 
     /*
      * Read rows in the range (startX, endX] in to dest.
      */
+    void Read(DSLength startX, DSLength endX, H5::DataType typeID, T*dest); 
 
-    void Read(int startX, int endX, H5::DataType typeID, T*dest); 
-
-    void Read(int startX, int endX, T*dest); 
+    void Read(DSLength startX, DSLength endX, T*dest); 
 
     /*
      * This is the non-specialized definition.  Since this should only
      * operate on specialized types, report an error and bail.
      */
-    void Read(int startX, int endX, int startY, int endY, T* dest); 
+    void Read(DSLength startX, DSLength endX, DSLength startY, DSLength endY, T* dest); 
 
-    void Read(int startX, int endX, int startY, int endY, H5::DataType typeID, 
+    void Read(DSLength startX, DSLength endX, DSLength startY, DSLength endY, H5::DataType typeID, 
         T *dest); 
 
-    void Create(H5::CommonFG *_container, std::string _datasetName, unsigned int _rowLength); 
+    void Create(H5::CommonFG *_container, std::string _datasetName, DSLength _rowLength); 
 
     void TypedCreate(H5::DataSpace &fileSpace, H5::DSetCreatPropList &cparms); 
     
@@ -109,12 +108,12 @@ public:
      * design pattern or simply better way to engineer this, but for now
      * it's 15 lines of code.
      */
-    void WriteRow(const T *data, int dataLength, int destRow=-1); 
+    void WriteRow(const T *data, DSLength dataLength, DSLength destRow=static_cast<DSLength>(-1)); 
 
-    void Flush(int destRow = -1); 
+    void Flush(DSLength destRow = static_cast<DSLength>(-1)); 
 };
 
-UInt GetDatasetNDim(H5::CommonFG &parentGroup, std::string datasetName);
+DSLength GetDatasetNDim(H5::CommonFG &parentGroup, std::string datasetName);
 
 #define DECLARE_TYPED_WRITE_ROW(T, Pred) template<>\
 void BufferedHDF2DArray<T>::TypedWriteRow(const T *data, \
@@ -130,7 +129,7 @@ DECLARE_TYPED_WRITE_ROW(float, H5::PredType::NATIVE_FLOAT)
 
 
 #define DECLARE_TYPED_READ_ROW(T, Pred) template<>\
-void BufferedHDF2DArray<T>::Read(int startX, int endX, int startY, int endY, T* dest);
+void BufferedHDF2DArray<T>::Read(DSLength startX, DSLength endX, DSLength startY, DSLength endY, T* dest);
 
 
 DECLARE_TYPED_READ_ROW(int, H5::PredType::NATIVE_INT)

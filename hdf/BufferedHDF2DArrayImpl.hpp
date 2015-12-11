@@ -19,12 +19,12 @@ BufferedHDF2DArray<T>::BufferedHDF2DArray() : HDFData() {
 }
 
 template<typename T>
-unsigned int BufferedHDF2DArray<T>::GetNRows() {
+DSLength BufferedHDF2DArray<T>::GetNRows() {
     return rowLength;
 }
 
 template<typename T>
-unsigned int BufferedHDF2DArray<T>::GetNCols() {
+DSLength BufferedHDF2DArray<T>::GetNCols() {
     return colLength;
 }
 
@@ -60,7 +60,7 @@ int BufferedHDF2DArray<T>::InitializeForReading(HDFGroup& group, std::string dat
  */
 template<typename T>
 int BufferedHDF2DArray<T>::Initialize(HDFGroup &group, std::string datasetName,
-    unsigned int _rowLength, int _bufferSize, bool createIfMissing) {
+    DSLength _rowLength, int _bufferSize, bool createIfMissing) {
 
     bool groupContainsDataset = group.ContainsObject(datasetName);
     if (groupContainsDataset == false) {
@@ -125,7 +125,7 @@ int BufferedHDF2DArray<T>::Initialize(HDFGroup &group, std::string datasetName,
 }
 
 template<typename T>
-int BufferedHDF2DArray<T>::size() {
+DSLength BufferedHDF2DArray<T>::size() {
     dataspace.getSimpleExtentDims(dimSize);
     return dimSize[0];
 }
@@ -134,12 +134,12 @@ int BufferedHDF2DArray<T>::size() {
  * Read rows in the range (startX, endX] in to dest.
  */
 template<typename T>
-void BufferedHDF2DArray<T>::Read(int startX, int endX, H5::DataType typeID, T*dest) {
+void BufferedHDF2DArray<T>::Read(DSLength startX, DSLength endX, H5::DataType typeID, T*dest) {
     Read(startX, endX, 0, dimSize[1], typeID, dest);
 }
 
 template<typename T>
-void BufferedHDF2DArray<T>::Read(int startX, int endX, T*dest) {
+void BufferedHDF2DArray<T>::Read(DSLength startX, DSLength endX, T*dest) {
     Read(startX, endX, 0, dimSize[1], dest);
 }
 /*
@@ -147,13 +147,13 @@ void BufferedHDF2DArray<T>::Read(int startX, int endX, T*dest) {
  * operate on specialized types, report an error and bail.
  */
 template<typename T>
-void BufferedHDF2DArray<T>::Read(int startX, int endX, int startY, int endY, T* dest) {
+void BufferedHDF2DArray<T>::Read(DSLength startX, DSLength endX, DSLength startY, DSLength endY, T* dest) {
     assert("ERROR, calling Read with an unsupported type. Use Read(startx,endx, starty,endy,datatype, dest) instead." == 0);
     exit(1);
 }
 
 template<typename T>
-void BufferedHDF2DArray<T>::Read(int startX, int endX, int startY, int endY, H5::DataType typeID, T *dest) {
+void BufferedHDF2DArray<T>::Read(DSLength startX, DSLength endX, DSLength startY, DSLength endY, H5::DataType typeID, T *dest) {
     hsize_t memSpaceSize[2] = {0, 0};
     memSpaceSize[0] = endX - startX;
     memSpaceSize[1] = endY - startY;
@@ -168,10 +168,10 @@ void BufferedHDF2DArray<T>::Read(int startX, int endX, int startY, int endY, H5:
 }
 
 template<typename T>
-void BufferedHDF2DArray<T>::Create(H5::CommonFG *_container, string _datasetName, unsigned int _rowLength) {
+void BufferedHDF2DArray<T>::Create(H5::CommonFG *_container, string _datasetName, DSLength _rowLength) {
     container   = _container;
     datasetName = _datasetName;
-    rowLength   = (unsigned int)_rowLength;
+    rowLength   = _rowLength;
     //
     // Make life easy if the buffer is too small to fit a row --
     // resize it so that rows may be copied and written out in an
@@ -237,11 +237,11 @@ void TypedWriteRow(const T*, const H5::DataSpace &memoryDataSpace,
  */
 
 template<typename T>
-void BufferedHDF2DArray<T>::WriteRow(const T *data, int dataLength, int destRow) {
+void BufferedHDF2DArray<T>::WriteRow(const T *data, DSLength dataLength, DSLength destRow) {
     // Fill the buffer with data. When there is overflow, write
     // that out to disk.
     //
-    int dataIndex = 0;
+    DSLength dataIndex = 0;
     int bufferCapacity;
     int bufferFillSize = 0;
     bool flushBuffer;
@@ -276,12 +276,12 @@ void BufferedHDF2DArray<T>::WriteRow(const T *data, int dataLength, int destRow)
 }
 
 template<typename T>
-void BufferedHDF2DArray<T>::Flush(int destRow) {
+void BufferedHDF2DArray<T>::Flush(DSLength destRow) {
 
     //
     // A default writeRow of -1 implies append
     //
-    int numDataRows;
+    DSLength numDataRows;
     //
     // this->bufferIndex points after the end of the last data in the
     // buffer (full rows), so this->bufferIndex / rowLength is the

@@ -86,8 +86,7 @@ bool HDFZMWWriter::WriteFakeDataSets(void) {
 }
 
 bool HDFZMWWriter::_WriteNumEvent(const uint32_t numEvent) {
-    int32_t length_ = static_cast<int32_t> (numEvent);
-    numEventArray_.Write(&length_, 1);
+    numEventArray_.Write(&numEvent, 1);
 }
 
 bool HDFZMWWriter::_WriteHoleNumber(const uint32_t holeNumber) {

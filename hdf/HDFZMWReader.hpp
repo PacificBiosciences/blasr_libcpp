@@ -12,10 +12,10 @@ class HDFZMWReader {
 public:
     HDFGroup *parentGroupPtr;
     HDFGroup zmwGroup;
-    HDFArray<unsigned int> holeNumberArray;
+    HDFArray<UInt> holeNumberArray;
     HDFArray<unsigned char> holeStatusArray;
     HDF2DArray<int16_t> xyArray;
-    HDFArray<int> numEventArray;
+    HDFArray<DNALength> numEventArray;
     bool readHoleNumber, readHoleStatus;
     bool readHoleXY;
     bool readNumEvent;
@@ -30,7 +30,7 @@ public:
 
     int Initialize(); 
 
-    int Advance(int nSteps); 
+    int Advance(UInt nSteps); 
 
     bool GetNext(ZMWGroupEntry &groupEntry); 
 

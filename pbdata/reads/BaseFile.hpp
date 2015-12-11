@@ -30,7 +30,7 @@ public:
     std::vector<unsigned char> substitutionQV;
     std::vector<unsigned char> substitutionTag;
     std::vector<unsigned char> mergeQV;
-    std::vector<int>  readLengths;
+    std::vector<uint32_t>  readLengths;
     std::vector<int>  readStartPositions;
     int nReads;
     int nBases;

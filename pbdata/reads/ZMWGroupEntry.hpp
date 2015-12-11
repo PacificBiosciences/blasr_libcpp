@@ -8,7 +8,7 @@ class ZMWGroupEntry {
 	UInt holeNumber;
 	UInt x;
 	UInt y;
-	int  numEvents;
+	DNALength numEvents;
     unsigned char holeStatus;
     ZMWGroupEntry(); 
 };

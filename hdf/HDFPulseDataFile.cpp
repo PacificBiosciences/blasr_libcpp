@@ -2,10 +2,10 @@
 
 using namespace std;
 
-int HDFPulseDataFile::GetAllReadLengths(vector<DNALength> &readLengths) {
-    nReads = zmwReader.numEventArray.arrayLength;
+size_t HDFPulseDataFile::GetAllReadLengths(vector<DNALength> &readLengths) {
+    nReads = static_cast<UInt>(zmwReader.numEventArray.arrayLength);
     readLengths.resize(nReads);
-    zmwReader.numEventArray.Read(0,nReads, (int*) &readLengths[0]);
+    zmwReader.numEventArray.Read(0, nReads, &readLengths[0]);
     return readLengths.size();
 }
 
@@ -34,15 +34,18 @@ HDFPulseDataFile::HDFPulseDataFile() {
 }
 
 void HDFPulseDataFile::PrepareForRandomAccess() {
-    GetAllReadLengths(eventOffset);
-    size_t i;
-    int curOffset = 0;
-    for (i = 0; i < eventOffset.size(); i++) {
-        int curLength = eventOffset[i];
+    std::vector<DNALength> offset_;
+    GetAllReadLengths(offset_);
+    // type of read length of a single read : DNALength
+    // type of total read length of all reads in plx.h5: DSLength
+    eventOffset = std::vector<DSLength>(offset_.begin(), offset_.end());
+    DSLength curOffset = 0;
+    for (size_t i = 0; i < eventOffset.size(); i++) {
+        DSLength curLength = eventOffset[i];
         eventOffset[i] = curOffset;
         curOffset = curOffset + curLength;
     }
-    nReads = eventOffset.size();
+    nReads = static_cast<UInt>(eventOffset.size());
     preparedForRandomAccess = true;
 }
 
@@ -120,10 +123,10 @@ int HDFPulseDataFile::InitializePulseGroup() {
     return 1;
 }
 
-int HDFPulseDataFile::GetAllHoleNumbers(vector<unsigned int> &holeNumbers) {
+size_t HDFPulseDataFile::GetAllHoleNumbers(vector<unsigned int> &holeNumbers) {
     CheckMemoryAllocation(zmwReader.holeNumberArray.arrayLength, maxAllocNElements, "HoleNumbers (base)");
     holeNumbers.resize(nReads);
-    zmwReader.holeNumberArray.Read(0,nReads, (unsigned int*)&holeNumbers[0]);
+    zmwReader.holeNumberArray.Read(0, nReads, &holeNumbers[0]);
     return holeNumbers.size();
 }	
 

@@ -43,13 +43,13 @@ public:
     hsize_t   nDims;
     hsize_t   *dimSize;
     int       maxDims;
-    UInt      arrayLength;
+    DSLength  arrayLength;
 
     /*
      * Constructor meant to be used for data that will be written.  
      * This allocates the write buffer.
      */
-    BufferedHDFArray(int pBufferSize=1024);
+    BufferedHDFArray(int pBufferSize=32768);
 
     BufferedHDFArray(H5::CommonFG* _container, std::string _datasetName);
 
@@ -57,10 +57,10 @@ public:
 
     void SetBufferSize(int _bufferSize); 
 
-    void Write(const T *data, UInt dataLength, bool append=true, 
-        UInt writePos = 0);
+    void Write(const T *data, DSLength dataLength, bool append=true, 
+        DSLength writePos = 0);
 
-    void Flush(bool append=true, UInt writePos = 0); 
+    void Flush(bool append=true, DSLength writePos = 0); 
 
     void TypedWrite(const char **data, const H5::DataSpace &memorySpace, 
         const H5::DataSpace &extendedSpace); 
@@ -88,15 +88,15 @@ public:
     int Initialize(HDFGroup &parentGroup, const std::string &datasetName); 
 
     int Initialize(HDFGroup &parentGroup, const std::string &datasetName,
-        bool createIfMissing, UInt newArrayLength=0); 
+        bool createIfMissing, const DSLength newArrayLength=0); 
 
     int UpdateH5Dataspace(); 
 
-    int Resize(UInt newArrayLength); 
+    int Resize(const DSLength newArrayLength); 
 
     void Close(); 
 
-    UInt size(); 
+    DSLength size(); 
 
     /*
      * Unspecialized form of read.
@@ -107,7 +107,7 @@ public:
      * exits the code.
      */
 
-    virtual void Read(UInt start, UInt end, T* dest); 
+    virtual void Read(DSLength start, DSLength end, T* dest); 
 
     /*
      * Read in type T from the opened dataset from the interval (start,
@@ -115,9 +115,9 @@ public:
      */
     void ReadDataset(std::vector<T> &dest); 
 
-    void Read(UInt start, UInt end, H5::DataType typeID, T* dest); 
+    void Read(DSLength start, DSLength end, H5::DataType typeID, T* dest); 
 
-    void ReadCharArray(UInt start, UInt end, std::string* dest); 
+    void ReadCharArray(DSLength start, DSLength end, std::string* dest); 
 };
 
 /*
@@ -126,7 +126,7 @@ public:
  * specified). 
  */
 #define DECLARE_TYPED_READ_ARRAY(T, Pred) template<>  \
-void BufferedHDFArray<T>::Read(UInt start, UInt end, T* dest);
+void BufferedHDFArray<T>::Read(DSLength start, DSLength end, T* dest);
 
 DECLARE_TYPED_READ_ARRAY(int, H5::PredType::NATIVE_INT)
 DECLARE_TYPED_READ_ARRAY(char, H5::PredType::NATIVE_INT8)
@@ -189,7 +189,7 @@ typedef BufferedHDFArray<void> BaseHDFArray;
 #define DEFINE_TYPED_CLASS(CLASS_NAME, TEMPLATE_TYPE) \
 class CLASS_NAME : public BufferedHDFArray< TEMPLATE_TYPE  > { \
 public: \
-    void Read(UInt start, UInt end, TEMPLATE_TYPE *dest) { \
+    void Read(DSLength start, DSLength end, TEMPLATE_TYPE *dest) { \
         BufferedHDFArray<TEMPLATE_TYPE>::Read(start, end, dest); \
     } \
 }; 

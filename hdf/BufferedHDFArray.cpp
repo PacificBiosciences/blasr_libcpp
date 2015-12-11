@@ -24,7 +24,7 @@
 // specified). 
 //
 #define DEFINE_TYPED_READ_ARRAY(T, Pred) template<>  \
-   	void BufferedHDFArray<T>::Read(UInt start, UInt end, T* dest) { \
+   	void BufferedHDFArray<T>::Read(DSLength start, DSLength end, T* dest) { \
    	Read(start,end, Pred, dest); \
 	}
 

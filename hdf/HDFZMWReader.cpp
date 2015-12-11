@@ -70,7 +70,7 @@ int HDFZMWReader::Initialize() {
     return 1;
 }
 
-int HDFZMWReader::Advance(int nSteps) {
+int HDFZMWReader::Advance(UInt nSteps) {
     if (curZMW >= nZMWEntries) {
         return 0;
     }
@@ -127,7 +127,7 @@ void HDFZMWReader::Close() {
 
 bool HDFZMWReader::GetHoleNumberAt(UInt index, UInt &holeNumber) {
     if (index >= nZMWEntries) { return false; }
-    holeNumberArray.Read(index, index + 1, (UInt *)&holeNumber); 
+    holeNumberArray.Read(index, index + 1, &holeNumber); 
     return true;
 }
 
