@@ -44,7 +44,7 @@ class AfgBasWriter {
 
     void WriteHeader();
 
-    void WriteOpen(SMRTSequence &seq);
+    void WriteOpen(void);
 
     void WriteIdentifier(SMRTSequence &seq);
 

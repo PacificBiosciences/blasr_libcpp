@@ -34,7 +34,7 @@ int AfgBasWriter::Write(SMRTSequence &seq) {
         WriteHeader();
         firstRecord = false;
     }
-    WriteOpen(seq);
+    WriteOpen();
     WriteIdentifier(seq);
     WriteBases(seq);
     WriteQualities(seq);
@@ -53,7 +53,7 @@ void AfgBasWriter::WriteHeader() {
     afgOut << "{DST" << std::endl << "mea:0" << std::endl << "std:0" << std::endl << "}" << std::endl << "}" << std::endl;
 }
 
-void AfgBasWriter::WriteOpen(SMRTSequence &seq) {
+void AfgBasWriter::WriteOpen(void) {
     afgOut << "{RED" << std::endl;
     afgOut << "frg:" << recordCount + 1 << std::endl;
     afgOut << "iid:" << recordCount << std::endl;
@@ -85,7 +85,7 @@ void AfgBasWriter::WriteBases(SMRTSequence &seq) {
 
 void AfgBasWriter::WriteQualities(SMRTSequence &seq) {
     afgOut << "qlt:" << std::endl;
-    int i;
+    DNALength i;
     for (i = 0; i < seq.length; i++ ){
         unsigned char quality =  seq.qual.data ?  seq.qual[i] : defaultQuality;
         quality = quality + charToQuality;
