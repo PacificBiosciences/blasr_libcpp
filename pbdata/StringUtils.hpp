@@ -21,7 +21,7 @@ int IsWhitespace(char c);
 
 int IsSpace(char c); 
 
-int ToWords(string &orig, vector<string> &words); 
+size_t ToWords(string &orig, vector<string> &words); 
 
 int Splice(const string & orig, const string & pattern, vector<string> &tokens); 
 

@@ -45,8 +45,8 @@ int IsSpace(char c) {
     return (c == ' ' or c == '\t');
 }
 
-int ToWords(string &orig, vector<string> &words) {
-    int curWordStart, curWordEnd;
+size_t ToWords(string &orig, vector<string> &words) {
+    size_t curWordStart, curWordEnd;
     curWordStart = 0;
     while(curWordStart < orig.size()) {
         while (curWordStart < orig.size() and IsSpace(orig[curWordStart])) { curWordStart++; }
