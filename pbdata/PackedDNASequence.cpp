@@ -152,7 +152,6 @@ DNALength PackedDNASequence::CountInWord(PackedDNAWord word, PackedDNAWord wordM
      *
      */
     PackedDNAWord w0,w1,w2, w;
-    PackedDNAWord w01, w12; 
     Nucleotide tbn = ThreeBit[nuc];
     PackedDNAWord xorMaskNuc = xorMask[tbn];
     w0 = w1 = w2 = (word ^ xorMaskNuc);
@@ -172,7 +171,6 @@ DNALength PackedDNASequence::CountInWord(PackedDNAWord word, PackedDNAWord wordM
 DNALength PackedDNASequence::CountNuc(DNALength start, DNALength end, Nucleotide nuc) {
     DNALength startWordIndex, endWordIndex, wordIndex;
     DNALength startInWord, endInWord;
-    Nucleotide tbn = ThreeBit[nuc];
     endInWord = NucsPerWord;
     startInWord = start % NucsPerWord;
     startWordIndex = start / NucsPerWord; 
@@ -223,7 +221,7 @@ void PackedDNASequence::PrintUnpacked(std::ostream &out, int lineLength) {
     DNALength p;
     for (p = 0; p < length; p++) {
         out << (char) ThreeBitToAscii[Get(p)];
-        if (p % lineLength == lineLength-1) {
+        if (static_cast<int>(p % lineLength) == lineLength-1) {
             out << std::endl;
         }
     }
