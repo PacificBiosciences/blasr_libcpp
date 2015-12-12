@@ -12,6 +12,7 @@ GFFEntry::GFFEntry(std::string & _name, std::string & _source,
     score = _score;
     strand = _strand;
     frame = _frame;
+    attributes = _attributes;
 }
 
 void GFFFile::ReadAll(std::string & gffFileName) {
