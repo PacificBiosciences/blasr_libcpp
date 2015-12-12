@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <assert.h>
-#include "Types.h"
 #include <sstream>
 #include "StringUtils.hpp"
 
@@ -90,7 +89,7 @@ public:
 
     void RegisterIntOption(std::string option, int *value, 
         std::string description, OptionType type, 
-        bool required=false, bool hidden=false);
+        bool required=false);
 
     void RegisterFloatOption(std::string option, float *value, 
         std::string description, OptionType type, bool required=false);
@@ -121,41 +120,40 @@ public:
     int ParseCommandLine(int argc, char* argv[], 
         std::vector<std::string> &unflaggedValues, bool isProgramNameOnlyAllowed=false);
 
-    ErrorValue ParseOption(VectorIndex optionIndex,
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParseOption(int optionIndex,
+        int &argi, int argc, char *argv[]);
 
     void PrintErrorMessage(ErrorValue ev, char *option);
 
-    ErrorValue ParseFlag(VectorIndex optionValueIndex, 
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParseFlag(int optionValueIndex);
 
-    ErrorValue ParseInteger(VectorIndex optionValueIndex, 
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParseInteger(int optionValueIndex, 
+        int &argi, int argc, char *argv[]);
 
-    ErrorValue ParsePositiveInteger(VectorIndex optionValueIndex, 
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParsePositiveInteger(int optionValueIndex, 
+        int &argi, int argc, char *argv[]);
 
-    ErrorValue ParseNonNegativeInteger(VectorIndex optionValueIndex, 
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParseNonNegativeInteger(int optionValueIndex, 
+        int &argi, int argc, char *argv[]);
 
-    ErrorValue ParseFloat(VectorIndex optionValueIndex, 
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParseFloat(int optionValueIndex, 
+        int &argi, int argc, char *argv[]);
 
-    ErrorValue ParsePositiveFloat(VectorIndex optionValueIndex, 
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParsePositiveFloat(int optionValueIndex, 
+        int &argi, int argc, char *argv[]);
 
-    ErrorValue ParseNonNegativeFloat(VectorIndex optionValueIndex, 
-        VectorIndex &argi, int argc, char *argv[]);
+    ErrorValue ParseNonNegativeFloat(int optionValueIndex, 
+        int &argi, int argc, char *argv[]);
 
-    ErrorValue ParseString(VectorIndex optionValueIndex, VectorIndex &argi, 
+    ErrorValue ParseString(int optionValueIndex, int &argi, 
         int argc, char *argv[]);
 
     bool IsValuedOption(OptionType optType);
 
-    ErrorValue ParseIntList(VectorIndex optionValueIndex, VectorIndex &argi, 
+    ErrorValue ParseIntList(int optionValueIndex, int &argi, 
         int argc, char *argv[]);
 
-    ErrorValue ParseStringList(VectorIndex optionValueIndex, VectorIndex &argi, 
+    ErrorValue ParseStringList(int optionValueIndex, int &argi, 
         int argc, char *argv[]);
 
     void PrintVersion();
