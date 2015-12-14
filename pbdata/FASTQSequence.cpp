@@ -581,10 +581,9 @@ void FASTQSequence::Free() {
 }
 
 void FASTQSequence::LowerCaseMask(int qThreshold) {
-    int i;
     if (qual.Empty() == true) return;
 
-   for (i = 0; i < length; i++ ){
+   for (DNALength i = 0; i < length; i++ ){
         if (qual[i] < qThreshold) {
             seq[i] = tolower(seq[i]);
         }
