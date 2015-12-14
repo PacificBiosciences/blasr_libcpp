@@ -26,7 +26,6 @@ HDFBaseCallsWriter::WritableQVs(const std::vector<PacBio::BAM::BaseFeature> & qv
     return ret;
 }
 
-
 HDFBaseCallsWriter::HDFBaseCallsWriter(const std::string & filename,
                                        HDFGroup & parentGroup,
                                        const std::map<char, size_t> & baseMap,
@@ -35,8 +34,8 @@ HDFBaseCallsWriter::HDFBaseCallsWriter(const std::string & filename,
     : HDFWriterBase(filename)
     , parentGroup_(parentGroup)
     , baseMap_(baseMap)
-    , basecallerVersion_(basecallerVersion)
     , qvsToWrite_({})
+    , basecallerVersion_(basecallerVersion)
     , arrayLength_(0)
     , zmwWriter_(nullptr)
     , zmwMetricsWriter_(nullptr)

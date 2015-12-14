@@ -85,13 +85,14 @@ private:
 
 private:
     HDFGroup & parentGroup_;
+	HDFGroup basecallsGroup_;
     std::map<char, size_t> baseMap_;
     std::vector<PacBio::BAM::BaseFeature> qvsToWrite_;
-    std::unique_ptr<HDFZMWWriter> zmwWriter_;
-    std::unique_ptr<HDFZMWMetricsWriter> zmwMetricsWriter_;
-	HDFGroup basecallsGroup_;
     std::string basecallerVersion_;
     uint32_t arrayLength_;
+
+    std::unique_ptr<HDFZMWWriter> zmwWriter_;
+    std::unique_ptr<HDFZMWMetricsWriter> zmwMetricsWriter_;
 
 private:
     /// BaseCalls/Basecall group
