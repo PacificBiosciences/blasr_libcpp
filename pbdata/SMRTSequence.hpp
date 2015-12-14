@@ -68,9 +68,15 @@ private:
 public:
     ZMWGroupEntry zmwData;
 
+    DNALength lowQualityPrefix, lowQualitySuffix;
+    int highQualityRegionScore; // High quality region score in region table.
+    float readScore;
+
+    // Whether or not this is originally copied from a BamRecord.
+    bool copiedFromBam;
+
     HalfWord *preBaseFrames;
     HalfWord *widthInFrames;
-
     //
     // The following are fields that are read in from the pulse file.
     // Because they are not standard in bas.h5 files, these fields
@@ -83,13 +89,6 @@ public:
     float *classifierQV;
     unsigned int *startFrame;
     int *pulseIndex;
-
-    DNALength lowQualityPrefix, lowQualitySuffix;
-    int highQualityRegionScore; // High quality region score in region table.
-    float readScore;
-
-    // Whether or not this is originally copied from a BamRecord.
-    bool copiedFromBam;
 
 public:
     SMRTSequence();
@@ -176,7 +175,7 @@ public:
 
     void Copy(const SMRTSequence &rhs); 
 
-    void Copy(const SMRTSequence &rhs, int rhsPos, int rhsLength); 
+    void Copy(const SMRTSequence &rhs, DNALength rhsPos, DNALength rhsLength); 
 
     void Print(std::ostream &out) const;
 

@@ -45,20 +45,21 @@ SMRTSequence::SMRTSequence()
     : FASTQSequence()
     , subreadStart_(0)      // subread start
     , subreadEnd_(0)        // subread end
-    , preBaseFrames(nullptr)
-    , widthInFrames(nullptr)
-    , pulseIndex(nullptr)
-    , startFrame(nullptr)   // not allocated by default
-    , meanSignal(nullptr)   // not allocated by default
-    , maxSignal(nullptr)    // not allocated by default
-    , midSignal(nullptr)    // not allocated by default
-    , classifierQV(nullptr) // not allocated by default
+    , readGroupId_("")      // read group id
+    , zmwData(ZMWGroupEntry())
     , lowQualityPrefix(0)   // By default, allow the entire read.
     , lowQualitySuffix(0)   // By default, allow the entire read.
     , highQualityRegionScore(0) // HQ read score
     , readScore(0)          // read score
-    , readGroupId_("")      // read group id
     , copiedFromBam(false)
+    , preBaseFrames(nullptr)
+    , widthInFrames(nullptr)
+    , meanSignal(nullptr)   // not allocated by default
+    , maxSignal(nullptr)    // not allocated by default
+    , midSignal(nullptr)    // not allocated by default
+    , classifierQV(nullptr) // not allocated by default
+    , startFrame(nullptr)   // not allocated by default
+    , pulseIndex(nullptr)   // not allocated by default
 #ifdef USE_PBBAM
     , bamRecord(PacBio::BAM::BamRecord())
 #endif
@@ -95,7 +96,7 @@ void SMRTSequence::SetSubreadTitle(SMRTSequence &subread, DNALength subreadStart
 }    
 
 void SMRTSequence::SetSubreadBoundaries(SMRTSequence &subread, DNALength subreadStart, DNALength subreadEnd) {
-    if (subreadEnd == -1) {
+    if (subreadEnd == static_cast<DNALength>(-1)) {
         subreadEnd = length;
     }
     assert(subreadEnd - subreadStart <= length);
@@ -136,7 +137,7 @@ void SMRTSequence::Copy(const SMRTSequence &rhs) {
     SMRTSequence::Copy(rhs, 0, rhs.length);
 }
 
-void SMRTSequence::Copy(const SMRTSequence &rhs, int rhsPos, int rhsLength) {
+void SMRTSequence::Copy(const SMRTSequence &rhs, DNALength rhsPos, DNALength rhsLength) {
     // Sanity check
     CheckBeforeCopyOrReference(rhs, "SMRTSequence");
     
