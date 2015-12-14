@@ -44,13 +44,13 @@
 RegionAnnotations::RegionAnnotations(const UInt holeNumber,
                                      const std::vector<RegionAnnotation> & annotations,
                                      const std::vector<RegionType> & types)
-    : holeNumber_(holeNumber)
-    , table_(annotations)
+    : table_(annotations)
+    , holeNumber_(holeNumber)
     , types_(types)
 {
     for (auto annotation: annotations) {
         // Only allow RegionAnnotations of a single ZMW
-        if (holeNumber_ != annotation.GetHoleNumber()) {
+        if (holeNumber_ != static_cast<UInt>(annotation.GetHoleNumber())) {
             assert(false && "RegionAnnotations must contain regions from a single ZMW");
         }
     }
@@ -59,8 +59,8 @@ RegionAnnotations::RegionAnnotations(const UInt holeNumber,
 }
 
 RegionAnnotations::RegionAnnotations(const RegionAnnotations & rhs)
-    : holeNumber_(rhs.holeNumber_)
-    , table_(rhs.table_)
+    : table_(rhs.table_)
+    , holeNumber_(rhs.holeNumber_)
     , types_(rhs.types_)
 { }
 
@@ -144,8 +144,8 @@ RegionAnnotations::SubreadIntervals(const DNALength wholeLength,
             std::vector<DNALength> starts, ends;
             starts.push_back(0);
             for(auto adapter: Adapters()) {
-                assert(wholeLength >= adapter.GetStart() and
-                       wholeLength >= adapter.GetEnd()); // bug if fail assert
+                assert(wholeLength >= static_cast<DNALength>(adapter.GetStart()) and
+                       wholeLength >= static_cast<DNALength>(adapter.GetEnd())); // bug if fail assert
                 starts.push_back(adapter.GetEnd());
                 ends.push_back(adapter.GetStart());
             }

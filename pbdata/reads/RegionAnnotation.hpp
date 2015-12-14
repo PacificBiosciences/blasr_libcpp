@@ -68,6 +68,10 @@ public:
     static const int REGIONSCORECOL = 4;
     static const int NCOLS=5;
 
+    // Notice the discrepencies between Region and other hdf datasets!!
+    // Region annotation is defined as int32_t * 5, while 
+    // holeNumber is defined as type UInt in other datasets (e.g., majorly ZMW),
+    // start and end are defined as type DNALength in other datasets.
     int row[NCOLS];
 
 public:

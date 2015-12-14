@@ -82,7 +82,8 @@ RegionTable & RegionTable::ConstructTable(std::vector<RegionAnnotation> & table,
         UInt pre_hn = table[0].GetHoleNumber();
         auto itBegin = table.begin();
         for (auto it = table.begin(); it != table.end(); it++) {
-            if (it->GetHoleNumber() > pre_hn) {
+            // Discrepency between data type of Regions/HoleNumber and ZMW/HoleNumber
+            if (it->GetHoleNumber() > static_cast<int>(pre_hn)) {
                 map_.insert(std::pair<UInt, RegionAnnotations>(pre_hn,
                             RegionAnnotations(pre_hn,
                                               std::vector<RegionAnnotation>(itBegin, it),
@@ -97,6 +98,7 @@ RegionTable & RegionTable::ConstructTable(std::vector<RegionAnnotation> & table,
                                       std::vector<RegionAnnotation>(itBegin, table.end()),
                                       regionTypeEnums)));
     }
+    return * this;
 }
 
 std::vector<RegionType> RegionTable::DefaultRegionTypes(void) {
