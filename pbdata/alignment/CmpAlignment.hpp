@@ -103,18 +103,18 @@ public:
 class CmpAlignment : public CmpAlignmentBase {
 public:
     int qStrand, tStrand;
-    int qStart, qLength;
-    int tStart, tLength;
+    DNALength qStart, qLength;
+    DNALength tStart, tLength;
     //
     // Default constructor just calls the base constructor to initialize platoformType
     CmpAlignment(PlatformId pid=Springfield);
 
-    void StoreAlignmentIndex(unsigned int *alignmentIndexPtr, int alignmentIndexLength);
+    void StoreAlignmentIndex(unsigned int *alignmentIndexPtr, DSLength alignmentIndexLength);
 
-    void StoreAlignmentArray(unsigned char* alignmentArrayPtr, int alignmentArrayLength); 
+    void StoreAlignmentArray(unsigned char* alignmentArrayPtr, DSLength alignmentArrayLength); 
 
     template<typename T_Field>
-    void StoreField(std::string fieldName, T_Field* fieldValues, int length); 
+    void StoreField(std::string fieldName, T_Field* fieldValues, DSLength length); 
 
     CmpAlignment &operator=(const CmpAlignment &rhs); 
 

@@ -71,8 +71,7 @@ unsigned int CmpAlignmentBase::LookupColumnValue(const char * columnName) {
 
 
 void CmpAlignmentBase::InitializeColumnNameToIndex(std::vector<std::string> &columnNames) {
-    int i;
-    for (i = 0; i < columnNames.size(); i++ ){
+    for (size_t i = 0; i < columnNames.size(); i++ ){
         columnNameToIndex[columnNames[i]] = i;
     }
 }
@@ -160,7 +159,7 @@ CmpAlignment::CmpAlignment(PlatformId pid) : CmpAlignmentBase(pid) {
 }
 
 void CmpAlignment::StoreAlignmentIndex(unsigned int *alignmentIndexPtr, 
-    int alignmentIndexLength) {
+    DSLength alignmentIndexLength) {
 
     alignmentIndex.clear();
     alignmentIndex.insert(alignmentIndex.begin(), &alignmentIndexPtr[0], 
@@ -168,11 +167,9 @@ void CmpAlignment::StoreAlignmentIndex(unsigned int *alignmentIndexPtr,
 }
 
 void CmpAlignment::StoreAlignmentArray(unsigned char* alignmentArrayPtr, 
-    int alignmentArrayLength) {
-
+    DSLength alignmentArrayLength) {
     alignmentArray.resize(alignmentArrayLength);
-    unsigned int a;
-    for (a = 0; a < alignmentArrayLength; a++ ){
+    for (DSLength a = 0; a < alignmentArrayLength; a++ ){
         alignmentArray[a] = alignmentArrayPtr[a];
     }
 }
