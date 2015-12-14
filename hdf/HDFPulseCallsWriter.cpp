@@ -285,6 +285,7 @@ bool HDFPulseCallsWriter::_CheckRead(const PacBio::BAM::BamRecord & read,
                                      const uint32_t qvLength,
                                      const std::string & qvName) {
     // Tag 'pb' will not be available until 3.0.1, bug 29486
+    (void)(read); (void)(qvLength); (void)(qvName);
     return true;
     /*
     // FIXME: pbbam should provide HasPulseBlockSize() and PulseBlockSize().
