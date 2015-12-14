@@ -5,6 +5,7 @@ using namespace std;
 using namespace H5;
 
 void CallStoreAttributeName(H5Location &obj, string attrName, void *attrList){ 
+    (void)(obj);
     ((vector<string>*)attrList)->push_back(string(attrName));
 }
 
