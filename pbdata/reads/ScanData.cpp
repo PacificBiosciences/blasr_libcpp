@@ -43,8 +43,8 @@ std::string ScanData::BaseMapToStr(const std::map<char, size_t> & baseMap) {
     if (not baseMap.empty()) {
         baseMapStr = "    ";
         for (auto it = baseMap.begin(); it != baseMap.end(); ++it){
-            if (it->second > 4 or it->second < 0) {
-                std::cout << "ERROR, there are more than four dye channels."
+            if (it->second != 4) {
+                std::cout << "ERROR, must have exactly four dye channels."
                           << std::endl;
                 exit(1);
             }
@@ -56,7 +56,7 @@ std::string ScanData::BaseMapToStr(const std::map<char, size_t> & baseMap) {
 
 std::map<char, size_t> ScanData::StrToBaseMap(const std::string & baseMapStr) {
     std::map<char, size_t> ret;
-    for (auto i = 0; i < baseMapStr.size(); i++) {
+    for (size_t i = 0; i < baseMapStr.size(); i++) {
         ret[baseMapStr[i]] = i;
     }
     return ret;
@@ -68,8 +68,7 @@ bool ScanData::IsValidBaseMap(const std::map<char, size_t> & baseMap) {
 
     for(const char base : {'A', 'T', 'G', 'C'}) {
         size_t index = baseMap.find(base)->second;
-        if (not (baseMap.find(base) != baseMap.end() and 
-                 index >= 0 and index <= 3))
+        if (not (baseMap.find(base) != baseMap.end() and index <= 3))
             return false;
         else
             v[index] = 'o';
