@@ -5,10 +5,8 @@ void GetSMRTReadCoordinates(FASTQSequence &seq, int &x, int &y) {
 	std::string str(seq.title, seq.titleLength);
 	std::vector<std::string> titleTokens;
 	Splice(str, "_", titleTokens);
-	int i;
 	x = y = -1;
-	int cmp;
-	for (i = 0; i < titleTokens.size(); i++ ) {
+	for (size_t i = 0; i < titleTokens.size(); i++ ) {
 		if (titleTokens[i].size() > 1 && titleTokens[i][0] == 'x') {
 			x = atoi(&titleTokens[i].c_str()[1]);
 		}
