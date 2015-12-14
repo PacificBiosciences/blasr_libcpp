@@ -11,8 +11,8 @@
 //
 class CCSSequence : public SMRTSequence {
 public:
-	UInt numPasses;
-	UInt numConsensusBases;
+	int numPasses;
+	DNALength numConsensusBases;
 	std::vector<DNALength> passStartPulse, passNumPulses, passStartBase, passNumBases;
 	std::vector<Byte> passDirection;
 	std::vector<Byte>      adapterHitBefore, adapterHitAfter, adapterHitConfidence;
