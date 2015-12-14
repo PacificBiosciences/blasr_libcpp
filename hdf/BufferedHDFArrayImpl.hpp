@@ -384,6 +384,9 @@ DSLength BufferedHDFArray<T>::size() {
 
 template<typename T>
 void BufferedHDFArray<T>::Read(DSLength start, DSLength end, T* dest) {
+    (void)(start);
+    (void)(end);
+    (void)(dest);
     assert("ERROR, calling Read with an unsupported type. Use Read(start,end,datatype, dest) instead." == 0);
     exit(1); // this is in case the assert statement is removed.
 }
