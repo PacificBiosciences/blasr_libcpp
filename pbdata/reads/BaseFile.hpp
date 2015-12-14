@@ -30,17 +30,18 @@ public:
     std::vector<unsigned char> substitutionQV;
     std::vector<unsigned char> substitutionTag;
     std::vector<unsigned char> mergeQV;
-    std::vector<uint32_t>  readLengths;
-    std::vector<int>  readStartPositions;
-    int nReads;
-    int nBases;
+    std::vector<DNALength>  readLengths;
+    std::vector<DSLength>  readStartPositions;
+    UInt nReads;
+    DSLength nBases;
 
-    bool LookupReadIndexByXY(uint16_t x, uint16_t y, int &index); 
+    bool LookupReadIndexByXY(uint16_t x, uint16_t y, UInt &index); 
 
-    void CopyReadAt(uint32_t readIndex, SMRTSequence &read); 
+    void CopyReadAt(UInt readIndex, SMRTSequence &read); 
 
+    // Copy array from fullArray starting from position pos with length length to dest.
     template<typename T>
-    void CopyArray(std::vector<T> &fullArray, int pos, int length, T*dest); 
+    void CopyArray(std::vector<T> &fullArray, DSLength pos, DNALength length, T*dest); 
     
 };
 

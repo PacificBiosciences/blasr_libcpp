@@ -10,7 +10,7 @@ bool CompareHoleXY::operator()(const HoleXY &lhs, const HoleXY &rhs) const {
     }
 }
 
-bool BaseFile::LookupReadIndexByXY(uint16_t x, uint16_t y, int &index) {
+bool BaseFile::LookupReadIndexByXY(uint16_t x, uint16_t y, UInt &index) {
     int16_t xy[2];
     xy[0] = x; xy[1] = y;
     std::vector<HoleXY>::iterator holeIt;
@@ -34,8 +34,8 @@ void BaseFile::CopyReadAt(uint32_t readIndex, SMRTSequence &read) {
                     holeXY[readIndex].xy[1]);
     }
 
-    int startPos = readStartPositions[readIndex];
-    int readLength = readLengths[readIndex];
+    DSLength startPos = readStartPositions[readIndex];
+    DNALength readLength = readLengths[readIndex];
     read.length = readLength;
     read.Allocate(readLength);
     if (baseCalls.size() > 0) {

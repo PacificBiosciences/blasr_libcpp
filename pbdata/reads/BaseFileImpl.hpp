@@ -4,7 +4,7 @@
 #include "BaseFile.hpp"
 
 template<typename T>
-void BaseFile::CopyArray(std::vector<T> &fullArray, int pos, int length, T*dest) {
+void BaseFile::CopyArray(std::vector<T> &fullArray, DSLength pos, DNALength length, T*dest) {
     memcpy(dest, &fullArray[pos], sizeof(T) * length);
 }
 
