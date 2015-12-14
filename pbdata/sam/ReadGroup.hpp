@@ -13,7 +13,7 @@ class SAMReadGroup {
  public:
   std::string id;
   void StoreValues(std::vector<SAMKeywordValuePair> &kvPairs,
-                   int lineNumber = 0);
+                   uint64_t lineNumber = 0);
 };
 
 /*
@@ -28,13 +28,13 @@ class SAMFullReadGroup : public SAMReadGroup {
   std::string keySequence;
   std::string library;
   std::string processingProgram;
-  int    insertSize;
+  uint64_t    insertSize;
   std::string platform;
   std::string platformUnit;
   std::string sample;
 
   void StoreValues(std::vector<SAMKeywordValuePair> &kvPairs,
-                   int lineNumber = 0);
+                   uint64_t lineNumber = 0);
 };
 
 #endif

@@ -3,8 +3,7 @@
 
 void SAMHeader::StoreValues(std::vector<SAMKeywordValuePair> &kvPairs,
                             int lineNumber) {
-  int i;
-  for ( i = 0; i < kvPairs.size(); i++) {
+  for (size_t i = 0; i < kvPairs.size(); i++) {
     if (kvPairs[i].key == "VN") {
       formatVersion = kvPairs[i].value;
     }

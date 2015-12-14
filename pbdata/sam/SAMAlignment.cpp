@@ -13,13 +13,13 @@ void SAMAlignment::PrintSAMAlignment(std::ostream & out) {
         << std::endl;
 }
 
-int SAMAlignment::FindPosOfNthChar(std::string str, int n, char c) {
+size_t SAMAlignment::FindPosOfNthChar(std::string str, int n, char c) {
   if (n < 1) {
     std::cout << "Nth should be a positive integer." << std::endl;
     exit(0);
   }
   int count = 1;
-  int pos = str.find(c, 0);
+  size_t pos = str.find(c, 0);
   // pos is the position of the first character c;
   while(count < n and pos != std::string::npos) {
       pos = str.find(c, pos+1);
@@ -43,7 +43,6 @@ bool SAMAlignment::StoreValues(std::string &line,  int lineNumber) {
   usedFields.resize(S_QUAL);
   fill(usedFields.begin(), usedFields.end(), false);
   std::string kvPair;
-  int i;
   bool parseError = false;
   SAMAlignmentRequiredFields field;
   //
@@ -93,7 +92,7 @@ bool SAMAlignment::StoreValues(std::string &line,  int lineNumber) {
   mapQV = (unsigned char) tmpMapQV;
 
   // Find posisition of the 11th tab.
-  int optTagsStartPos = FindPosOfNthChar(strm.str(), 11, '\t');
+  size_t optTagsStartPos = FindPosOfNthChar(strm.str(), 11, '\t');
   // Save all optional tags.
   if (optTagsStartPos != std::string::npos) {
       optTagStr = strm.str().substr(optTagsStartPos+1);

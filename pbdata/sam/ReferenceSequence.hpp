@@ -8,7 +8,7 @@
 class SAMReferenceSequence {
  public:
   std::string sequenceName;
-  unsigned int length;
+  uint64_t length;
   std::string GetSequenceName() {
     return sequenceName;
   }
@@ -21,7 +21,7 @@ class SAMReferenceSequence {
   std::string GetMD5() {
     return "";
   }
-  unsigned int GetLength() {
+  uint64_t GetLength() {
     return length;
   }
   std::string GetGenomeAssembly() {
@@ -39,7 +39,7 @@ class SAMReferenceSequence {
   static const char* SAMReferenceSequenceFieldNames[];
 
   void StoreValues(std::vector<SAMKeywordValuePair> &kvPairs,
-                   int lineNumber=0);
+                   uint64_t lineNumber=0);
 };
 
 class SAMFullReferenceSequence : public SAMReferenceSequence {
@@ -65,7 +65,7 @@ class SAMFullReferenceSequence : public SAMReferenceSequence {
 
   static const char* SAMFullReferenceSequenceFieldNames[];
 
-  void StoreValues(std::vector<SAMKeywordValuePair> &kvPairs, int lineNumber=0);
+  void StoreValues(std::vector<SAMKeywordValuePair> &kvPairs, uint64_t lineNumber=0);
 };
 
 

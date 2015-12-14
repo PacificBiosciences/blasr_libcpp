@@ -1,10 +1,9 @@
 #include "ReadGroup.hpp"
 
 void SAMReadGroup::StoreValues(std::vector<SAMKeywordValuePair> &kvPairs,
-                               int lineNumber) {
-  int i;
+                               uint64_t lineNumber) {
   bool idIsStored = false;
-  for (i = 0; i < kvPairs.size(); i++ ){
+  for (size_t i = 0; i < kvPairs.size(); i++ ){
     if (kvPairs[i].key == "ID") {
       id = kvPairs[i].value;
       idIsStored = true;
@@ -17,12 +16,11 @@ void SAMReadGroup::StoreValues(std::vector<SAMKeywordValuePair> &kvPairs,
 }
 
 void SAMFullReadGroup::StoreValues(vector<SAMKeywordValuePair> &kvPairs,
-                 int lineNumber) {
+                 uint64_t lineNumber) {
   SAMReadGroup::StoreValues(kvPairs, lineNumber);
   std::string kwPair;
   std::string key, valueStr;
-  int i;
-  for (i = 0; i < kvPairs.size(); i++) {
+  for (size_t i = 0; i < kvPairs.size(); i++) {
     if (kvPairs[i].key == "CN") {
       centerName = kvPairs[i].value;
     }

@@ -74,7 +74,7 @@ class SAMAlignment {
   void PrintSAMAlignment(std::ostream &out = std::cout);
 
   // Find position of the nth character in a string.
-  int FindPosOfNthChar(std::string str, int n, char c);
+  size_t FindPosOfNthChar(std::string str, int n, char c);
 
   // Trim the end '\n\r' characters from a string.
   std::string TrimStringEnd(std::string str);

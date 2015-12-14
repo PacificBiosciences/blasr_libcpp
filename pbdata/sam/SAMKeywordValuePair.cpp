@@ -2,7 +2,7 @@
 
 
 bool SplitSAMKeyValuePair(std::string &kvPair, std::string &key, std::string &value) {
-  int sepIndex = kvPair.find_first_of(":");
+  size_t sepIndex = kvPair.find_first_of(":");
   if (sepIndex == kvPair.npos) {
     return false;
   }
@@ -44,8 +44,7 @@ void KeywordValueStringsToPairs(std::vector<std::string> &kvStrings, std::vector
     return;
   }
 
-  int i;
-  for (i = 0; i < kvStrings.size(); i++ ) {
+  for (size_t i = 0; i < kvStrings.size(); i++ ) {
     SplitSAMKeyValuePair(kvStrings[i], kvPairs[i].key, kvPairs[i].value);
   }
 }
