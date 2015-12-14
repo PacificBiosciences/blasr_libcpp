@@ -28,6 +28,8 @@ bool HDFData::IsInitialized() const {
 // Allow derived classes to be initialized generically.
 //
 int HDFData::Initialize(HDFGroup &parentGroup, const string &datasetName) { 
+    (void)(parentGroup);
+    (void)(datasetName);
     cout << "ERROR! Only a subclass should call this." << endl;
     exit(1);
 }
