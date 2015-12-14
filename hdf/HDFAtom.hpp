@@ -29,21 +29,21 @@ public:
         return NULL;
     }
 
-    int Initialize(H5::H5Location &object, const std::string & attributeName, bool createIfMissing=false) {
+    int Initialize(H5::H5Location &object, const std::string & attributeName) {
         attribute = object.openAttribute(attributeName.c_str());
         isInitialized = true;
         return 1;
     }
 
-    int Initialize(HDFGroup &group, const std::string & attributeName, bool createIfMissing=false) {
+    int Initialize(HDFGroup &group, const std::string & attributeName) {
         return Initialize(group.group, attributeName);
     }
 
-    int Initialize(HDFData &data, const std::string & attributeName, bool createIfMissing=false) {
+    int Initialize(HDFData &data, const std::string & attributeName) {
         return Initialize(data.dataset, attributeName);
     }
 
-    int Initialize(H5::Group &object, const std::string & attributeName, bool createIfMissing=false) {
+    int Initialize(H5::Group &object, const std::string & attributeName) {
         try {
             attribute = object.openAttribute(attributeName.c_str());
         }
@@ -97,14 +97,19 @@ public:
     }
 
     void TypedCreate(H5::H5Location &object, const std::string &atomName, H5::DataSpace &dataSpace) {
+        (void)(object);
+        (void)(atomName);
+        (void)(dataSpace);
         assert("Calling HDFAtom<T>::typedCreate on an unsupported type" == 0);
     }
 
     void Write(T value) {
+        (void)(value);
         assert("Calling HDFAtom<T>::Write on an unsupported type" == 0);
     }
 
     void Read(T& value) {
+        (void)(value);
         assert("Calling read on an unsupported type!" == 0);
     }
 
