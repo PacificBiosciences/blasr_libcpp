@@ -61,6 +61,7 @@ int BufferedHDF2DArray<T>::InitializeForReading(HDFGroup& group, std::string dat
 template<typename T>
 int BufferedHDF2DArray<T>::Initialize(HDFGroup &group, std::string datasetName,
     DSLength _rowLength, int _bufferSize, bool createIfMissing) {
+    (void)(_bufferSize);
 
     bool groupContainsDataset = group.ContainsObject(datasetName);
     if (groupContainsDataset == false) {
