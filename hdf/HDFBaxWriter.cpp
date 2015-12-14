@@ -111,6 +111,7 @@ bool HDFBaxWriter::WriteOneZmw(const SMRTSequence & seq,
             return regionsWriter_->Write(regions);
         }
     }
+    return true;
 }
 
 bool HDFBaxWriter::WriteFakeDataSets() {
