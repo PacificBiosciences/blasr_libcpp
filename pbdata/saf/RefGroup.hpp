@@ -14,8 +14,8 @@ class RefGroup {
 	vector<string> refGroupName;
 	vector<uint32_t> refInfoId;
 
-    bool IdToIndex(int idKey, int &idIndex);
-	int FindPath(int idKey, string &pathVal, string &groupNameVal);
+    bool IdToIndex(uint32_t idKey, uint32_t &idIndex);
+	int FindPath(uint32_t idKey, string &pathVal, string &groupNameVal);
 };
 
 #endif

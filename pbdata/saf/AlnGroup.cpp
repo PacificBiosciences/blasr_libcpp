@@ -1,8 +1,7 @@
 #include "AlnGroup.hpp"
 
-int AlnGroup::FindPath(int idKey, std::string &val) {
-    int i;
-    for (i = 0; i < id.size(); i++) {
+int AlnGroup::FindPath(unsigned int idKey, std::string &val) {
+    for (size_t i = 0; i < id.size(); i++) {
         if (idKey == id[i]) {
             val = path[i];
             return 1;

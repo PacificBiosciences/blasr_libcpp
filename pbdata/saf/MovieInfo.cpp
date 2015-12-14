@@ -1,9 +1,8 @@
 #include "MovieInfo.hpp"
 
 
-int MovieInfo::FindMovie(int idKey, string &nameVal) {
-    int i;
-    for (i = 0; i < id.size(); i++) {
+int MovieInfo::FindMovie(UInt idKey, string &nameVal) {
+    for (size_t i = 0; i < id.size(); i++) {
         if (id[i] == idKey) {
             nameVal = name[i];
             return 1;

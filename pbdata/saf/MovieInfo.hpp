@@ -13,7 +13,7 @@ class MovieInfo {
 	vector<UInt>   run;
 	vector<UInt>   experiment;
 	vector<UInt>   id;
-	int FindMovie(int idKey, string &nameVal);
+	int FindMovie(UInt idKey, string &nameVal);
 };
 
 #endif
