@@ -9,8 +9,8 @@ HDFZMWWriter::HDFZMWWriter(const std::string & filename,
                            const std::map<char, size_t> & baseMap)
     : HDFWriterBase(filename)
     , parentGroup_(parentGroup)
-    , inPulseCalls_(inPulseCalls)
     , baseMap_(baseMap)
+    , inPulseCalls_(inPulseCalls)
     , arrayLength_(0)
 { 
     if (not parentGroup.groupIsInitialized)
@@ -87,10 +87,12 @@ bool HDFZMWWriter::WriteFakeDataSets(void) {
 
 bool HDFZMWWriter::_WriteNumEvent(const uint32_t numEvent) {
     numEventArray_.Write(&numEvent, 1);
+    return true;
 }
 
 bool HDFZMWWriter::_WriteHoleNumber(const uint32_t holeNumber) {
     holeNumberArray_.Write(&holeNumber, 1);
+    return true;
 }
 
 bool HDFZMWWriter::_WriteHoleXY(const int16_t holeX, const int16_t holeY) {
@@ -101,8 +103,8 @@ bool HDFZMWWriter::_WriteHoleXY(const int16_t holeX, const int16_t holeY) {
 
 bool HDFZMWWriter::_WriteHoleStatus(const unsigned char holeStatus) {
     // NOTE that: We assume that all zmws in BAM are SEQUENCING zmws.
-    //unsigned char hs_ = 
     holeStatusArray_.Write(&holeStatus, 1);
+    return true;
 }
 
 bool HDFZMWWriter::_WriteBaseLineSigma(const PacBio::BAM::BamRecord & read) {
