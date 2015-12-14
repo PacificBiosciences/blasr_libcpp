@@ -123,7 +123,6 @@ long FASTAReader::ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatab
     seqLength = fileSize - p;
     long memorySize = seqLength+padding+1;
 
-    long a = memorySize;
     if (memorySize > UINT_MAX) {
         cout << "ERROR! Reading fasta files greater than 4Gbytes is not supported." << endl;
         exit(1);
@@ -307,7 +306,7 @@ int FASTAReader::GetNext(FASTASequence &seq) {
                     c != '\t' and
                     c != '\n' and
                     c != '\r') {
-                seq.seq[s] = convMat[filePtr[p]];
+                seq.seq[s] = convMat[static_cast<unsigned char>(filePtr[p])];
                 s++;
             }
             p++;
