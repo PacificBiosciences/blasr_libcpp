@@ -195,8 +195,7 @@ void DNASequence::ReferenceSubstring(const DNASequence &rhs, DNALength pos, DNAL
     //
     // This makes a reference therefore it should not be deleted.
     //
-    assert(pos >= 0 && pos <= rhs.length &&
-           substrLength >= 0 && substrLength <= rhs.length);
+    assert(pos <= rhs.length && substrLength <= rhs.length);
     if (substrLength == 0) {
         substrLength = rhs.length - pos;
     }
