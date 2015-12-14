@@ -4,8 +4,9 @@ THISDIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 -include ${CURDIR}/defines.mk
 include ${THISDIR}/../rules.mk
 
-CXXOPTS  += -std=c++11 -pedantic
-INCLUDES += ${LIBPBDATA_INC} ${HDF5_INC} ${PBBAM_INC} ${HTSLIB_INC} ${BOOST_INC}
+CXXOPTS  += -std=c++11 -pedantic -Wall -Wextra
+INCLUDES += ${LIBPBDATA_INC}
+SYSINCLUDES = ${HDF5_INC} ${PBBAM_INC} ${HTSLIB_INC} ${BOOST_INC}
 LIBS     += ${LIBPBDATA_LIB} ${HDF5_LIB} ${PBBAM_LIB} ${HTSLIB_LIB} ${ZLIB_LIB}
 LDFLAGS  += $(patsubst %,-L%,${LIBS})
 LDLIBS += -lpbdata -lhdf5 -lhdf5_cpp
