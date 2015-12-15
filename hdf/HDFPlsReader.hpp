@@ -25,11 +25,11 @@ using namespace std;
 
 class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
 	DNALength curPos;
-	int curRead;
+	DSLength curRead;
 
 	HDFGroup pulseCallsGroup;
 
-  int meanSignalNDims, midSignalNDims, maxSignalNDims;
+    int meanSignalNDims, midSignalNDims, maxSignalNDims;
   
 	HDF2DArray<uint16_t>   meanSignalMatrix;
 	HDF2DArray<uint16_t>   midSignalMatrix;
@@ -184,7 +184,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
 		classifierQVArray.Read(0, classifierQVArray.arrayLength, &classifierQV[0]);
 	}
 
-	void GetAllNumEvent(vector<int> &numEvent) {
+	void GetAllNumEvent(vector<DNALength> &numEvent) {
 		CheckMemoryAllocation(zmwReader.numEventArray.arrayLength, maxAllocNElements, "NumEvent (pulse)");
 		numEvent.resize(zmwReader.numEventArray.arrayLength);
 		zmwReader.numEventArray.Read(0, zmwReader.numEventArray.arrayLength, &numEvent[0]);
@@ -467,7 +467,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
      * This requires that the read has the read.seq field assigned.
      */
     assert(read.seq != NULL);
-    int seqLength;
+    DNALength seqLength;
     
     try{
     //
