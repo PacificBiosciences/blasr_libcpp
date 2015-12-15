@@ -91,7 +91,7 @@ int
 FileOfFileNames::ExpandFileNameList(std::vector<std::string> &fileNames) {
     int rfn;
     std::vector<std::string> expandedFileNames;
-    for (rfn = 0; rfn < fileNames.size(); rfn++) {
+    for (rfn = 0; rfn < static_cast<int>(fileNames.size()); rfn++) {
         std::vector<std::string> tmpList;
         FileOfFileNames::StoreFileOrFileList(fileNames[rfn], tmpList);
         expandedFileNames.insert(expandedFileNames.end(),
