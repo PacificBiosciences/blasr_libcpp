@@ -8,7 +8,7 @@ void
 CreateSequenceToAlignmentMap(const string & alignedSequence,
         vector<int> & baseToAlignmentMap) {
     baseToAlignmentMap.resize(alignedSequence.size());
-    int alignedPos, unalignedPos;
+    size_t alignedPos, unalignedPos;
     for (alignedPos=0, unalignedPos=0; 
          alignedPos < alignedSequence.size();
          alignedPos++) {

@@ -81,17 +81,16 @@ void Alignment::Assign(Alignment &rhs) {
     std::vector<Block> empty;
     blocks.swap(empty);
     blocks.resize(rhs.size());
-    int b;
-    for (b = 0; b < rhs.blocks.size(); b++) {
+    for (size_t b = 0; b < rhs.blocks.size(); b++) {
         blocks[b].Assign(rhs.blocks[b]);
     }
 }
 int Alignment::ComputeNumAnchors(int minAnchorSize, int &nAnchors, int &nAnchorBases) {
-    int i;
     nAnchors = 0;
     nAnchorBases = 0;
-    for (i = 0; i < blocks.size(); i++) {
-        if (blocks[i].length >= minAnchorSize) {
+    for (size_t i = 0; i < blocks.size(); i++) {
+        // minAnchorSize is always a small int.
+        if (blocks[i].length >= static_cast<DNALength>(minAnchorSize)) {
             nAnchors++;
             nAnchorBases += blocks[i].length;
         }
@@ -231,7 +230,6 @@ void Alignment::ArrowPathToAlignment(std::vector<Arrow> &optPath) {
 // that Picard / samtools accepts the alignments.
 //
 void Alignment::OrderGapsByType() {
-    int g;
     //
     // Gaps at the beginning and end of the sequence are hard to deal
     // with. Just get rid of them. 
@@ -241,16 +239,15 @@ void Alignment::OrderGapsByType() {
     // Start at 1 since the gaps at the beginning of the sequence are
     // removed.
     //
-    for (g = 1; g < gaps.size(); g++ ) {
+    for (size_t g = 1; g < gaps.size(); g++ ) {
         if (gaps[g].size() <= 1) {
             continue;
         }
         Gap queryGap, targetGap;
         GapList condensedGapList;
-        int gi;
         targetGap.seq = Gap::Target;
         queryGap.seq  = Gap::Query;
-        for (gi = 0; gi < gaps[g].size(); gi++) {
+        for (size_t gi = 0; gi < gaps[g].size(); gi++) {
             if (gaps[g][gi].seq == Gap::Target) {
                 targetGap.length += gaps[g][gi].length;
             }
@@ -258,7 +255,6 @@ void Alignment::OrderGapsByType() {
                 queryGap.length += gaps[g][gi].length;
             }
         }
-        int nTypes = 0;
         gaps[g].clear();
         int matchExtend = 0;
         if (targetGap.length > queryGap.length) {
@@ -294,14 +290,13 @@ void
 Alignment::LongGapArrowPathToAlignment(
     std::vector<Arrow> &optPath, DNALength lengthOfLongGap)  {
 
-    DNALength i;
     int numLongGaps = 0;
 
     // Input checking.
     // Only one long gap is allowed per alignment.  Make sure this is
     // the case on the input.
     //
-    for (i = 0; i < optPath.size(); i++) {
+    for (size_t i = 0; i < optPath.size(); i++) {
         if (optPath[i] == AffineLongDelLeft or
                 optPath[i] == AffineLongDelClose) {
             numLongGaps++;
@@ -318,14 +313,13 @@ Alignment::LongGapArrowPathToAlignment(
     // First locate the position of the gap.
     // Also, change the gap to a normal arrow.
     //
-    DNALength indexOfLongGap; // undefined until one is found
+    size_t indexOfLongGap; // undefined until one is found
     bool aLongGapWasFound = false;
-    Arrow longGapArrow; // will hold the type of the long gap
-    int numBlocksBeforeGap = 0;
-    int indexOfLastMatchBeforeGap = 0;
+    size_t numBlocksBeforeGap = 0;
+    size_t indexOfLastMatchBeforeGap = 0;
     // Now locate both the type of type of the arrow, and the 
     // position 
-    for (i = 0; i < optPath.size(); i++) {
+    for (size_t i = 0; i < optPath.size(); i++) {
         //
         // Count the number of blocks. This will tell us where to insert
         // the gap.
@@ -342,7 +336,6 @@ Alignment::LongGapArrowPathToAlignment(
         if (optPath[i] == AffineLongDelLeft or
                 optPath[i] == AffineLongDelClose) {
             aLongGapWasFound = true;
-            longGapArrow = optPath[i];
             indexOfLongGap = i;
             optPath[i] = Left;
             break;
@@ -365,20 +358,18 @@ Alignment::LongGapArrowPathToAlignment(
         // the hardest step.  First, find how many arrow instructions
         // there are between the last block and the arrow.
 
-        int numGapChars = indexOfLongGap - indexOfLastMatchBeforeGap + 1;
-        int gi;
+        size_t numGapChars = indexOfLongGap - indexOfLastMatchBeforeGap + 1;
+        size_t gi;
 
         // Define some variables for readability.
-        int indexOfBlockBeforeGap;
-        int gapIndex;
-        gapIndex = numBlocksBeforeGap;
+        size_t gapIndex = numBlocksBeforeGap;
 
         assert(gapIndex < gaps.size());
 
         // There must be at least one gap here (the long deletion)
         assert(gaps[gapIndex].size() > 0);
 
-        int cumulativeGapLength = 0;
+        DNALength cumulativeGapLength = 0;
         bool indexOfGapFound = false;
         for (gi = 0; gi < gaps[gapIndex].size(); gi++) {
             cumulativeGapLength += gaps[gapIndex][gi].length;
@@ -446,8 +437,7 @@ DNALength Alignment::GenomicTEnd() {
 
 void Alignment::RemoveEndGaps() {
     if (gaps.size() > 0 and gaps[0].size() > 0) {
-        int i;
-        for (i = 0; i < gaps[0].size(); i++) {
+        for (size_t i = 0; i < gaps[0].size(); i++) {
             if (gaps[0][i].seq == Gap::Target) {
                 qPos += gaps[0][i].length;
             }
