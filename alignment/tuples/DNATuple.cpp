@@ -34,9 +34,9 @@ int DNATuple::FromStringRL(Nucleotide *strPtr, TupleMetrics &tm) {
 
 int DNATuple::MakeRC(DNATuple &dest, TupleMetrics &tm) {
     int i;
-    ULong tempTuple = tuple;
+    TupleData tempTuple = tuple;
     dest.tuple = 0;
-    ULong mask = 0x3;
+    TupleData mask = 0x3;
     if (tm.tupleSize == 0)
         return 0;
     for (i = 0; i < tm.tupleSize - 1; i++ ) {
@@ -51,7 +51,7 @@ int DNATuple::MakeRC(DNATuple &dest, TupleMetrics &tm) {
 std::string DNATuple::ToString(TupleMetrics &tm) {
     int i;
     std::string s;
-    ULong tempTuple = tuple;
+    TupleData tempTuple = tuple;
     for (i = 0;i < tm.tupleSize;i++) {
         s.insert(s.begin(), TwoBitToAscii[tempTuple & 3]);
         tempTuple = tempTuple >> 2;
