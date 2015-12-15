@@ -261,7 +261,7 @@ SAMHeaderSQs SAMHeaderPrinter::MakeSQs(SequenceIndexDatabase<FASTASequence> & se
     SAMHeaderSQs sqs;
     for (int i = 0; i < seqdb.nSeqPos-1; i++) {
         std::string md5 = "";
-        if (seqdb.md5.size() == seqdb.nSeqPos - 1) {
+        if (static_cast<int>(seqdb.md5.size()) == seqdb.nSeqPos - 1) {
             md5 = seqdb.md5[i];
         }
         string seqName;
