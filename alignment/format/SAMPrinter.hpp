@@ -34,7 +34,7 @@ void BuildFlag(T_AlignmentCandidate &alignment, AlignmentContext &context, uint1
 // so it is called trim instead of clip.
 //
 void CreateDNAString(DNASequence &seq, DNASequence &clippedSeq, 
-    int trimFront=0, int trimEnd=0); 
+    DNALength trimFront=0, DNALength trimEnd=0); 
 
 void AddGaps(T_AlignmentCandidate &alignment, int gapIndex,
         std::vector<int> &opSize, std::vector<char> &opChar);

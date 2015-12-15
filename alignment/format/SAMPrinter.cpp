@@ -54,9 +54,9 @@ void SAMOutput::CreateDNAString(DNASequence &seq,
         // Trimming is used for both hard non-clipping
         // so it is called trim instead of clip.
         //
-        int trimFront,
-        int trimEnd) {
-    assert(seq.length - trimEnd >= trimFront);
+        DNALength trimFront,
+        DNALength trimEnd) {
+    assert(seq.length >= trimEnd and seq.length - trimEnd >= trimFront);
 
     clippedSeq.seq    = &seq.seq[trimFront];
     clippedSeq.length = seq.length - trimEnd - trimFront;
@@ -64,8 +64,7 @@ void SAMOutput::CreateDNAString(DNASequence &seq,
 
 void SAMOutput::AddGaps(T_AlignmentCandidate &alignment, int gapIndex,
         std::vector<int> &opSize, std::vector<char> &opChar) {
-    int g;
-    for (g = 0; g < alignment.gaps[gapIndex].size(); g++) {
+    for (size_t g = 0; g < alignment.gaps[gapIndex].size(); g++) {
         if (alignment.gaps[gapIndex][g].seq == blasr::Gap::Query) {
             opSize.push_back(alignment.gaps[gapIndex][g].length);
             opChar.push_back('D');
@@ -80,7 +79,7 @@ void SAMOutput::AddGaps(T_AlignmentCandidate &alignment, int gapIndex,
 void SAMOutput::AddMatchBlockCigarOps(DNASequence & qSeq, DNASequence & tSeq, 
         blasr::Block & b, DNALength & qSeqPos, DNALength & tSeqPos,
         std::vector<int> & opSize, std::vector<char> & opChar) {
-    DNALength qPos = qSeqPos + b.qPos, tPos = tSeqPos + b.tPos, n = 0;
+    DNALength qPos = qSeqPos + b.qPos, tPos = tSeqPos + b.tPos;
     bool started = false, prevSeqMatch = false;
     for(DNALength i = 0; i < b.length; i++) {
         bool curSeqMatch = (qSeq[qPos + i] == tSeq[tPos + i]);
@@ -103,7 +102,7 @@ void SAMOutput::MergeAdjacentIndels(std::vector<int> &opSize,
                                     std::vector<char> &opChar,
                                     const char mismatchChar) {
     assert(opSize.size() == opChar.size() and not opSize.empty());
-    int i, j;
+    size_t i, j;
     for (i = 0, j = 1; i < opSize.size() and j < opSize.size(); j++) {
         const int  ni = opSize[i], nj = opSize[j];
         const char ci = opChar[i], cj = opChar[j];
@@ -114,6 +113,7 @@ void SAMOutput::MergeAdjacentIndels(std::vector<int> &opSize,
                 opSize[i] = std::min(ni, nj);
                 opChar[i] = mismatchChar; // merge 'I' and 'D' to Mismatch
                 if (i != 0 and i != opSize.size() and opChar[i] == opChar[i - 1]) {
+                    assert(i >= 1);
                     opSize[i - 1] += opSize[i]; // merge with i - 1?
                     i--;
                 }
@@ -159,7 +159,7 @@ void SAMOutput::CreateNoClippingCigarOps(T_AlignmentCandidate &alignment,
         // possible that the qurey and target are gapped at the same
         // time, which merges into a mismatch.
         //
-        int qGap=0, tGap=0, commonGap=0;
+        int qGap=0, tGap=0;
         int matchLength = alignment.blocks[b].length;
         if (nGaps == 0) {
             if (b + 1 < nBlocks) {
