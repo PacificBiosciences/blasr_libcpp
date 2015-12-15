@@ -24,7 +24,7 @@ T_Int CeilOfFraction(T_Int num, T_Int denom) {
 }
 
 template<typename T>
-inline T* ProtectedNew(unsigned long size) {
+inline T* ProtectedNew(uint64_t size) {
     T * ptr = nullptr;
     try {
         ptr = new T[size];
