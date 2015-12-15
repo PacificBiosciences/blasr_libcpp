@@ -9,6 +9,11 @@
 #include "matrix/FlatMatrix.hpp"
 #include "datastructures/alignment/Alignment.hpp"
 
+//FIXME: change data type of target pos from int to GenomeLength 
+//       in order to support > 4G genome.
+//       No need to change data type of query pos to DNALength, 
+//       since it's unlikely to have > 2G bases per zmw.
+
 class RCToIndex {
 public:
     int qStart, tStart;

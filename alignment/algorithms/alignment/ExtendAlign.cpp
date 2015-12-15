@@ -46,10 +46,12 @@ int ForwardIndex::RefSeqPos(int t) {
 }
 
 int ForwardIndex::GetQueryStartPos(int startQ, int endQ) {
+    (void)(endQ);
     return queryPos + startQ + 1;
 }
 
 int ForwardIndex::GetRefStartPos(int startT, int endT) {
+    (void)(endT);
     return refPos + startT + 1;
 }
 
@@ -67,13 +69,15 @@ int ReverseIndex::RefSeqPos(int t) {
 }
 
 int ReverseIndex::GetQueryStartPos(int startQ, int endQ) {
+    (void)(startQ);
     return queryPos - (endQ-1);
 }
 
 int ReverseIndex::GetRefStartPos(int startT, int endT) {
+    (void)(startT);
     return refPos - (endT-1);
 }
 
 void ReverseIndex::OrderArrowVector(std::vector<Arrow> &mat) {
+    (void)(mat);
 }
-
