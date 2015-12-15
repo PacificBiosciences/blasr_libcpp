@@ -44,12 +44,12 @@ public:
 };
 
 inline MatchPos::MatchPos(DNALength pt, DNALength pq, DNALength pl, int pm) :
-    t(pt), q(pq), l(pl), m(pm), w(0){ }
+    t(pt), q(pq), w(0), l(pl), m(pm){ }
 
 inline MatchPos::MatchPos() {
     t = q = -1;
-    l = 0;
     w = 0;
+    l = 0;
     m = 0;
 }
 
@@ -87,7 +87,7 @@ public:
 
     ChainedMatchPos();
 
-    inline ChainedMatchPos(const ChainedMatchPos &rhs); 
+    //inline ChainedMatchPos(const ChainedMatchPos &rhs); 
 
     inline int GetScore();
 
@@ -97,15 +97,16 @@ public:
 
     inline ChainedMatchPos* GetChainPrev();
 
-    inline ChainedMatchPos &operator=(const ChainedMatchPos &rhs); 
+    //inline ChainedMatchPos &operator=(const ChainedMatchPos &rhs); 
 
     friend std::ostream& operator<<(std::ostream & out, ChainedMatchPos &p); 
 
 };
 
+/*
 inline ChainedMatchPos::ChainedMatchPos(const ChainedMatchPos &rhs) {
     (*this) = rhs;
-}
+}*/
 
 inline ChainedMatchPos* ChainedMatchPos::GetChainPrev() {
     return chainPrev;
@@ -115,10 +116,13 @@ inline int ChainedMatchPos::GetScore() {
     return score;
 }
 
+/*
 inline ChainedMatchPos &ChainedMatchPos::operator=(const ChainedMatchPos &rhs) {
+    score = rhs.score;
     ((MatchPos&)(*this)) = ((MatchPos&)rhs);
     return *this;
 }
+*/
 
 
 template<typename T_MatchPos>
