@@ -75,7 +75,7 @@ public:
 
     int BuildReverseIndex(int maxRun, int binSize); 
 
-    long Lookup4BitCompressedSequencePos(int cpPos); 
+    GenomeLength Lookup4BitCompressedSequencePos(int cpPos); 
 
     int LookupSequencePos(int cpPos); 
 
