@@ -14,8 +14,8 @@ void InitializeCandidateFromSAM(SAMAlignment &sam,
 // Change a list of gap operations into a gap structure between
 // blocks. 
 //
-int ProcessGap(std::vector<int> &lengths, std::vector<char> &ops, 
-               int &opIndex, int opEnd, blasr::GapList &gaps, 
+size_t ProcessGap(std::vector<int> &lengths, std::vector<char> &ops, 
+               size_t &opIndex, size_t opEnd, blasr::GapList &gaps, 
                int &qAdvance, int &tAdvance);
 
 inline bool IsClipping(char c) {
@@ -37,12 +37,12 @@ inline bool IsAssignChar(char c) {
 
 int AdvancePastClipping(std::vector<int> &lengths,
                         std::vector<char> &ops,
-                        int &opIndex,
+                        size_t &opIndex,
                         int &numSoftClipped);
 
 int AdvancePastSkipped(std::vector<int> &lengths,
                        std::vector<char> &ops,
-                       int &opIndex);
+                       size_t &opIndex);
 
 
 
@@ -51,8 +51,8 @@ int ProcessMatch(std::vector<int> &lengths, std::vector<char> &ops,
                  
 
 void CIGAROpsToBlocks(std::vector<int> &lengths, std::vector<char> &ops,
-                      int cigarStart,
-                      int cigarEnd,
+                      size_t cigarStart,
+                      size_t cigarEnd,
                       AlignmentCandidate<> &aln);
   
 int AdvancePosToAlignmentEnd(std::vector<char> &ops, int &pos);
@@ -62,8 +62,8 @@ int GetAlignedQueryLengthByCIGARSum(std::vector<char> &ops, std::vector<int> &le
 int GetAlignedReferenceLengthByCIGARSum(std::vector<char> &ops, std::vector<int> &lengths);
 
 void CIGAROpsToBlocks(std::vector<int> &lengths, std::vector<char> &ops,
-                      int &cigarPos,
-                      int &cigarEnd,
+                      size_t &cigarPos,
+                      size_t &cigarEnd,
                       int &qPos, int &tPos,
                       AlignmentCandidate<> &aln);
 

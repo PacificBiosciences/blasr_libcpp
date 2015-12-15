@@ -10,8 +10,8 @@ void InitializeCandidateFromSAM(SAMAlignment &sam,
   candidate.mapQV = sam.mapQV;
 }
 
-int ProcessGap(std::vector<int> &lengths, std::vector<char> &ops, 
-               int &opIndex, int opEnd, blasr::GapList &gaps, 
+size_t ProcessGap(std::vector<int> &lengths, std::vector<char> &ops, 
+               size_t &opIndex, size_t opEnd, blasr::GapList &gaps, 
                int &qAdvance, int &tAdvance) {
   //
   // Default is no gap.
@@ -47,7 +47,7 @@ int ProcessGap(std::vector<int> &lengths, std::vector<char> &ops,
 
 int AdvancePastClipping(std::vector<int> &lengths,
                         std::vector<char> &ops,
-                        int &opIndex,
+                        size_t &opIndex,
                         int &numSoftClipped) {
   int numClipped = 0;
   numSoftClipped = 0;
@@ -64,7 +64,7 @@ int AdvancePastClipping(std::vector<int> &lengths,
 
 int AdvancePastSkipped(std::vector<int> &lengths,
                        std::vector<char> &ops,
-                       int &opIndex) {
+                       size_t &opIndex) {
   int numSkipped = 0;
   while (opIndex < lengths.size() and IsSkipped(ops[opIndex])) {
     numSkipped += lengths[opIndex];
@@ -74,7 +74,7 @@ int AdvancePastSkipped(std::vector<int> &lengths,
 }
 
 int ProcessMatch(std::vector<int> &lengths, std::vector<char> &ops,
-                  int &opIndex, int opEnd) {
+                 size_t &opIndex, size_t opEnd) {
 
   //
   // Make sure this starts on some sort of blockn
@@ -89,16 +89,16 @@ int ProcessMatch(std::vector<int> &lengths, std::vector<char> &ops,
 }
 
 void CIGAROpsToBlocks(std::vector<int> &lengths, std::vector<char> &ops,
-                      int cigarStart,
-                      int cigarEnd,
+                      size_t cigarStart,
+                      size_t cigarEnd,
                       AlignmentCandidate<> &aln) {
   cigarStart = 0;
   cigarEnd   = lengths.size();
   CIGAROpsToBlocks(lengths, ops, cigarStart, cigarEnd, aln);
 }
 
-int AdvancePosToAlignmentEnd(std::vector<char> &ops, int &pos) {
-  int start = pos;
+int AdvancePosToAlignmentEnd(std::vector<char> &ops, size_t &pos) {
+  size_t start = pos;
   while (pos < ops.size() and ops[pos] != 'N' and !IsClipping(ops[pos])) {
     pos++;
   }
@@ -106,7 +106,7 @@ int AdvancePosToAlignmentEnd(std::vector<char> &ops, int &pos) {
 }
 
 int GetAlignedQueryLengthByCIGARSum(std::vector<char> &ops, std::vector<int> &lengths) {
-  int i;
+  size_t i;
   for (i = 0; i < ops.size(); i++) {
     if (ops[i] != 'S' && ops[i] != 'H') {
       break;
@@ -122,7 +122,7 @@ int GetAlignedQueryLengthByCIGARSum(std::vector<char> &ops, std::vector<int> &le
 }
 
 int GetAlignedReferenceLengthByCIGARSum(std::vector<char> &ops, std::vector<int> &lengths) {
-  int i;
+  size_t i;
   for (i = 0; i < ops.size(); i++) {
     if (ops[i] != 'S' && ops[i] != 'H') {
       break;
@@ -138,12 +138,11 @@ int GetAlignedReferenceLengthByCIGARSum(std::vector<char> &ops, std::vector<int>
 }
 
 void CIGAROpsToBlocks(std::vector<int> &lengths, std::vector<char> &ops,
-                      int &cigarPos,
-                      int &cigarEnd,
+                      size_t &cigarPos,
+                      size_t &cigarEnd,
                       int &qPos, int &tPos,
                       AlignmentCandidate<> &aln) {
 
-  int gapIndex = 0;
   DNALength qStart = qPos, tStart = tPos;
   assert(cigarPos >= cigarEnd or !IsClipping(ops[cigarPos]));
 
@@ -243,27 +242,22 @@ void SAMAlignmentsToCandidates(SAMAlignment &sam,
     
     // We also need to reverse any optional QVs
     if (copyQVs) {
-      for(int i=0; i<optionalQVs.size(); i++) {
+      for(size_t i=0; i<optionalQVs.size(); i++) {
         std::reverse(optionalQVs[i].begin(), optionalQVs[i].end());
       }
     }
   }
 
 
-  int i;
-  int offset = 0;
   if (ops.size() == 0) {
     return;
   }
-  bool alignmentStarted = false;
-  bool onFirstMatch = true;
-  int  curAlignment;
   
   //
   // Advance past any clipping.  This advances in both query and
   // reference position.
   //
-  int cigarPos = 0;
+  size_t cigarPos = 0;
   int qPos = 0; 
   int tPos = 0;
 
@@ -293,14 +287,13 @@ void SAMAlignmentsToCandidates(SAMAlignment &sam,
 
 
   while (cigarPos < lengths.size()) {
-    int numClipped;
     //
     // Sequence clipping becomes offsets into the q/t alignedSeqPos
     //
 
 
     int numSoftClipped;
-    numClipped = AdvancePastClipping(lengths, ops, cigarPos, numSoftClipped);
+    AdvancePastClipping(lengths, ops, cigarPos, numSoftClipped);
 
     //
     // End loop now.
@@ -334,7 +327,7 @@ void SAMAlignmentsToCandidates(SAMAlignment &sam,
     // tAlignStart is the start of the alignment in the genome.
     DNALength tAlignStart = tPos;
     
-    int cigarEnd = cigarPos;
+    size_t cigarEnd = cigarPos;
     AdvancePosToAlignmentEnd(ops, cigarEnd);
 
     CIGAROpsToBlocks(lengths, ops,          
@@ -342,9 +335,9 @@ void SAMAlignmentsToCandidates(SAMAlignment &sam,
                      qPos, tPos,
                      alignment);
 
+    GetAlignedQueryLengthByCIGARSum(ops, lengths);
+    GetAlignedReferenceLengthByCIGARSum(ops, lengths);
 
-    DNALength queryLengthSum = GetAlignedQueryLengthByCIGARSum(ops, lengths);
-    DNALength refLengthSum   = GetAlignedReferenceLengthByCIGARSum(ops, lengths);
     alignment.qAlignedSeqLength = qPos - qAlignStart;
     alignment.tAlignedSeqLength = tPos - tAlignStart;
 
@@ -379,7 +372,6 @@ void SAMAlignmentsToCandidates(SAMAlignment &sam,
     }
     else {
       int refIndex;
-      int s = refNameToRefListIndex.size();
       if (refNameToRefListIndex.find(sam.rName) == refNameToRefListIndex.end()) {
         std::cout <<" ERROR.  SAM Reference " << sam.rName << " is not found in the list of reference contigs." << std::endl;
         exit(1);
