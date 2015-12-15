@@ -29,6 +29,9 @@
 
 #define MAX_BAND_SIZE 250
 
+//FIXME: Change data type of target pos to GenomeLength in order to support
+//       > 4G genome.
+
 class GuideRow {
 public:
     int q, t;
@@ -55,7 +58,7 @@ void StoreMatrixOffsets(Guide &guide);
 
 float QVToLogPScale(char qv);
 
-void QVToLogPScale(QualityValueVector<QualityValue> &qualVect, int phredVectLength, std::vector<float> &lnVect); 
+void QVToLogPScale(QualityValueVector<QualityValue> &qualVect, size_t phredVectLength, std::vector<float> &lnVect); 
 
 int AlignmentToGuide(blasr::Alignment &alignment, Guide &guide, int bandSize); 
 

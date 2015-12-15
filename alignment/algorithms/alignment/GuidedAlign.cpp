@@ -35,8 +35,7 @@ int GetBufferIndexFunctor::operator()(Guide &guide, int seqRow, int seqCol, int 
 
 int ComputeMatrixNElem(Guide &guide) {
     int totalSize = 0;
-    int r;
-    for (r = 0; r < guide.size(); r++) {
+    for (size_t r = 0; r < guide.size(); r++) {
         totalSize += guide[r].GetRowLength();
         //    cout << r << " " << totalSize << endl;
         assert(guide[r].GetRowLength() >= 0);
@@ -46,8 +45,7 @@ int ComputeMatrixNElem(Guide &guide) {
 
 void StoreMatrixOffsets(Guide &guide) {
     int curMatrixSize = 0;
-    int r;
-    for (r = 0; r < guide.size(); r++) {
+    for (size_t r = 0; r < guide.size(); r++) {
         guide[r].matrixOffset = guide[r].tPre + curMatrixSize;
         curMatrixSize += guide[r].GetRowLength();
     }
@@ -57,12 +55,11 @@ float QVToLogPScale(char qv) {
     return qv/-10.0;
 }
 
-void QVToLogPScale(QualityValueVector<QualityValue> &qualVect, int phredVectLength, std::vector<float> &lnVect) {
+void QVToLogPScale(QualityValueVector<QualityValue> &qualVect, size_t phredVectLength, std::vector<float> &lnVect) {
     if (phredVectLength > lnVect.size()) {
         lnVect.resize(phredVectLength);
     }
-    int i;
-    for (i = 0; i < phredVectLength; i++) {
+    for (size_t i = 0; i < phredVectLength; i++) {
         lnVect[i] = qualVect[i]/-10.0; //log(qualVect.ToProbability(i));
     }
 }
@@ -75,12 +72,12 @@ int AlignmentToGuide(Alignment &alignment, Guide &guide, int bandSize)  {
 		return 0;
 	}
 	
-	int tStart, tEnd, qStart, qEnd;
+	int tStart, qStart, qEnd;
 	int firstBlock   = 0;
 	int lastBlock    = alignment.size() - 1;
 	
 	tStart = alignment.blocks[firstBlock].tPos;
-	tEnd   = alignment.blocks[lastBlock].TEnd();
+	//int tEnd   = alignment.blocks[lastBlock].TEnd();
 	qStart = alignment.blocks[firstBlock].qPos;
 	qEnd   = alignment.blocks[lastBlock].QEnd();
 
@@ -102,19 +99,14 @@ int AlignmentToGuide(Alignment &alignment, Guide &guide, int bandSize)  {
 	guide[0].tPre  = 0;
 
 	// The first row of the guide matches 
-	int q = 0;
-	int t = 0;
 	int guideIndex = 1;
-	int b;
 
-	for (b = 0; b < alignment.blocks.size(); b++) {
+	for (size_t b = 0; b < alignment.blocks.size(); b++) {
 		//
 		// First add the match stored in block b, each block is a
 		// diagonal, so that makes life easy.  
 		//
-		int bp;
-
-		for (bp = 0; bp < alignment.blocks[b].length; bp++) {
+		for (DNALength bp = 0; bp < alignment.blocks[b].length; bp++) {
 			guide[guideIndex].t     = alignment.blocks[b].tPos + bp;
 			guide[guideIndex].q     = alignment.blocks[b].qPos + bp;
 			// 
@@ -124,7 +116,7 @@ int AlignmentToGuide(Alignment &alignment, Guide &guide, int bandSize)  {
 			// path matrix to go backwards into cells that should not be
 			// touched.  
 			//
-			int tDiff = guide[guideIndex].t - guide[guideIndex-1].t;
+			//int tDiff = guide[guideIndex].t - guide[guideIndex-1].t;
 			if (bp == 0) {
 				guide[guideIndex].tPre  = guide[guideIndex].t - 
 					(guide[guideIndex-1].t - guide[guideIndex-1].tPre); 
@@ -168,13 +160,13 @@ int AlignmentToGuide(Alignment &alignment, Guide &guide, int bandSize)  {
 			
 			int diagPos;
 			int qPos, tPos;
-			int qEnd, tEnd;
+			int qEnd;
 			
 			qPos = alignment.blocks[b].QEnd();
 			tPos = alignment.blocks[b].TEnd();
 
 			qEnd = alignment.blocks[b+1].qPos;
-			tEnd = alignment.blocks[b+1].tPos;
+			//int tEnd = alignment.blocks[b+1].tPos;
 
 			for (diagPos = 0; diagPos < diagonalLength; diagPos++, tPos++, qPos++) {
 				guide[guideIndex].t     = tPos;
