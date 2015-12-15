@@ -4,50 +4,50 @@
 #include "TupleMetrics.hpp"
 #include "BaseTuple.hpp"
 
-ULong BaseTuple::HashPowerOfFour(int nBases, TupleMetrics &tm) {
+TupleData BaseTuple::HashPowerOfFour(int nBits, TupleMetrics &tm) {
     //
     // When the hash can fit inside the entire tuple, just return the
     // tuple.
     //
-    if (tm.tupleSize > nBases) {
+    if (tm.tupleSize > nBits) {
         return tuple;
     }
     else {
-        return ((tuple & TupleMask[nBases]) + (tuple % 1063)) % (1 << (nBases*2));
+        return ((tuple & TupleMask[nBits]) + (tuple % 1063)) % (1 << (nBits*2));
     }
 }
 
-int BaseTuple::operator<(const BaseTuple &rhs) const {
+bool BaseTuple::operator<(const BaseTuple &rhs) const {
     return tuple < rhs.tuple;
 }
 
-int BaseTuple::operator==(const BaseTuple &rhs) const {
+bool BaseTuple::operator==(const BaseTuple &rhs) const {
     return tuple == rhs.tuple;
 }
 
-int BaseTuple::operator!= (const BaseTuple &rhs) const {
+bool BaseTuple::operator!= (const BaseTuple &rhs) const {
     return tuple != rhs.tuple;
 }
 
-BaseTuple BaseTuple::ShiftLeft(TupleMetrics &tm, ULong shift) {
+BaseTuple & BaseTuple::ShiftLeft(TupleMetrics &tm, int shift) {
     tuple = tuple << shift;
     tuple = tuple & tm.tupleMask;
     return *this;
 }
 
-BaseTuple BaseTuple::ShiftRight(ULong shift) {
+BaseTuple & BaseTuple::ShiftRight(int shift) {
     tuple = tuple >> shift;
     return *this;
 }
 
-BaseTuple BaseTuple::Append(ULong val, TupleMetrics &tm, ULong nBits) {
+BaseTuple & BaseTuple::Append(TupleData val, TupleMetrics &tm, int nBits) {
     tuple = tuple << nBits;
     tuple = tuple & tm.tupleMask;
     tuple = tuple + val;
     return *this;
 }
 
-long BaseTuple::ToLongIndex() {
-    long tempTuple = tuple;
-    return tempTuple;
+BaseTuple::operator TupleData() const{
+    return tuple;
 }
+

@@ -5,23 +5,23 @@
 
 class BaseTuple {
 public:
-    ULong  tuple;
+    TupleData tuple;
 
-    ULong  HashPowerOfFour(int nBases, TupleMetrics &tm);
+    TupleData HashPowerOfFour(int nBits, TupleMetrics &tm);
 
-    int operator<(const BaseTuple &rhs) const; 
+    bool operator<(const BaseTuple &rhs) const; 
 
-    int operator==(const BaseTuple &rhs) const; 
+    bool operator==(const BaseTuple &rhs) const; 
 
-    int operator!= (const BaseTuple &rhs) const;
+    bool operator!=(const BaseTuple &rhs) const;
 
-    BaseTuple ShiftLeft(TupleMetrics &tm, ULong shift=1L); 
+    BaseTuple & ShiftLeft(TupleMetrics &tm, int shift=1); 
 
-    BaseTuple ShiftRight(ULong shift=1L); 
+    BaseTuple & ShiftRight(int shift=1); 
 
-    BaseTuple Append(ULong val, TupleMetrics &tm, ULong nBits); 
+    BaseTuple & Append(TupleData val, TupleMetrics &tm, int nBits); 
 
-    long ToLongIndex(); 
+    operator TupleData() const;
 };
 
 #endif
