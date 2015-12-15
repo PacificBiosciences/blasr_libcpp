@@ -9,13 +9,13 @@
 class AnchorParameters {
 public:
     QualityValue branchQualityThreshold;
-    int minMatchLength;
+    DNALength minMatchLength;
     int maxMatchScore;
     int expand;
     int contextAlignLength;
     bool useLookupTable;
     int numBranches;
-    int maxAnchorsPerPosition;
+    UInt maxAnchorsPerPosition;
     int advanceExactMatches;
     int maxLCPLength;
     bool stopMappingOnceUnique;
