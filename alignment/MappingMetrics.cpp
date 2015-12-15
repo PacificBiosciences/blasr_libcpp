@@ -243,8 +243,7 @@ void MappingMetrics::CollectSDPMetrics(MappingMetrics &rhs) {
 
 void MappingMetrics::PrintSDPMetrics(std::ostream &out) {
     out << "nbases ncells time" << std::endl;
-    int i;
-    for (i = 0; i < sdpAnchors.size(); i++) {
+    for (size_t i = 0; i < sdpAnchors.size(); i++) {
         out << sdpBases[i] << " " << sdpAnchors[i] << " " << sdpClock[i] << std::endl;
     }
 }
