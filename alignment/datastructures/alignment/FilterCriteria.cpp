@@ -140,6 +140,10 @@ HitPolicy::Apply(const std::vector<T_AlignmentCandidate*> alnPtrs,
     std::vector<T_AlignmentCandidate*> ret = alnPtrs;
     // Sort AlignmentCandidate pointers according to score and target start position.
     ScoreSign sign = this->Sign();
+    if (sign == ScoreSign::POSITIVE) {
+        std::cout << "ERROR: ScoreSign POSITIVE not supported yet." << std::endl;
+        exit(1);
+    }
     std::sort(ret.begin(), ret.end(), SortAlignmentPointersByScore()); 
 
     // Get the best alignments whose alignment scores are the best.
