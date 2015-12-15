@@ -20,6 +20,7 @@ void BuildDiffCoverReverseLookup(UInt diffCover[], UInt diffCoverLength,
 }
 
 UInt DiffCoverFindH(UInt diffCover[], UInt diffCoverLength, UInt diffCoverSize, UInt textSize) {
+    (void)(diffCoverLength);
     UInt h;
     for (h = 0; h < diffCoverSize; h++) {
         UInt rem = textSize % diffCoverSize ;
@@ -45,7 +46,6 @@ UInt DiffCoverMu::operator()(const UInt k) {
     UInt i  = diffCoverReverseLookup[di];
     //		return (textSize/diffCoverSize)*i + min(i,h) + j;
     //		return (textSize/diffCoverSize)*i + i + j;
-    UInt itemsInBucket; 
     //		return min(i,h)*(1 + textSize / diffCoverSize) + (i > h ? i - h : 0)*(textSize/diffCoverSize) + j;
     return (textSize/diffCoverSize) * i + std::min(i,h+1) + j;
 }
@@ -124,6 +124,7 @@ UInt NCompareSuffices(unsigned char text[], UInt a, UInt b, UInt n) {
 }
 
 UInt ComputeDSetSize(UInt diffCover, UInt diffCoverLength, UInt diffCoverSize, UInt textSize) {
+    (void)(diffCover); (void)(diffCoverLength);
     UInt div = textSize / diffCoverSize + 1;
     UInt rem = textSize % diffCoverSize;
     return div*diffCoverSize + rem;
@@ -197,8 +198,7 @@ void DiffCoverComputeLOrder(UInt sufVNaming[], UInt sufVNamingLength, UInt maxVN
  *
  * Input: textVOrder - the v-ordering of a subset of the text.
  *        textSize   - the size of the v-order set.
- *        diffCover  - the diff cover used, and it's length
- *        diffCoverLength 
+ *        diffCoverLength - diff cover length
  *        diffCoverSize - the size of the diff cover.
  * Output: lexNaming: the lex-naming of the v-order suffices.  The
  *        names are implemented as unsigned integers. 
@@ -206,16 +206,12 @@ void DiffCoverComputeLOrder(UInt sufVNaming[], UInt sufVNamingLength, UInt maxVN
  */
 UInt DiffCoverBuildLexNaming( unsigned char text[], UInt textSize,
         UInt textVOrder[],
-        UInt dSetSize, UInt diffCover[], UInt diffCoverLength, UInt diffCoverSize, 
+        UInt dSetSize, UInt diffCoverLength, UInt diffCoverSize, 
         UInt diffCoverLookup[],
         UInt lexNaming[]) {
-    UInt nCovers = textSize / diffCoverSize + 1;
-    UInt cover = 0;
+    (void)(textSize);
     UInt d;
-    UInt vOrder = 0;
-    UInt prevCoverIndex, coverIndex;
     UInt lexOrder = 0;
-    UInt lexIndex = 0;
     //
     // Make sure there is something to do here.
     //
@@ -306,7 +302,7 @@ bool LightweightSuffixSort(unsigned char text[], UInt textLength, UInt *index, i
     UInt largestLexName;
     std::cerr << "Enumerating " << diffCoverSize << "-prefixes." << std::endl;
     largestLexName = DiffCoverBuildLexNaming(text, textLength,
-            index, dSetSize, diffCover, diffCoverLength, diffCoverSize, 
+            index, dSetSize, diffCoverLength, diffCoverSize, 
             mu.diffCoverReverseLookup, lexVNaming);
     //
     // Step 1.3 Compute ISA' of lex-order.
@@ -318,7 +314,6 @@ bool LightweightSuffixSort(unsigned char text[], UInt textLength, UInt *index, i
     // auxiliary array.  Since the index is not being used right now,
     // use that as the extra space.
     //
-    UInt t;
     UInt dci,di;	
     for (dci = 0; dci < nDiffCover; dci++) {
         for (di = 0 ; di < diffCoverLength; di++) {
