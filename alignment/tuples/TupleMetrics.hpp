@@ -5,8 +5,8 @@
 
 class TupleMetrics {
 public:
-    unsigned int tupleSize;
-    ULong tupleMask;
+    int tupleSize; // Number of bits in a tuple.
+    TupleData tupleMask;
 
     TupleMetrics();
 
