@@ -37,19 +37,22 @@
 
 #include "ScanData.hpp"
 #include <iostream>
+#include <algorithm>
 
 std::string ScanData::BaseMapToStr(const std::map<char, size_t> & baseMap) {
     std::string baseMapStr = ""; //4 dye channels.
     if (not baseMap.empty()) {
         baseMapStr = "    ";
         for (auto it = baseMap.begin(); it != baseMap.end(); ++it){
-            if (it->second != 4) {
-                std::cout << "ERROR, must have exactly four dye channels."
-                          << std::endl;
-                exit(1);
-            }
             baseMapStr[it->second]= it->first;
         }
+    }
+    std::string tmpBaseMap = baseMapStr;
+    std::sort(tmpBaseMap.begin(), tmpBaseMap.end());
+    std::transform(tmpBaseMap.begin(), tmpBaseMap.end(), tmpBaseMap.begin(), ::toupper);
+    if (tmpBaseMap != "ACGT") {
+        std::cout << "ERROR, invalid ScanData BaseMap " << baseMapStr << std::endl;
+        exit(1);
     }
     return baseMapStr;
 }
