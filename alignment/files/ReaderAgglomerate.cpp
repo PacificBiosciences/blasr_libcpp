@@ -131,6 +131,7 @@ int ReaderAgglomerate::Initialize(FileType &pFileType, string &pFileName) {
 bool ReaderAgglomerate::HasRegionTable() {
     switch(fileType) {
         case PBBAM:
+        case PBDATASET:
         case Fasta:
         case Fastq:
             return false;
@@ -535,7 +536,6 @@ int ReaderAgglomerate::GetNext(CCSSequence &seq) {
 
 
 int ReaderAgglomerate::Advance(int nSteps) {
-    int i;
     switch(fileType) {
         case Fasta:
             return fastaReader.Advance(nSteps);
@@ -548,6 +548,7 @@ int ReaderAgglomerate::Advance(int nSteps) {
         case Fastq:
             return fastqReader.Advance(nSteps);
         case PBBAM:
+        case PBDATASET:
         case Fourbit:
         case None:
             UNREACHABLE();
