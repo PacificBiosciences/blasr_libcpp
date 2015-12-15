@@ -12,7 +12,7 @@ template<typename TSequence, typename TTuple>
 class TupleCountTable {
 public:
 	int *countTable;
-	int countTableLength;
+	TupleData countTableLength;
 	int nTuples;
 	TupleMetrics tm;
 	bool deleteStructures;

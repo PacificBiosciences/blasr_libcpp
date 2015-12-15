@@ -56,7 +56,7 @@ void TupleCountTable<TSequence, TTuple>::Free() {
 template<typename TSequence, typename TTuple>
 void TupleCountTable<TSequence, TTuple>::IncrementCount(
     TTuple &tuple) {
-    long tupleIndex = tuple.ToLongIndex();
+    TupleData tupleIndex = TupleData(tuple.tuple);
     assert(tupleIndex < countTableLength);
     countTable[tupleIndex]++;
     ++nTuples;
