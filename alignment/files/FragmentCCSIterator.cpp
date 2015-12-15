@@ -36,10 +36,9 @@ Initialize(CCSSequence *_seqPtr, RegionTable *_regionTablePtr) {
     // start base and the template should always match up. 
     //
     int i, j;
-    for (i = 0; i < subreadIntervals.size(); i++) {
-        for (j = 0; j < seqPtr->passStartBase.size(); j++) {
-            if (abs( ((int)subreadIntervals[i].start)  - 
-                     ((int)seqPtr->passStartBase[j]) ) < 10) {
+    for (i = 0; i < static_cast<int>(subreadIntervals.size()); i++) {
+        for (j = 0; j < static_cast<int>(seqPtr->passStartBase.size()); j++) {
+            if (abs( subreadIntervals[i].start - seqPtr->passStartBase[j] ) < 10) {
                 readIntervalDirection[i] = seqPtr->passDirection[j];
                 break;
             }
@@ -47,19 +46,19 @@ Initialize(CCSSequence *_seqPtr, RegionTable *_regionTablePtr) {
     }
 
     int firstAssignedSubread = 0;
-    while (firstAssignedSubread < subreadIntervals.size() and 
+    while (firstAssignedSubread < static_cast<int>(subreadIntervals.size()) and 
            readIntervalDirection[firstAssignedSubread] == 2) { 
         firstAssignedSubread++; 
     }
 
-    if (firstAssignedSubread == subreadIntervals.size()) {
+    if (firstAssignedSubread == static_cast<int>(subreadIntervals.size())) {
         // None of the subread has been assigned a direction, guess.
         firstAssignedSubread = 0;
         readIntervalDirection[0] = 0;
     }
 
     // Assign directions to intervals to the left of the first assigned.
-    if (firstAssignedSubread < subreadIntervals.size() and 
+    if (firstAssignedSubread < static_cast<int>(subreadIntervals.size()) and 
         subreadIntervals.size() > 0) {
         int curSubreadDir = readIntervalDirection[firstAssignedSubread];
         assert(curSubreadDir == 0 or curSubreadDir == 1);
@@ -71,7 +70,7 @@ Initialize(CCSSequence *_seqPtr, RegionTable *_regionTablePtr) {
 
     // Assign directions to intervals which are to the right of the first 
     // assigned and whose direction is unknown.
-    for (i = firstAssignedSubread + 1; i < subreadIntervals.size(); i++) {
+    for (i = firstAssignedSubread + 1; i < static_cast<int>(subreadIntervals.size()); i++) {
         int & di = readIntervalDirection[i];
         int   dp = readIntervalDirection[i-1]; 
         if (di != 0 and di != 1) {
@@ -96,12 +95,12 @@ Initialize(CCSSequence *_seqPtr, RegionTable *_regionTablePtr) {
 
 int FragmentCCSIterator::
 GetNext(int &direction, int &startBase, int &numBases) {
-    if (curPass >= subreadIntervals.size()) {
+    if (curPass >= int(subreadIntervals.size())) {
         return 0;
     }
-    direction = int(readIntervalDirection[curPass]);
-    startBase = int(subreadIntervals[curPass].start);
-    numBases  = int(subreadIntervals[curPass].end - subreadIntervals[curPass].start);
+    direction = readIntervalDirection[curPass];
+    startBase = subreadIntervals[curPass].start;
+    numBases  = subreadIntervals[curPass].end - subreadIntervals[curPass].start;
     ++curPass;
     return 1;
 }
