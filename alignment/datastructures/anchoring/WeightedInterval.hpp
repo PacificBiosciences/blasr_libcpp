@@ -69,9 +69,9 @@ T_WeightedIntervalMultiSet;
 
 class WeightedIntervalSet: public T_WeightedIntervalMultiSet {
 public:
-    int maxSize;
+    size_t maxSize;
     WeightedIntervalSet();
-    WeightedIntervalSet(int maxSizeP);
+    WeightedIntervalSet(const size_t maxSizeP);
     bool insert(WeightedInterval &intv);
     friend std::ostream & operator << (std::ostream & out, WeightedIntervalSet & wis) {
         WeightedIntervalSet::iterator it;

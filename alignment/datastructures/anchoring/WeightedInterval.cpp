@@ -97,12 +97,13 @@ int CompareWeightedIntervalByPValue::operator()(const WeightedInterval &a,
 }
 
 // Functions of class WeightedIntervalSet
-WeightedIntervalSet::WeightedIntervalSet() {
-    maxSize = 0;
-}
+WeightedIntervalSet::WeightedIntervalSet()
+    : maxSize (0) 
+{ }
 
-WeightedIntervalSet::WeightedIntervalSet(int maxSizeP): maxSize(maxSizeP) {
-} 
+WeightedIntervalSet::WeightedIntervalSet(const size_t maxSizeP)
+    : maxSize(maxSizeP) 
+{ } 
 
 bool WeightedIntervalSet::insert(WeightedInterval &intv) {
     intv.isOverlapping = false;
