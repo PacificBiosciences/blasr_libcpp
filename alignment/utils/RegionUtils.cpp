@@ -41,7 +41,6 @@ int GetHighQualitySubreadsIntervals(
     for(int i = 0; i < int(subreadIntervals.size()); i++) {
         int & thisStart = subreadIntervals[i].start;
         int & thisEnd   = subreadIntervals[i].end;
-        int & thisScore = subreadIntervals[i].score;
 
         if (thisStart >= hqEnd or thisEnd <= hqStart) {
             continue;
@@ -73,10 +72,10 @@ std::vector<int>
 GetFullPassSubreadIndices(std::vector<ReadInterval> & subreadIntervals,
                           std::vector<ReadInterval> & adapterIntervals) {
     std::vector<int> indices; // Indices of fullpass subread.
-    for(int i = 0; i < subreadIntervals.size(); i++) {
+    for(int i = 0; i < static_cast<int>(subreadIntervals.size()); i++) {
         ReadInterval & subread = subreadIntervals[i];
         bool ladapter = false, radapter = false;
-        for(int j = 0; j < adapterIntervals.size(); j++) {
+        for(int j = 0; j < static_cast<int>(adapterIntervals.size()); j++) {
             ReadInterval & adapter = adapterIntervals[j];
             if (abs(subread.start - adapter.end) < 10) {
                 ladapter = true;
@@ -111,7 +110,7 @@ int GetLongestFullSubreadIndex(std::vector<ReadInterval> & subreadIntervals,
         return -1;
     std::vector<std::pair<int, int>> indices_lens;
 
-    for (int i = 0; i < indices.size(); i++) {
+    for (int i = 0; i < static_cast<int>(indices.size()); i++) {
         ReadInterval & subread = subreadIntervals[indices[i]];
         indices_lens.push_back(std::make_pair(indices[i], subread.end - subread.start));
     }
@@ -141,7 +140,7 @@ int GetTypicalFullSubreadIndex(std::vector<ReadInterval> & subreadIntervals,
     std::vector<std::pair<int, int>> indices_lens;
     std::vector<int> lengths;
 
-    for (int i = 0; i < indices.size(); i++) {
+    for (int i = 0; i < static_cast<int>(indices.size()); i++) {
         ReadInterval & subread = subreadIntervals[indices[i]];
         indices_lens.push_back(std::make_pair(indices[i], subread.end - subread.start));
         lengths.push_back(subread.end - subread.start);
@@ -183,7 +182,7 @@ int GetMedianLengthFullSubreadIndex(
         return -1;
     std::vector<std::pair<int, int>> indices_lens;
 
-    for (int i = 0; i < indices.size(); i++) {
+    for (int i = 0; i < static_cast<int>(indices.size()); i++) {
         ReadInterval & subread = subreadIntervals[indices[i]];
         indices_lens.push_back(std::make_pair(indices[i], subread.end - subread.start));
     }
