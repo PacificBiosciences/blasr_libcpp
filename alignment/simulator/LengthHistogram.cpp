@@ -27,10 +27,8 @@ void LengthHistogram::GetRandomLength(int &length) {
 }
 
 void LengthHistogram::BuildFromAlignmentLengths(std::vector<int> &lengths) {
-    int i;
     sort(lengths.begin(), lengths.end());
-    int f;
-    for (f = 0, i = 1; i < lengths.size(); i++) {
+    for (size_t f = 0, i = 1; i < lengths.size(); i++) {
         if (lengths[i] != lengths[f]) {
             lengthHistogram.data.push_back(lengths[f]);
             lengthHistogram.cdf.push_back(i);
