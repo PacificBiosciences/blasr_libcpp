@@ -10,13 +10,13 @@
 class ContextSample {
 public:
     std::vector<QualitySample> samples;
-    int minSamples;
-    int maxSamples;
+    size_t minSamples;
+    size_t maxSamples;
     int reachedMinSamples;
 
     ContextSample();
 
-    int GetNSamples();
+    size_t GetNSamples();
 
     int AppendSample(SMRTSequence &seq, DNALength pos);
 

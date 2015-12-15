@@ -6,7 +6,7 @@ ContextSample::ContextSample() {
     reachedMinSamples = 0;
 }
 
-int ContextSample::GetNSamples() {
+size_t ContextSample::GetNSamples() {
     return samples.size();
 }
 
@@ -34,10 +34,9 @@ QualitySample* ContextSample::GetRandomQualitySample() {
 }
 
 void ContextSample::Write(std::ofstream &out) {
-    int s;
     int sampleSize = samples.size();
     out.write((char*) &sampleSize, sizeof(sampleSize));
-    for (s = 0; s < samples.size(); s++ ){
+    for (size_t s = 0; s < samples.size(); s++ ){
         samples[s].Write(out);
     }
 }
