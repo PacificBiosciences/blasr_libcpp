@@ -13,6 +13,4 @@ float Gamma(float lambda, float t, int n);
 
 float Exponential(float lambda, int t);
 
-float Normal(float mu, float sigma, float x);
-
 #endif

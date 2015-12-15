@@ -28,9 +28,3 @@ float Gamma(float lambda, float t, int n) {
 float Exponential(float lambda, int t) {
 	return lambda * exp(-lambda*t);
 }
-
-float Normal(float mu, float sigma, float x) {
-	assert(0);
-	return 0;
-}
-
