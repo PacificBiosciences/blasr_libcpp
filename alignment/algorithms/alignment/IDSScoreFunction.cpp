@@ -44,12 +44,15 @@ int IDSScoreFunction<DNASequence, FASTQSequence>::Deletion(FASTQSequence &query,
 
 template<>
 int IDSScoreFunction<DNASequence, DNASequence>::Deletion(DNASequence &query, DNALength pos) {
+    (void)(query);
+    (void)(pos);
     return del; // For now there is no global deletion quality value.
 }
 
 template<>
 int IDSScoreFunction<DNASequence, FASTQSequence>::Insertion(DNASequence &refSeq, DNALength refPos, 
         FASTQSequence &query, DNALength pos) {
+    (void)(refSeq); (void)(refPos);
     return query.insertionQV[pos] ;
 }
 

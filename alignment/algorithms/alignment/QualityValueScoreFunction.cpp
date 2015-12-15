@@ -47,12 +47,14 @@ int QualityValueScoreFunction<T_RefSequence, T_QuerySequence>::Insertion(
 template<>
 int QualityValueScoreFunction<FASTASequence, FASTQSequence>::Deletion(
     FASTASequence &ref, DNALength pos) {
+    (void)(ref); (void)(pos);
     return del; // For now there is no global deletion quality value.
 }
 
 template<>
 int QualityValueScoreFunction<DNASequence, FASTQSequence>::Deletion(
     DNASequence &ref, DNALength pos) {
+    (void)(ref); (void)(pos);
     return del; // For now there is no global deletion quality value.
 }
 
@@ -60,6 +62,7 @@ template<>
 int QualityValueScoreFunction<DNASequence, FASTQSequence>::Deletion(
     DNASequence &seq, DNALength refPos, FASTQSequence &querySeq,
     DNALength queryPos) {
+    (void)(querySeq); (void)(queryPos);
     return Deletion(seq, refPos);
 }
 
@@ -74,6 +77,7 @@ template<>
 int QualityValueScoreFunction<DNASequence, FASTQSequence>::Insertion(
     DNASequence &ref, DNALength refPos, FASTQSequence &query, 
     DNALength pos) {
+    (void)(ref); (void)(refPos); (void)(query); (void)(pos);
     // Positive value for quality value penalizes the alignment.
     // return query.qual[pos];
     // return Insertion(query, pos);
