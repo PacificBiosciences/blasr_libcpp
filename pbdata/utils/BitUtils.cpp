@@ -7,13 +7,6 @@ int32_t CountBits(uint32_t v) {
 	 * contains this code.
 	 */
   return std::bitset<sizeof(uint32_t)*8>(v).count();
-/*
-	unsigned long long c;
-	c =  ((v & 0xfff) * 0x1001001001001ULL & 0x84210842108421ULL) % 0x1f;
-	c += (((v & 0xfff000) >> 12) * 0x1001001001001ULL & 0x84210842108421ULL) % 
-		0x1f;
-	c += ((v >> 24) * 0x1001001001001ULL & 0x84210842108421ULL) % 0x1f;
-	return c;*/
 }
 
 
