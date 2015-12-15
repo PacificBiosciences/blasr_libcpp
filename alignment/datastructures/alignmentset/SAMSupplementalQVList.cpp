@@ -8,9 +8,8 @@ int SupplementalQVList::nqvTags = 4;
 int SupplementalQVList::nTags = 6;
 
 int SupplementalQVList::UseQV(std::vector<std::string> &qvList) {
-    int i;
     useqv = 0;
-    for (i = 0; i < qvList.size(); i++) {
+    for (size_t i = 0; i < qvList.size(); i++) {
         int j;
         for (j = 0; j < nTags; j++) {
             if (qvList[i] == qvNames[j]) {
