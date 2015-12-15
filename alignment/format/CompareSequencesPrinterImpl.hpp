@@ -47,7 +47,7 @@ void CompareSequencesOutput::Print(T_Alignment &alignment,
 		DNALength alignStringLength = alignStr.size();
 		for (pos = 0; pos < alignStringLength; pos++ ) {
 			if (queryStr[pos] != '-') {
-				queryStrRC[alignStringLength-pos-1] = ReverseComplementNuc[queryStr[pos]];
+				queryStrRC[alignStringLength-pos-1] = ReverseComplementNuc[static_cast<int>(queryStr[pos])];
 			}
 			else {
 				queryStrRC[alignStringLength-pos-1] = '-';
@@ -55,7 +55,7 @@ void CompareSequencesOutput::Print(T_Alignment &alignment,
 			alignStrRC[alignStringLength-pos-1] = alignStr[pos];
 			
 			if (textStr[pos] != '-') {
-				textStrRC[alignStringLength-pos-1] = ReverseComplementNuc[textStr[pos]];
+				textStrRC[alignStringLength-pos-1] = ReverseComplementNuc[static_cast<int>(textStr[pos])];
 			}
 			else {
 				textStrRC[alignStringLength-pos-1] = '-';
