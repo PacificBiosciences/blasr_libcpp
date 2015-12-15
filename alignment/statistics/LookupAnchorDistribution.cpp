@@ -45,7 +45,6 @@ int LookupAnchorDistribution(int readLength, int minMatchLength,
 
 
     int nLengths = (anchorReadLengths[1] - anchorReadLengths[0]) / anchorReadLengths[2];
-    int nAccuracies = (anchorReadAccuracies[1] - anchorReadAccuracies[0]) / anchorReadAccuracies[2];
     int nAnchors = (anchorMinKValues[1] - anchorMinKValues[0]) / anchorMinKValues[2];
     int index = accIndex*(nLengths*nAnchors) + kIndex*nLengths + lengthIndex;
 
