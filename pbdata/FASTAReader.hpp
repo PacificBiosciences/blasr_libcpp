@@ -7,10 +7,10 @@
 
 class FASTAReader {
 protected:
-    long fileSize;
+    GenomeLength fileSize;
     int fileDes;
     char* filePtr;
-    long curPos;
+    GenomeLength curPos;
     int padding;
     char endOfReadDelim;
     char readStartDelim;
@@ -21,7 +21,7 @@ protected:
     //
     void SetFileSize(); 
 
-    void ReadTitle(long &p, char *&title, int &titleLength); 
+    void ReadTitle(GenomeLength &p, char *&title, int &titleLength); 
 
 public:
     bool computeMD5;
@@ -44,13 +44,13 @@ public:
 
     int Init(std::string &seqInName, int passive=0); 
 
-    void AdvanceToTitleStart(long &p, char delim='>'); 
+    void AdvanceToTitleStart(GenomeLength &p, char delim='>'); 
 
-    void CheckValidTitleStart(long &p, char delim='>'); 
+    void CheckValidTitleStart(GenomeLength &p, char delim='>'); 
 
-    long ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatabase<FASTASequence> *seqDBPtr=NULL); 
+    GenomeLength ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatabase<FASTASequence> *seqDBPtr=NULL); 
 
-    void ReadTitle(long &p, FASTASequence & seq);
+    void ReadTitle(GenomeLength &p, FASTASequence & seq);
 
     int GetNext(FASTASequence &seq); 
     /*

@@ -11,7 +11,7 @@ public:
 
     FASTQReader();
 
-    long GetNext(FASTASequence &seq); 
+    int GetNext(FASTASequence &seq); // return 1 if suceed.
 
     unsigned char phredQVtoPacbioQV(unsigned char phredQV);
 

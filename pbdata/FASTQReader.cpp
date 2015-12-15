@@ -7,7 +7,7 @@ FASTQReader::FASTQReader() : FASTAReader() {
     endOfReadDelim = '\n';
 }
 
-long FASTQReader::GetNext(FASTASequence &seq) {
+int FASTQReader::GetNext(FASTASequence &seq) {
     return ((FASTAReader*)this)->GetNext(seq);
 }
 
@@ -28,13 +28,13 @@ int FASTQReader::GetNext(FASTQSequence &seq) {
     if (curPos >= fileSize) {
         return false;
     }
-    long p = curPos;
+    GenomeLength p = curPos;
     AdvanceToTitleStart(p, '@');
     CheckValidTitleStart(p,'@');
     ReadTitle(p, seq);
     // Title ends on '\n', consume that;
     p++;
-    long p2;
+    GenomeLength p2;
     p2 = p;
     while(p2 < fileSize and filePtr[p2] != '\n') { p2++;}
     if (p2 - p > UINT_MAX) {
@@ -43,7 +43,7 @@ int FASTQReader::GetNext(FASTQSequence &seq) {
     }
 
     seq.length = p2 - p;
-    long seqPos;
+    GenomeLength seqPos;
     if (seq.length > 0) {
         seq.seq = ProtectedNew<Nucleotide>(seq.length);
         p2 = p;
@@ -65,7 +65,7 @@ int FASTQReader::GetNext(FASTQSequence &seq) {
     if (seq.length > 0) {
         seq.qual.Allocate(seq.length);
         p2 = p;
-        long seqPos = 0;
+        GenomeLength seqPos = 0;
         while(p2 < fileSize and filePtr[p2] != '\n') { 
             seq.qual[seqPos] = filePtr[p2] - FASTQSequence::charToQuality;
             p2++; seqPos++;
@@ -76,7 +76,7 @@ int FASTQReader::GetNext(FASTQSequence &seq) {
     }
     curPos = p2;
     seq.deleteOnExit = true;
-    return true;
+    return 1;
 }
 
 

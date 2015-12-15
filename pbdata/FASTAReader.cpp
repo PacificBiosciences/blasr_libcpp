@@ -90,7 +90,7 @@ int FASTAReader::Init(string &seqInName, int passive) {
     return 1;
 }
 
-void FASTAReader::AdvanceToTitleStart(long &p, char delim) {
+void FASTAReader::AdvanceToTitleStart(GenomeLength &p, char delim) {
     while (p < fileSize and 
             filePtr[p] != delim) { 
         p++;
@@ -98,16 +98,16 @@ void FASTAReader::AdvanceToTitleStart(long &p, char delim) {
 }
 
 
-void FASTAReader::CheckValidTitleStart(long &p, char delim) {
+void FASTAReader::CheckValidTitleStart(GenomeLength &p, char delim) {
     if (p >= fileSize or filePtr[p] != delim) {
         cout << "ERROR, FASTA entry must begin with \"" << delim << "\"" << endl;
         exit(1);
     }
 }
 
-long FASTAReader::ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatabase<FASTASequence> *seqDBPtr) {
+GenomeLength FASTAReader::ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatabase<FASTASequence> *seqDBPtr) {
     seq.Free();
-    long p = curPos;
+    GenomeLength p = curPos;
     AdvanceToTitleStart(p);
     CheckValidTitleStart(p);
     ReadTitle(p, seq); 
@@ -119,16 +119,16 @@ long FASTAReader::ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatab
     if (seqDBPtr != NULL) {
         seqDBPtr->growableName.push_back(seq.title);
     }
-    long seqLength;
+    GenomeLength seqLength;
     seqLength = fileSize - p;
-    long memorySize = seqLength+padding+1;
+    GenomeLength memorySize = seqLength+padding+1;
 
     if (memorySize > UINT_MAX) {
         cout << "ERROR! Reading fasta files greater than 4Gbytes is not supported." << endl;
         exit(1);
     }
     seq.Resize(memorySize);
-    long i;
+    GenomeLength i;
     i = 0L;
     for (; p < fileSize; p++, i++ ) {
         seq.seq[i] = filePtr[p];
@@ -150,12 +150,12 @@ long FASTAReader::ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatab
         if (p < seqLength and seq.seq[p] == '>') {
             seq.seq[i] = 'N';
 
-            long titleStartPos = p+1;
+            GenomeLength titleStartPos = p+1;
             i++;
             while (p < seqLength and seq.seq[p] != '\n') p++;
             if (seqDBPtr != NULL and p < seqLength) {
                 string title;
-                long tp;
+                GenomeLength tp;
                 for (tp = titleStartPos; tp < p; tp++) {
                     title.push_back(seq.seq[tp]);
                 }
@@ -211,7 +211,7 @@ long FASTAReader::ReadAllSequencesIntoOne(FASTASequence &seq, SequenceIndexDatab
     return seq.length;
 }
 
-void FASTAReader::ReadTitle(long &p, FASTASequence & seq) {
+void FASTAReader::ReadTitle(GenomeLength &p, FASTASequence & seq) {
     char * seqTitle = NULL;
     int seqTitleLen; 
     ReadTitle(p, seqTitle, seqTitleLen);
@@ -219,7 +219,7 @@ void FASTAReader::ReadTitle(long &p, FASTASequence & seq) {
     if (seqTitle) {delete [] seqTitle;}
 }
 
-void FASTAReader::ReadTitle(long &p, char *&title, int &titleLength) {
+void FASTAReader::ReadTitle(GenomeLength &p, char *&title, int &titleLength) {
     // 
     // Extract the title.  The length of the title does not include the newline.
     //
@@ -258,7 +258,7 @@ int FASTAReader::GetNext(FASTASequence &seq) {
     // 
     // Extract the title of the current record.
     //
-    long p = curPos;
+    GenomeLength p = curPos;
 
     AdvanceToTitleStart(p);
 
@@ -275,7 +275,7 @@ int FASTAReader::GetNext(FASTASequence &seq) {
 
     // Count the length of the sequence.
 
-    long seqLength = 0;
+    GenomeLength seqLength = 0;
     curPos = p;
     char c;
     while (p < fileSize and
@@ -299,7 +299,7 @@ int FASTAReader::GetNext(FASTASequence &seq) {
         seq.seq = ProtectedNew <Nucleotide>(seqLength+padding+1);
         p = curPos;
         seq.deleteOnExit = true;
-        long s = 0;
+        GenomeLength s = 0;
         while (p < fileSize and
                 (c = filePtr[p]) != endOfReadDelim) {
             if (c != ' ' and
@@ -334,7 +334,7 @@ iterting over reads.
 int FASTAReader::Advance(int nSeq) {
 
     int nAdvanced = 0;
-    long p = curPos;
+    GenomeLength p = curPos;
     // base case -- it's always ok to advance 0
     if (nSeq == 0) { return 1; }
 
@@ -403,7 +403,7 @@ void FASTAReader::ReadAllSequences(vector<FASTASequence> &sequences) {
     // Step 1, compute the number of reads in the file.
     // 
 
-    long p;
+    GenomeLength p;
     p = 0;
     int nSeq = 0;
     while (p < fileSize) { 
