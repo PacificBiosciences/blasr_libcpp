@@ -29,7 +29,7 @@ void VecSwap( UInt i, UInt j, UInt n, UInt index[]);
 unsigned char ComputeMedianValue(unsigned char text[], UInt index[], int length, 
         UInt low, UInt high, int offset, UInt maxPossible, UInt *freq ); 
 
-UInt FindFirstOf(unsigned char text[], UInt index[], UInt length, 
+UInt FindFirstOf(unsigned char text[], UInt index[],
         UInt low, UInt high, int offset, Nucleotide nuc);
 
 void SwapIndices(UInt &a, UInt &b);

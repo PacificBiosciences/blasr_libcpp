@@ -19,18 +19,18 @@ void VecSwap( UInt i, UInt j, UInt n, UInt index[]) {
 
 unsigned char ComputeMedianValue(unsigned char text[], UInt index[], int length, 
         UInt low, UInt high, int offset, UInt maxPossible, UInt *freq ) {
+    (void)(length);
     /*
      * Compute the median value of positions at suffix+offset across all
      * suffices from [low,high).
      */
 
-    int f;
-    for (f = 0; f< maxPossible+1; f++) {
+    for (UInt f = 0; f< maxPossible+1; f++) {
         freq[f] = 0;
     }
 
     UInt pos;
-    UInt maxValue = 0;
+    unsigned char maxValue = 0;
     int val;
     //  return text[index[(high+low)/2]+offset];
     // Compute frequencies of nucleotides (+N), packed into 3-bit representation.
@@ -45,10 +45,9 @@ unsigned char ComputeMedianValue(unsigned char text[], UInt index[], int length,
         //		}
     }
     UInt medianBound = (high - low)/2;
-    int i;
-    int runningTotal = 0;
+    UInt runningTotal = 0;
 
-    for(i =1; i<= maxValue; i++ ){
+    for(unsigned char i =1; i<= maxValue; i++ ){
         runningTotal = freq[i] + runningTotal;
         if (runningTotal >= medianBound) {
             return i;
@@ -57,8 +56,7 @@ unsigned char ComputeMedianValue(unsigned char text[], UInt index[], int length,
     return maxValue;
 }
 
-UInt FindFirstOf(unsigned char text[], UInt index[], UInt length, 
-        UInt low, UInt high, int offset, Nucleotide nuc) {
+UInt FindFirstOf(unsigned char text[], UInt index[], UInt low, UInt high, int offset, Nucleotide nuc) {
     UInt p;
     for (p = low; p < high and text[index[p]+offset] != nuc; p++);
     return p;
@@ -122,7 +120,7 @@ void MediankeyBoundedQuicksort(unsigned char text[], UInt index[], UInt length,
     }
 
     Nucleotide medianChar = ComputeMedianValue(text, index, length, low, high, depth, maxChar, freq );
-    UInt medianCharPos    = FindFirstOf(text, index, length, low, high, depth, medianChar);
+    UInt medianCharPos    = FindFirstOf(text, index, low, high, depth, medianChar);
     UInt medLeft, lastLeft;
     UInt medRight, lastRight;
 
