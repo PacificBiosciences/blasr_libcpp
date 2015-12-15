@@ -8,7 +8,7 @@ int GetTupleCount(TSequence &seq, DNALength startPos,
 
 	T_Tuple tuple;
 	if (tuple.FromStringLR(&seq.seq[startPos], tm)) {
-		count = ct.countTable[tuple.ToLongIndex()];
+		count = ct.countTable[TupleData(tuple)];
 		return 1;
 	}
 	else {
@@ -122,8 +122,7 @@ int SumRightShiftMarginalTupleCounts(TupleMetrics &tm,
 		alt.tuple = alt.tuple & altMask.tuple;
 		alt.tuple += i;
 		//		next.Append(i,2L);
-		long countedTuple = alt.ToLongIndex();
-		rightMarCount = ct.countTable[countedTuple];
+		rightMarCount = ct.countTable[TupleData(alt)];
 		totalCount += rightMarCount;
 		if (i == nextNuc) {
 			nextSeqCount = rightMarCount;
