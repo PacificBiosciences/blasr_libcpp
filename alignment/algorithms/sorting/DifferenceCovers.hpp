@@ -11,6 +11,6 @@ const UInt diffCovers[N_COVERS][60] = {
 	{111,12, 1, 2, 3, 6,13,28,37,39,45,53,66,94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{2281, 58, 0, 1,2,3,4,5,6,7,8,9,19,38,57,76,95,114,133,152,171,190,229,268,307,346,385,424,463,502,541,580,619,658,697,736,775,814,853,892,931,951,971,991,1011,1031,1051,1071,1091,1111,1131,1132,1133,1134,1135,1136,1137,1138,1139, 1140}};
 
-int InitializeDifferenceCover(int diffCoverSize, UInt &diffCoverLength, UInt *&diffCover); 
+int InitializeDifferenceCover(UInt diffCoverSize, UInt &diffCoverLength, UInt *&diffCover);
 
 #endif // _BLASR_DIFFERENCE_COVERS_HPP_

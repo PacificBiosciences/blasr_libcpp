@@ -2,9 +2,8 @@
 #include "utils.hpp"
 #include "DifferenceCovers.hpp"
 
-int InitializeDifferenceCover(int diffCoverSize, UInt &diffCoverLength, UInt *&diffCover) {
-	UInt index;
-	for (index = 0; index < N_COVERS; index++) {
+int InitializeDifferenceCover(UInt diffCoverSize, UInt &diffCoverLength, UInt *&diffCover) {
+	for (int index = 0; index < N_COVERS; index++) {
 		if (diffCovers[index][0] == diffCoverSize) {
 			diffCoverLength = diffCovers[index][1];
 			diffCover = ProtectedNew<UInt>(diffCoverLength);
