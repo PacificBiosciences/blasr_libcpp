@@ -40,10 +40,9 @@
 #include <algorithm>
 
 std::string ScanData::BaseMapToStr(const std::map<char, size_t> & baseMap) {
-    std::string baseMapStr = ""; //4 dye channels.
-    if (not baseMap.empty()) {
-        baseMapStr = "    ";
-        for (auto it = baseMap.begin(); it != baseMap.end(); ++it){
+    std::string baseMapStr = "    "; //4 dye channels.
+    for (auto it = baseMap.begin(); it != baseMap.end(); ++it){
+        if (it->second < 4) {
             baseMapStr[it->second]= it->first;
         }
     }
