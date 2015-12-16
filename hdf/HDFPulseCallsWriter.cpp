@@ -268,8 +268,7 @@ bool HDFPulseCallsWriter::WriteOneZmw(const SMRTSequence & read) {
 
 bool HDFPulseCallsWriter::WriteFakeDataSets() {
     uint32_t block_sz = 65536; // This is a data buffer.
-    std::vector<uint16_t> buffer_uint16_5M_0(block_sz);
-    std::fill(buffer_uint16_5M_0.begin(), buffer_uint16_5M_0.end(), 0);
+    std::vector<uint16_t> buffer_uint16_5M_0(block_sz, 0);
     // Write 2D Array: Chi2, 1D Arrays: MaxSignal, MidStdDev 
     bool OK = __WriteFake2DDataSet<uint16_t>(pulsecallsGroup_, PacBio::GroupNames::chi2, arrayLength_, 4, 0) and 
               __WriteFakeDataSet<uint16_t>(pulsecallsGroup_, PacBio::GroupNames::maxsignal, arrayLength_, buffer_uint16_5M_0) and 

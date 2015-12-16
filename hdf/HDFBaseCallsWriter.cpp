@@ -307,8 +307,7 @@ bool HDFBaseCallsWriter::_WritePulseIndex(const SMRTSequence & read) {
 bool HDFBaseCallsWriter::WriteFakeDataSets() {   
     // Fake QualityValue with 255
     uint32_t block_sz = 65536; // This is a data buffer.
-    std::vector<uint8_t> buffer_uint16_5M_0(block_sz);
-    std::fill(buffer_uint16_5M_0.begin(), buffer_uint16_5M_0.end(), 255);
+    std::vector<uint8_t> buffer_uint16_5M_0(block_sz, 255);
     bool OK = __WriteFakeDataSet<uint8_t>(basecallsGroup_, PacBio::GroupNames::qualityvalue, arrayLength_, buffer_uint16_5M_0);
     return OK;
 }
