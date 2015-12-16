@@ -42,16 +42,16 @@ ReaderAgglomerate::ReaderAgglomerate(int _start, int _stride) {
 }
 
 void ReaderAgglomerate::GetMovieName(string &movieName) {
-    if (fileType == Fasta || fileType == Fastq) {
+    if (fileType == FileType::Fasta || fileType == FileType::Fastq) {
         movieName = fileName;
     }
-    else if (fileType == HDFPulse || fileType == HDFBase) {
+    else if (fileType == FileType::HDFPulse || fileType == FileType::HDFBase) {
         movieName = hdfBasReader.GetMovieName();
     } 
-    else if (fileType == HDFCCS || fileType == HDFCCSONLY) {
+    else if (fileType == FileType::HDFCCS || fileType == FileType::HDFCCSONLY) {
         movieName = hdfCcsReader.GetMovieName();
     }
-    else if (fileType == PBBAM  || fileType == PBDATASET) {
+    else if (fileType == FileType::PBBAM  || fileType == FileType::PBDATASET) {
 #ifdef USE_PBBAM
         assert("Reading movie name from BAM using ReaderAgglomerate is not supported." == 0);
 #endif 
@@ -60,13 +60,13 @@ void ReaderAgglomerate::GetMovieName(string &movieName) {
 
 void ReaderAgglomerate::GetChemistryTriple(string & bindingKit, 
         string & sequencingKit, string & baseCallerVersion) {
-    if (fileType == HDFPulse || fileType == HDFBase) {
+    if (fileType == FileType::HDFPulse || fileType == FileType::HDFBase) {
         hdfBasReader.GetChemistryTriple(bindingKit, sequencingKit, baseCallerVersion);
     }
-    else if (fileType == HDFCCS || fileType == HDFCCSONLY) {
+    else if (fileType == FileType::HDFCCS || fileType == FileType::HDFCCSONLY) {
         hdfCcsReader.GetChemistryTriple(bindingKit, sequencingKit, baseCallerVersion);
     }
-    else if (fileType == PBBAM || fileType == PBDATASET) {
+    else if (fileType == FileType::PBBAM || fileType == FileType::PBDATASET) {
 #ifdef USE_PBBAM
         assert("Reading chemistry triple from BAM using ReaderAgglomerate is not supported." == 0);
 #endif
@@ -84,8 +84,8 @@ ReadType::ReadTypeEnum ReaderAgglomerate::GetReadType() {
 }
 
 bool ReaderAgglomerate::FileHasZMWInformation() {
-    return (fileType == HDFPulse || fileType == HDFBase || 
-            fileType == HDFCCS || fileType == HDFCCSONLY);
+    return (fileType == FileType::HDFPulse || fileType == FileType::HDFBase || 
+            fileType == FileType::HDFCCS || fileType == FileType::HDFCCSONLY);
 }
 
 void ReaderAgglomerate::SkipReadQuality() {
@@ -130,22 +130,22 @@ int ReaderAgglomerate::Initialize(FileType &pFileType, string &pFileName) {
 
 bool ReaderAgglomerate::HasRegionTable() {
     switch(fileType) {
-        case PBBAM:
-        case PBDATASET:
-        case Fasta:
-        case Fastq:
+        case FileType::PBBAM:
+        case FileType::PBDATASET:
+        case FileType::Fasta:
+        case FileType::Fastq:
             return false;
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             return hdfBasReader.HasRegionTable();
             break;
-        case HDFCCSONLY:
-        case HDFCCS:
+        case FileType::HDFCCSONLY:
+        case FileType::HDFCCS:
             return hdfCcsReader.HasRegionTable();
             break;
-        case Fourbit:
-        case None:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
@@ -174,26 +174,26 @@ bool ReaderAgglomerate::HasRegionTable() {
 int ReaderAgglomerate::Initialize() {
     int init = 1;
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             init = fastaReader.Init(fileName);
             break;
-        case Fastq:
+        case FileType::Fastq:
             init = fastqReader.Init(fileName);
             break;
-        case HDFCCSONLY:
+        case FileType::HDFCCSONLY:
             ignoreCCS = false;
             hdfCcsReader.SetReadBasesFromCCS();
             hdfCcsReader.InitializeDefaultIncludedFields();
             init = hdfCcsReader.Initialize(fileName);
             if (init == 0) return 0;
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             //
             // Here one needs to test and see if the hdf file contains ccs.
             // If this is the case, then the file type is HDFCCS.
             if (hdfCcsReader.BasFileHasCCS(fileName) and !ignoreCCS) {
-                fileType = HDFCCS;
+                fileType = FileType::HDFCCS;
                 hdfCcsReader.InitializeDefaultIncludedFields();
                 init = hdfCcsReader.Initialize(fileName);
                 if (init == 0) return 0;
@@ -208,8 +208,8 @@ int ReaderAgglomerate::Initialize() {
                 if (init == 0) return 0;
             }
             break;
-        case PBBAM: 
-        case PBDATASET: 
+        case FileType::PBBAM: 
+        case FileType::PBDATASET: 
 #ifdef USE_PBBAM
             RESET_PBBAM_PTRS();
             try {
@@ -219,7 +219,7 @@ int ReaderAgglomerate::Initialize() {
                      << ": " << e.what() << endl;
                 return 0;
             }
-            if (fileType == PBBAM) {
+            if (fileType == FileType::PBBAM) {
                 entireFileQueryPtr = new PacBio::BAM::EntireFileQuery(*dataSetPtr);
                 assert(entireFileQueryPtr != nullptr);
                 entireFileIterator = entireFileQueryPtr->begin();
@@ -227,7 +227,7 @@ int ReaderAgglomerate::Initialize() {
                 sequentialZmwQueryPtr = new PacBio::BAM::SequentialZmwGroupQuery(*dataSetPtr);
                 assert(sequentialZmwQueryPtr != nullptr);
                 sequentialZmwIterator = sequentialZmwQueryPtr->begin();
-            } else if (fileType == PBDATASET) {
+            } else if (fileType == FileType::PBDATASET) {
                 const PacBio::BAM::PbiFilter filter = PacBio::BAM::PbiFilter::FromDataSet(*dataSetPtr);
                 pbiFilterQueryPtr = new PacBio::BAM::PbiFilterQuery(filter, *dataSetPtr);
                 assert(pbiFilterQueryPtr != nullptr);
@@ -239,9 +239,9 @@ int ReaderAgglomerate::Initialize() {
             }
             break;
 #endif
-        case HDFCCS:
-        case Fourbit:
-        case None:
+        case FileType::HDFCCS:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
@@ -249,7 +249,7 @@ int ReaderAgglomerate::Initialize() {
     if (init == 0 || (start > 0 && Advance(start) == 0) ){
         return 0;
     };
-    if (fileType != PBBAM and fileType != PBDATASET) {
+    if (fileType != FileType::PBBAM and fileType != FileType::PBDATASET) {
         // All reads from a non-PBBAM file must have the same read group id. 
         // Reads from a PABBAM file may come from different read groups.
         // We have sync reader.readGroupId and SMRTSequence.readGroupId everytime
@@ -278,33 +278,33 @@ int ReaderAgglomerate::GetNext(FASTASequence &seq) {
         return 0;
     }
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             numRecords = fastaReader.GetNext(seq);
             break;
-        case Fastq:
+        case FileType::Fastq:
             numRecords = fastqReader.GetNext(seq);
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             numRecords = hdfBasReader.GetNext(seq);
             break;
-        case HDFCCSONLY:
-        case HDFCCS:
+        case FileType::HDFCCSONLY:
+        case FileType::HDFCCS:
             cout << "ERROR! Reading CCS into a structure that cannot handle it." << endl;
             assert(0);
             break;
-        case PBDATASET:
+        case FileType::PBDATASET:
 #ifdef USE_PBBAM
             GET_NEXT_FROM_DATASET();
             break;
 #endif
-        case PBBAM:
+        case FileType::PBBAM:
 #ifdef USE_PBBAM
             GET_NEXT_FROM_BAM();
             break;
 #endif
-        case Fourbit:
-        case None:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
@@ -318,33 +318,33 @@ int ReaderAgglomerate::GetNext(FASTQSequence &seq) {
         return 0;
     }
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             numRecords = fastaReader.GetNext(seq);
             break;
-        case Fastq:
+        case FileType::Fastq:
             numRecords = fastqReader.GetNext(seq);
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             numRecords = hdfBasReader.GetNext(seq);
             break;
-        case PBDATASET:
+        case FileType::PBDATASET:
 #ifdef USE_PBBAM
             GET_NEXT_FROM_DATASET();
             break;
 #endif
-        case PBBAM:
+        case FileType::PBBAM:
 #ifdef USE_PBBAM
             GET_NEXT_FROM_BAM();
             break;
 #endif
-        case HDFCCSONLY:
-        case HDFCCS:
+        case FileType::HDFCCSONLY:
+        case FileType::HDFCCS:
             cout << "ERROR! Reading CCS into a structure that cannot handle it." << endl;
             assert(0);
             break;
-        case Fourbit:
-        case None:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
@@ -360,7 +360,7 @@ int ReaderAgglomerate::GetNext(vector<SMRTSequence> & reads) {
     if (Subsample(subsample) == 0) {
         return 0;
     }
-    if (fileType == PBBAM) {
+    if (fileType == FileType::PBBAM) {
 #ifdef USE_PBBAM
         if (sequentialZmwIterator != sequentialZmwQueryPtr->end()) {
             const vector<PacBio::BAM::BamRecord> & records = *sequentialZmwIterator;
@@ -372,7 +372,7 @@ int ReaderAgglomerate::GetNext(vector<SMRTSequence> & reads) {
             sequentialZmwIterator++;
         }
 #endif
-    } else if (fileType == PBDATASET) {
+    } else if (fileType == FileType::PBDATASET) {
 #ifdef USE_PBBAM
         if (pbiFilterZmwIterator != pbiFilterZmwQueryPtr->end()) {
             const vector<PacBio::BAM::BamRecord> & records = *pbiFilterZmwIterator;
@@ -398,37 +398,37 @@ int ReaderAgglomerate::GetNext(SMRTSequence &seq) {
         return 0;
     }
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             numRecords = fastaReader.GetNext(seq);
             break;
-        case Fastq:
+        case FileType::Fastq:
             numRecords = fastqReader.GetNext(seq);
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             numRecords = hdfBasReader.GetNext(seq);
             break;
-        case HDFCCSONLY:
+        case FileType::HDFCCSONLY:
             cout << "ERROR! Reading CCS into a structure that cannot handle it." << endl;
             assert(0);
             break;
-        case HDFCCS:
+        case FileType::HDFCCS:
             assert(ignoreCCS == false);
             assert(hdfBasReader.readBasesFromCCS == true);
             numRecords = hdfBasReader.GetNext(seq);
             break;
-        case PBDATASET:
+        case FileType::PBDATASET:
 #ifdef USE_PBBAM
             GET_NEXT_FROM_DATASET();
             break;
 #endif
-        case PBBAM:
+        case FileType::PBBAM:
 #ifdef USE_PBBAM
             GET_NEXT_FROM_BAM();
             break;
 #endif
-        case Fourbit:
-        case None:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
@@ -436,7 +436,7 @@ int ReaderAgglomerate::GetNext(SMRTSequence &seq) {
     // and should be empty, use this->readGroupId instead. Otherwise, 
     // read group id should be loaded from BamRecord to SMRTSequence, 
     // update this->readGroupId accordingly.
-    if (fileType != PBBAM and fileType != PBDATASET) seq.ReadGroupId(readGroupId);
+    if (fileType != FileType::PBBAM and fileType != FileType::PBDATASET) seq.ReadGroupId(readGroupId);
     else readGroupId = seq.ReadGroupId();
 
     if (stride > 1)
@@ -452,38 +452,38 @@ int ReaderAgglomerate::GetNextBases(SMRTSequence &seq, bool readQVs) {
         return 0;
     }
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             cout << "ERROR! Can not GetNextBases from a Fasta File." << endl;
             assert(0);
             break;
-        case Fastq:
+        case FileType::Fastq:
             cout << "ERROR! Can not GetNextBases from a Fastq File." << endl;
             assert(0);
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             numRecords = hdfBasReader.GetNextBases(seq, readQVs);
             break;
-        case HDFCCSONLY:
+        case FileType::HDFCCSONLY:
             cout << "ERROR! Reading CCS into a structure that cannot handle it." << endl;
             assert(0);
             break;
-        case HDFCCS:
+        case FileType::HDFCCS:
             cout << "ERROR! Can not GetNextBases from a CCS File." << endl;
             assert(0);
             break;
-        case PBBAM:
-        case PBDATASET:
+        case FileType::PBBAM:
+        case FileType::PBDATASET:
 #ifdef USE_PBBAM
             cout << "ERROR! Can not GetNextBases from a BAM File." << endl;
 #endif
-        case Fourbit:
-        case None:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
 
-    if (fileType != PBBAM and fileType != PBDATASET) seq.ReadGroupId(readGroupId);
+    if (fileType != FileType::PBBAM and fileType != FileType::PBDATASET) seq.ReadGroupId(readGroupId);
     else readGroupId = seq.ReadGroupId();
 
     if (stride > 1)
@@ -498,35 +498,35 @@ int ReaderAgglomerate::GetNext(CCSSequence &seq) {
     }
 
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             // This just reads in the fasta sequence as if it were a ccs sequence
             numRecords = fastaReader.GetNext(seq);
             seq.SubreadStart(0).SubreadEnd(0);
             break;
-        case Fastq:
+        case FileType::Fastq:
             numRecords = fastqReader.GetNext(seq);
             seq.SubreadStart(0).SubreadEnd(0);
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             numRecords = hdfBasReader.GetNext(seq);
             break;
-        case HDFCCSONLY:
-        case HDFCCS:
+        case FileType::HDFCCSONLY:
+        case FileType::HDFCCS:
             numRecords = hdfCcsReader.GetNext(seq);
             break;
-        case PBBAM:
-        case PBDATASET:
+        case FileType::PBBAM:
+        case FileType::PBDATASET:
 #ifdef USE_PBBAM
             cout << "ERROR! Could not read BamRecord as CCSSequence" << endl;
 #endif
-        case Fourbit:
-        case None:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
 
-    if (fileType != PBBAM and fileType != PBDATASET) seq.ReadGroupId(readGroupId);
+    if (fileType != FileType::PBBAM and fileType != FileType::PBDATASET) seq.ReadGroupId(readGroupId);
     else readGroupId = seq.ReadGroupId();
 
     if (stride > 1)
@@ -537,20 +537,20 @@ int ReaderAgglomerate::GetNext(CCSSequence &seq) {
 
 int ReaderAgglomerate::Advance(int nSteps) {
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             return fastaReader.Advance(nSteps);
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             return hdfBasReader.Advance(nSteps);
-        case HDFCCSONLY:
-        case HDFCCS:
+        case FileType::HDFCCSONLY:
+        case FileType::HDFCCS:
             return hdfCcsReader.Advance(nSteps);
-        case Fastq:
+        case FileType::Fastq:
             return fastqReader.Advance(nSteps);
-        case PBBAM:
-        case PBDATASET:
-        case Fourbit:
-        case None:
+        case FileType::PBBAM:
+        case FileType::PBDATASET:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
@@ -559,28 +559,28 @@ int ReaderAgglomerate::Advance(int nSteps) {
 
 void ReaderAgglomerate::Close() {
     switch(fileType) {
-        case Fasta:
+        case FileType::Fasta:
             fastaReader.Close();
             break;
-        case Fastq:
+        case FileType::Fastq:
             fastqReader.Close();
             break;
-        case HDFPulse:
-        case HDFBase:
+        case FileType::HDFPulse:
+        case FileType::HDFBase:
             hdfBasReader.Close();
             break;
-        case HDFCCSONLY:
-        case HDFCCS:
+        case FileType::HDFCCSONLY:
+        case FileType::HDFCCS:
             hdfCcsReader.Close();
             break;
-        case PBBAM:
-        case PBDATASET:
+        case FileType::PBBAM:
+        case FileType::PBDATASET:
 #ifdef USE_PBBAM
             RESET_PBBAM_PTRS();
             break;
 #endif
-        case Fourbit:
-        case None:
+        case FileType::Fourbit:
+        case FileType::None:
             UNREACHABLE();
             break;
     }
