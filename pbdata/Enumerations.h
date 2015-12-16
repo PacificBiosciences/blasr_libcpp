@@ -3,7 +3,7 @@
 #ifndef _BLASR_ENUMERATIONS_HPP_
 #define _BLASR_ENUMERATIONS_HPP_
 
-typedef enum T_FileType {Fasta,
+enum class FileType {Fasta,
     Fastq,
     HDFPulse,
     Fourbit,
@@ -13,7 +13,7 @@ typedef enum T_FileType {Fasta,
     PBBAM,
     PBDATASET,
     None
-} FileType;
+};
 
 typedef enum T_Strand {Forward, Reverse} Strand;
 
