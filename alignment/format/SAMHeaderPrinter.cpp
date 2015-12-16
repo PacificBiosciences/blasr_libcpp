@@ -308,7 +308,7 @@ SAMHeaderRGs SAMHeaderPrinter::MakeRGs(const std::vector<std::string> & readsFil
         const SupplementalQVList & samQVs) {
     SAMHeaderRGs rgs;
 
-    if (fileType != PBBAM and fileType != PBDATASET) {
+    if (fileType != FileType::PBBAM and fileType != FileType::PBDATASET) {
         ReaderAgglomerate * reader = new ReaderAgglomerate();
         assert(reader != nullptr);
         std::vector<std::string>::const_iterator rfit;
@@ -345,7 +345,7 @@ SAMHeaderRGs SAMHeaderPrinter::MakeRGs(const std::vector<std::string> & readsFil
         delete reader;
     } else {
 #ifdef USE_PBBAM
-        if (fileType == PBBAM) {
+        if (fileType == FileType::PBBAM) {
         // TODO: use Derek's API to merge bamHeaders from different files when 
         // it is in place. Use the following code for now. 
         std::vector<std::string>::const_iterator rfit;
@@ -364,7 +364,7 @@ SAMHeaderRGs SAMHeaderPrinter::MakeRGs(const std::vector<std::string> & readsFil
                 exit(1);
             }
         }
-        } else if (fileType == PBDATASET) {
+        } else if (fileType == FileType::PBDATASET) {
             for (auto xmlfn: readsFiles) {
                 for (auto bamFile: PacBio::BAM::DataSet(xmlfn).BamFiles()) {
                     for (auto rg: bamFile.Header().ReadGroups())
@@ -388,7 +388,7 @@ SAMHeaderPGs SAMHeaderPrinter::MakePGs(const std::vector<std::string> & readsFil
     // program id, unique identifier for @PG lines;
     int prog_id = 1;
 
-    if (fileType != PBBAM) {
+    if (fileType != FileType::PBBAM) {
         // Reads files are not in BAM format, no other @PG lines.
     } else {
 #ifdef USE_PBBAM
@@ -418,7 +418,7 @@ SAMHeaderPGs SAMHeaderPrinter::MakePGs(const std::vector<std::string> & readsFil
 SAMHeaderCOs SAMHeaderPrinter::MakeCOs(const std::vector<std::string> & readsFiles) {
     SAMHeaderCOs cos;
 
-    if (fileType == PBBAM) {
+    if (fileType == FileType::PBBAM) {
 #ifdef USE_PBBAM
         // Reads files are in BAM format, keep all @CO lines from Bam files.
         std::vector<std::string>::const_iterator rfit;
