@@ -468,7 +468,7 @@ void ComputeAlignmentStats(T_Alignment &alignment, Nucleotide* qSeq, Nucleotide 
 template<typename T_Alignment>
 int ComputeDrift(T_Alignment &alignment) {
     VectorIndex b;
-    int qGap = 0, tGap = 0, commonGap = 0;
+    int qGap = 0, tGap = 0;
     int drift = 0;
     int maxDrift = 0;
     int driftBetweenBlocks;
