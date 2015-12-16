@@ -38,7 +38,7 @@ void HDFPulseDataFile::PrepareForRandomAccess() {
     GetAllReadLengths(offset_);
     // type of read length of a single read : DNALength
     // type of total read length of all reads in plx.h5: DSLength
-    eventOffset = std::vector<DSLength>(offset_.begin(), offset_.end());
+    eventOffset.assign(offset_.begin(), offset_.end());
     DSLength curOffset = 0;
     for (size_t i = 0; i < eventOffset.size(); i++) {
         DSLength curLength = eventOffset[i];
