@@ -68,6 +68,7 @@ class HDFCCSReader : public T_HDFBasReader<T_Sequence> {
 	}
 
 	int Advance(int nSteps) {
+        (void)(nSteps);
 		cout << "ERROR! Advance is not yet implemented for ccs reader" << endl;
 		assert(0);
 		return 0;
