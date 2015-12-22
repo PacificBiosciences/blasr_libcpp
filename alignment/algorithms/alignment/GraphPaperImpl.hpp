@@ -3,8 +3,6 @@
 
 template<typename T_Point>
 bool SetBounds(vector<T_Point> &points, DNALength &minPos, DNALength &maxPos, int axis) {
-  int i;
-  DNALength maxRow = 0;
   if (points.size() == 0) {
     return false;
   }
@@ -16,7 +14,7 @@ bool SetBounds(vector<T_Point> &points, DNALength &minPos, DNALength &maxPos, in
       minPos = maxPos = points[0].GetY();
     }
   }
-  for (i = 1; i < points.size(); i++) {
+  for (size_t i = 1; i < points.size(); i++) {
     DNALength curPos;
     if (axis == 0) {
       curPos = points[i].GetX();
@@ -31,6 +29,7 @@ bool SetBounds(vector<T_Point> &points, DNALength &minPos, DNALength &maxPos, in
       maxPos = curPos;
     }
   }
+  return true;
 }
 
 
@@ -61,6 +60,7 @@ int GraphPaper(vector<T_Point> &points,
   fill(onOptPath.begin(), onOptPath.end(), false);
 
   DNALength xMin, xMax, yMin, yMax;
+  xMin = xMax = yMin = yMax = 0;
   SetBounds(points, xMin, xMax, 0); 
   xMax++; // make half-open interval.
   SetBounds(points, yMin, yMax, 1); 
