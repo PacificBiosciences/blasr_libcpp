@@ -61,9 +61,10 @@ void SAMOutput::SetSoftClip(T_AlignmentCandidate &alignment,
     qEnd   = alignment.QAlignEnd();
 
     assert(qStart >= hardClipPrefix);
-    softClipPrefix = alignment.QAlignStart() - hardClipPrefix;
-    assert(alignment.QAlignEnd() + hardClipSuffix <= read.length);
-    softClipSuffix = read.length - hardClipSuffix - alignment.QAlignEnd();
+    softClipPrefix = qStart - hardClipPrefix;
+    assert(read.length >= hardClipSuffix and read.length >= qEnd and
+           qEnd + hardClipSuffix <= read.length);
+    softClipSuffix = read.length - hardClipSuffix - qEnd;
 }
 
 template<typename T_Sequence>
