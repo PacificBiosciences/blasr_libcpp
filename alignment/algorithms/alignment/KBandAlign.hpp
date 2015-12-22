@@ -57,6 +57,7 @@ int KBandAlign(T_QuerySequence &qSeq, T_TargetSequence &tSeq,
 							 T_Alignment   &alignment, 
 							 AlignmentType alignType, 
 							 T_ScoreFn &scoreFn, bool samplePaths=false) {
+    (void)(matchMat);
 
 	DNALength qLen, tLen;	
 	SetKBoundedLengths(tSeq.length, qSeq.length, k, tLen, qLen);
@@ -101,13 +102,13 @@ int KBandAlign(T_QuerySequence &qSeq, T_TargetSequence &tSeq,
 		}
 	}
 	if (alignType == QueryFit or alignType == Fit) {
-		for (t = 1; t <= k & t < tLen; t++) {
+		for (t = 1; t <= k && t < tLen; t++) {
 			scoreMat[rc2index(0, t + k , nCols)] = 0;
 			pathMat[rc2index(0, t + k , nCols)] = Left;
 		}
 	}
 	if (alignType == TargetFit or alignType == Fit) {
-		for (q = 1; q <= k & q < qLen; q++) {
+		for (q = 1; q <= k && q < qLen; q++) {
 			scoreMat[rc2index(q, 0, nCols)] = 0;
 			pathMat[rc2index(q, 0, nCols)] = Up;
 		}
@@ -226,7 +227,7 @@ int KBandAlign(T_QuerySequence &qSeq, T_TargetSequence &tSeq,
 	t = k - (qLen - tLen);
 
 	int globalMinScore;
-	int minLastColScoreIndex, minLastRowScoreIndex;
+	int minLastColScoreIndex=0, minLastRowScoreIndex=0;
 	globalMinScore = scoreMat[rc2index(q,t,nCols)];
 	int minLastColScore = globalMinScore, minLastRowScore = globalMinScore;
 
@@ -234,9 +235,7 @@ int KBandAlign(T_QuerySequence &qSeq, T_TargetSequence &tSeq,
 		int q2,t2;
 		q2 = qLen;
 		t2 = k - (qLen - tLen);
-		UInt qi, qend;
 		bool minScoreSet = false;
-		int minScoreIndex;
 		for (t2 = q - k; t2 < q2 + k + 1; t2++) {
 			if (t2 < 1)
 				continue;
