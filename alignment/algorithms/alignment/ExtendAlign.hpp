@@ -102,6 +102,7 @@ template<typename T_Alignment,
             // terminating the alignment
             // 
             ) {
+        (void)(queryPos); (void)(refPos);
         //
         // Try extending an alignment in the forward direction as long the
         // maximum score that is extended is above a threshold above the
@@ -287,7 +288,6 @@ template<typename T_Alignment,
                 if (minScore < curRowMinScore) {
                     curRowMinScore = minScore;
                 }
-                int nRows = q+1;
                 if (minScore < globalMinScore) {
                     globalMinScore = minScore;
                     globalMinScoreQPos  = q;
@@ -301,8 +301,6 @@ template<typename T_Alignment,
             }
             prevRowMinScore = curRowMinScore;
         }
-
-        int nRows = q;
 
         q = globalMinScoreQPos;
         t = globalMinScoreTPos;
