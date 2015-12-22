@@ -90,12 +90,14 @@ void AdvanceIndexToPastInterval(T_MatchList &pos, DNALength nPos,
     T_SequenceBoundaryDB &SeqBoundary,
     DNALength startIndex, DNALength startIntervalBoundary,
     DNALength &index, DNALength &indexIntervalBoundary) {
+    (void)(contigLength);
     if (index >= pos.size()) {
         return;
     }
     indexIntervalBoundary = SeqBoundary(pos[index].t);
     DNALength boundaryIndex = SeqBoundary.GetIndex(pos[index].t);
     DNALength nextBoundary  = SeqBoundary.GetStartPos(boundaryIndex + 1);
+    (void)(nextBoundary);
     while (// index is not past the end of the genome
             index < nPos and 
             //
@@ -130,10 +132,9 @@ int RemoveZeroLengthAnchors(T_MatchList &matchList) {
 
 template<typename T_MatchList>
 int RemoveOverlappingAnchors(T_MatchList &matchList) {       
-  int cur = 0;
   int m;
   int n;
-  for (m = matchList.size(); m > 0; m--) {
+  for (m = int(matchList.size()); m > 0; m--) {
     n = m - 1;
     //
     // Skip past repeats in the query.
@@ -200,6 +201,7 @@ void StoreLargestIntervals(
     DNALength curBoundary = 0, nextBoundary = 0;
     DNALength contigLength = ContigStartPos.Length(pos[cur].t);
     DNALength endOfCurrentInterval = curBoundary + contigLength;
+    (void)(curBoundary); (void)(nextBoundary); (void)(endOfCurrentInterval);
 
     curBoundary = ContigStartPos(pos[cur].t);
     nextBoundary = ContigStartPos(pos[next].t);  
@@ -211,16 +213,14 @@ void StoreLargestIntervals(
     //
 
     DNALength curIntervalLength = NumRemainingBases(pos[cur].q, intervalLength);
+    (void)(curIntervalLength);
 
     AdvanceIndexToPastInterval(pos, nPos, intervalLength, contigLength, ContigStartPos,
             cur, curBoundary, next, nextBoundary);
 
-    DNALength prevStart = cur, prevEnd = next ;
-    int prevSize = next - cur;
     DNALength maxStart = cur, maxEnd = next;
     int maxSize = SumAnchors(pos, cur, next);
     int curSize = maxSize;
-    bool onFirst = true;
     if (curSize > minSize) {
         start.push_back(cur);
         end.push_back(next);
@@ -419,8 +419,8 @@ int FindMaxIncreasingInterval(
     ClusterList &clusterList,
     VarianceAccumulator<float> &accumPValue, 
     VarianceAccumulator<float> &accumWeight,
-    VarianceAccumulator<float> &accumNumAnchorBases,
-    const char *titlePtr) {
+    VarianceAccumulator<float> &accumNumAnchorBases) {
+    (void)(accumNumAnchorBases);
 
     int maxLISSize = 0;
     if (params.fastMaxInterval) {
@@ -532,10 +532,10 @@ int FastFindMaxIncreasingInterval(
         ClusterList &clusterList,
         VarianceAccumulator<float> &accumPValue, 
         VarianceAccumulator<float> &accumWeight) {
+    (void)(nBest); (void)(query); (void)(reference);
  
     WeightedIntervalSet sdpiq;
     VectorIndex cur = 0;
-    VectorIndex nPos = pos.size();
     vector<VectorIndex> lisIndices;
     //
     // Initialize the first interval.
@@ -545,10 +545,8 @@ int FastFindMaxIncreasingInterval(
     }
 
     int lisSize;
-    float lisWeight;
     float lisPValue;
     T_MatchList lis;
-    float neginf = -1.0/0.0;
     int noOvpLisSize = 0;
     int noOvpLisNBases = 0;
 
@@ -561,6 +559,7 @@ int FastFindMaxIncreasingInterval(
     DNALength curBoundary = 0, nextBoundary = 0;
     DNALength contigLength = ContigStartPos.Length(pos[cur].t);
     DNALength endOfCurrentInterval = curBoundary + contigLength;
+    (void)(curBoundary); (void)(nextBoundary); (void)(endOfCurrentInterval);
 
     vector<UInt> scores, prevOpt;
     vector<DNALength> start, end;
@@ -683,6 +682,7 @@ int ExhaustiveFindMaxIncreasingInterval(
         ClusterList &clusterList,
         VarianceAccumulator<float> &accumPValue, 
         VarianceAccumulator<float> &accumWeight) {
+    (void)(nBest); (void)(query); (void)(reference);
 
     WeightedIntervalSet sdpiq;
     VectorIndex cur = 0;
@@ -695,10 +695,8 @@ int ExhaustiveFindMaxIncreasingInterval(
     }
 
     int lisSize;
-    float lisWeight;
     float lisPValue;
     T_MatchList lis;
-    float neginf = -1.0/0.0;	
     int noOvpLisSize = 0;
     int noOvpLisNBases = 0;
 
@@ -711,7 +709,7 @@ int ExhaustiveFindMaxIncreasingInterval(
     DNALength curBoundary = 0, nextBoundary = 0;
     DNALength contigLength = ContigStartPos.Length(pos[cur].t);
     DNALength endOfCurrentInterval = curBoundary + contigLength;
-
+    (void)(curBoundary); (void)(nextBoundary); (void)(endOfCurrentInterval);
 
     curBoundary = ContigStartPos(pos[cur].t);
     nextBoundary = ContigStartPos(pos[next].t);  
@@ -724,6 +722,7 @@ int ExhaustiveFindMaxIncreasingInterval(
     //
 
     DNALength curIntervalLength = NumRemainingBases(pos[cur].q, intervalLength);
+    (void)(curIntervalLength);
 
     AdvanceIndexToPastInterval(pos, nPos, intervalLength, contigLength, ContigStartPos,
     cur, curBoundary, next, nextBoundary);

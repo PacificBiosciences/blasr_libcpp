@@ -122,8 +122,7 @@ int FindMaxIncreasingInterval(
         ClusterList &clusterList,
         VarianceAccumulator<float> &accumPValue, 
         VarianceAccumulator<float> &accumWeight,
-        VarianceAccumulator<float> &accumNumAnchorBases,
-        const char *titlePtr=NULL);
+        VarianceAccumulator<float> &accumNumAnchorBases);
 
 template<typename T_MatchList,
          typename T_PValueFunction, 
