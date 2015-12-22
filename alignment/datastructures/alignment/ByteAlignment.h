@@ -131,13 +131,13 @@ void MakeReverseComplementByteAlignment(const unsigned char *byteAlignment,
                                         UInt length,
                                         unsigned char *byteAlignmentRC) {
   unsigned char q,t;
-  int i;
+  size_t i;
   for (i = 0; i < length; i++) {
     if (QueryChar[byteAlignment[i]] == ' ') { q = ' '; }
-    else { q = ReverseComplementNuc[QueryChar[byteAlignment[i]]]; }
+    else { q = ReverseComplementNuc[static_cast<int>(QueryChar[byteAlignment[i]])]; }
 
     if (RefChar[byteAlignment[i]] == ' ') { t = ' '; }
-    else { t = ReverseComplementNuc[RefChar[byteAlignment[i]]]; }
+    else { t = ReverseComplementNuc[static_cast<int>(RefChar[byteAlignment[i]])]; }
     
     byteAlignmentRC[length - i - 1] = QueryAlignmentByte[q] + RefAlignmentByte[t];
   }
@@ -147,8 +147,7 @@ void MakeReverseComplementByteAlignment(const unsigned char *byteAlignment,
 void ByteAlignmentToQueryString(const unsigned char* byteAlignment,
 																UInt length,
 																char* charAlignment) {
-	int i;
-	for (i = 0; i < length; i++) {
+	for (size_t i = 0; i < length; i++) {
 		charAlignment[i] = QueryChar[byteAlignment[i]];
 	}
 }
@@ -157,15 +156,14 @@ void ByteAlignmentToQueryString(const unsigned char* byteAlignment,
 void ByteAlignmentToRefString(const unsigned char* byteAlignment,
 															UInt length,
 															char* charAlignment) {
-	int i;
-	for (i = 0; i < length; i++) {
+	for (size_t i = 0; i < length; i++) {
 		charAlignment[i] = RefChar[byteAlignment[i]];
 	}
 }
 
 void RemoveGaps(string &gappedStr, string &ungappedStr) {
 	ungappedStr = gappedStr;
-	int i, i2;
+	size_t i, i2;
 	i = i2 = 0;
 	for (i = 0;  i < ungappedStr.size(); i++ ){
 		if (ungappedStr[i] != ' ') {
@@ -178,8 +176,8 @@ void RemoveGaps(string &gappedStr, string &ungappedStr) {
 
 
 void GappedStringsToAlignment(string &gappedQuery, string &gappedRef, Alignment &alignment) {
-int qPos = 0, rPos = 0;
-	int i = 0; // position in alignment string
+    size_t qPos = 0, rPos = 0;
+	size_t i = 0; // position in alignment string
 	while (i < gappedQuery.size()) {
 		while (i < gappedQuery.size() and (gappedQuery[i] == ' ' or gappedRef[i] == ' ')) {
 			if (gappedQuery[i] != ' ') {
@@ -190,7 +188,6 @@ int qPos = 0, rPos = 0;
 			}
 			i++;
 		}
-		int queryBlockStart, queryBlockEnd, refBlockStart, refBlockEndl;
 		Block b;
 		b.qPos = qPos;
 		b.tPos = rPos;
@@ -222,9 +219,8 @@ void AlignmentToByteAlignment(Alignment &alignment,
   CreateAlignmentStrings(alignment, querySeq, refSeq, 
                          refStr, alignStr, queryStr);
   byteAlignment.resize(refStr.size());
-  int i;
-  for (i = 0; i < refStr.size(); i++) {
-    byteAlignment[i] = RefAlignmentByte[refStr[i]] + QueryAlignmentByte[queryStr[i]];
+  for (size_t i = 0; i < refStr.size(); i++) {
+    byteAlignment[i] = RefAlignmentByte[static_cast<int>(refStr[i])] + QueryAlignmentByte[static_cast<int>(queryStr[i])];
   }
 }
 
@@ -266,9 +262,8 @@ void CountStats(vector<unsigned char> &byteAlignment,
 }
 
 int CountBasesInReference(vector<unsigned char> &byteAlignment) {
-	int i;
 	int nBases = 0;
-	for (i = 0; i < byteAlignment.size(); i++) {
+	for (size_t i = 0; i < byteAlignment.size(); i++) {
 		if (RefChar[byteAlignment[i]] != ' ') {
 			nBases++;
 		}
@@ -277,9 +272,8 @@ int CountBasesInReference(vector<unsigned char> &byteAlignment) {
 }
 
 int CountBasesInQuery(vector<unsigned char> &byteAlignment) {
-	int i;
 	int nBases = 0;
-	for (i = 0; i < byteAlignment.size(); i++) {
+	for (size_t i = 0; i < byteAlignment.size(); i++) {
 		if (QueryChar[byteAlignment[i]] != ' ') {
 			nBases++;
 		}
@@ -289,8 +283,7 @@ int CountBasesInQuery(vector<unsigned char> &byteAlignment) {
 
 int CountNMatches(vector<unsigned char> &byteAlignment) {
 	int nMatches = 0;
-	int i;
-	for (i = 0; i < byteAlignment.size(); i++) {
+	for (size_t i = 0; i < byteAlignment.size(); i++) {
 		if (IsMatch(byteAlignment, i)) {
 			nMatches++;
 		}
@@ -307,7 +300,6 @@ float ComputePacBioAccuracy(vector<unsigned char> &byteAlignment) {
 
 
 float ComputePercentIdentity(vector<unsigned char> &byteAlignment) {
-	int i;
 	int nMatch = CountNMatches(byteAlignment);
 	return (1.0*nMatch) / byteAlignment.size();
 }
