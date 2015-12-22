@@ -15,8 +15,7 @@ class CmpIndexedStringTable {
 	}
 
 	void StoreArrayIndexMap() {
-		int i;
-		for (i = 0; i < ids.size(); i++) {
+		for (size_t i = 0; i < ids.size(); i++) {
 			idToArrayIndex[ids[i]] = i;
 		}
 	}
