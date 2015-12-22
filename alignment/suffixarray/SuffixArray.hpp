@@ -203,13 +203,11 @@ public:
         deleteStructures = true;
 
         Tuple curPrefix, nextPrefix;
-        SAIndex tablePrefixIndex = 0;
 
         for (i = 0; i < lookupTableLength; i++) {
             startPosTable[i] = endPosTable[i] = 0;
         }
         i = 0;
-        VectorIndex tablePos;
         SAIndex     indexPos;
         indexPos = 0;
         do {
@@ -255,6 +253,7 @@ public:
     }
 
     void LarssonBuildSuffixArray(T* target, SAIndexLength targetLength, Sigma &alphabet) {
+        (void)(alphabet);
         assert(index == NULL or not deleteStructures);
         index =  ProtectedNew<SAIndex>(targetLength+1);
         deleteStructures = true;
@@ -996,8 +995,6 @@ public:
             // has been found, so store this.
             //
             if (l < r) {
-                VectorIndex off_i;
-                VectorIndex boundLength = lcpLeftBounds.size();
                 lcpLeftBounds.push_back(l);
                 lcpRightBounds.push_back(r);
             }
