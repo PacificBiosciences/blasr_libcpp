@@ -94,7 +94,6 @@ int POneOrMoreMatches(TSequence &seq, DNALength startPos,
     DNALength length, TupleMetrics &tm, 
 	TupleCountTable<TSequence, T_Tuple> &ct,
 	float &pValue){ 
-	int nMatches;
 	float pMatch = 1;
 	//
 	// Compute the probability that the sequence matches ANY spot 
@@ -110,6 +109,7 @@ template<typename TSequence, typename T_Tuple>
 int SumRightShiftMarginalTupleCounts(TupleMetrics &tm, 
     TupleCountTable<TSequence, T_Tuple> &ct, T_Tuple curTuple, 
     int nextNuc, int &nextSeqCount) {
+    (void)(tm);
 	int totalCount = 0;
 	int rightMarCount = 0;
 	long i;
