@@ -11,6 +11,7 @@ bool SAMReader<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment>::Initialize(std
   } else {
     samFilePtr = &std::cin;
   }
+  return true;
 }
 
 template<typename T_ReferenceSequence, typename T_ReadGroup, typename T_SAMAlignment>
@@ -78,7 +79,7 @@ void SAMReader<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment>::StoreKVPairs(s
 }
 
 template<typename T_ReferenceSequence, typename T_ReadGroup, typename T_SAMAlignment>
-int SAMReader<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment>::StoreHeader(std::vector<SAMKeywordValuePair> &kvPairs,
+void SAMReader<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment>::StoreHeader(std::vector<SAMKeywordValuePair> &kvPairs,
                            AlignmentSet<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment> &alignments) {
   alignments.header.StoreValues(kvPairs, lineNumber);
 }

@@ -31,7 +31,7 @@ class SAMReader {
  
   void StoreKVPairs(std::string line, std::vector<SAMKeywordValuePair> &kvPairs);
  
-  int StoreHeader(std::vector<SAMKeywordValuePair> &kvPairs,
+  void StoreHeader(std::vector<SAMKeywordValuePair> &kvPairs,
                   AlignmentSet<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment> &alignments);
 
   void StoreReferenceSequence(std::vector<SAMKeywordValuePair> &kvPairs,
@@ -45,7 +45,7 @@ class SAMReader {
     
   // Not implemented
   void StoreProgram(std::vector<SAMKeywordValuePair> &kvPairs,
-                    AlignmentSet<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment> &alignments ) {}
+                    AlignmentSet<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment> &alignments ) {(void)(kvPairs); (void)(alignments);}
 
   void Read(std::string samFileName, AlignmentSet<T_ReferenceSequence, T_ReadGroup, T_SAMAlignment> &alignments);
 
