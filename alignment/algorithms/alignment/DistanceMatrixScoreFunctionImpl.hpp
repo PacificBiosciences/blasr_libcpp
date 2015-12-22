@@ -41,6 +41,7 @@ template<typename T_RefSequence, typename T_QuerySequence>
 int DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>::Deletion(
     T_RefSequence &seq, DNALength pos, T_QuerySequence &querySeq, 
     DNALength queryPos) {
+    (void)(seq); (void)(pos); (void)(querySeq); (void)(queryPos);
     return del;
 }
 
@@ -48,12 +49,14 @@ template<typename T_RefSequence, typename T_QuerySequence>
 int DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>::Insertion(
     T_RefSequence &seq, DNALength pos, T_QuerySequence &querySeq, 
     DNALength queryPos) {
+    (void)(seq); (void)(pos); (void)(querySeq); (void)(queryPos);
     return ins;
 }
 
 template<typename T_RefSequence, typename T_QuerySequence>
 int DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>::Deletion(
     T_RefSequence &seq, DNALength pos) {
+    (void)(seq); (void)(pos);
     return del;
 }
 
@@ -77,6 +80,7 @@ int DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>::Match(
 template<typename T_RefSequence, typename T_QuerySequence>
 int DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>::Insertion(
     T_QuerySequence &seq, DNALength pos) {
+    (void)(seq); (void)(pos);
     return ins;
 }
 
@@ -84,15 +88,24 @@ template<typename T_RefSequence, typename T_QuerySequence>
 float 
 DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>
 ::NormalizedMatch(T_RefSequence &ref, DNALength refPos, 
-    T_QuerySequence &query, DNALength queryPos) {return 0;}
+    T_QuerySequence &query, DNALength queryPos) {
+    (void)(ref); (void)(refPos); (void)(query); (void)(queryPos);
+    return 0;
+}
 
 template<typename T_RefSequence, typename T_QuerySequence>
 float DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>
 ::NormalizedInsertion(T_RefSequence &ref, DNALength refPos, 
-    T_QuerySequence &query, DNALength queryPos) {return 0;}
+    T_QuerySequence &query, DNALength queryPos) {
+    (void)(ref); (void)(refPos); (void)(query); (void)(queryPos);
+    return 0;
+}
 
 template<typename T_RefSequence, typename T_QuerySequence>
-float DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>::NormalizedDeletion(T_RefSequence &ref, DNALength refPos, T_QuerySequence &query, DNALength queryPos) {return 0;}
+float DistanceMatrixScoreFunction<T_RefSequence,T_QuerySequence>::NormalizedDeletion(T_RefSequence &ref, DNALength refPos, T_QuerySequence &query, DNALength queryPos) {
+    (void)(ref); (void)(refPos); (void)(query); (void)(queryPos);
+    return 0;
+}
 
 
 #endif // _BLASR_DISTANCE_MATRIX_SCORE_FUNCTION_IMPL_HPP_
