@@ -26,6 +26,7 @@ int SWAlign(T_QuerySequence &qSeq, T_TargetSequence &tSeq,
         bool trustSequences,
         bool printMatrix
         ) {
+    (void)(trustSequences);
     VectorIndex nRows = qSeq.length + 1;
     VectorIndex nCols = tSeq.length + 1;
 
