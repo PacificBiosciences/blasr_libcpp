@@ -352,6 +352,7 @@ int OneGapAlign(T_QuerySequence &query,
         T_ScoreFunction &scoreFunction,
         T_BufferList &buffers,
         Alignment &alignment) {
+    (void)(buffers);
 
     T_RefSequence leftReference, rightReference;
     UInt leftReferenceLength = min(reference.length, query.length);
