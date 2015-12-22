@@ -315,7 +315,6 @@ public:
                 // the gap created with the endGap.  So get rid of the first
                 // gaps. 
                 //        next.gaps[0].resize(0);
-                static const bool mergeFirstGap = true;
                 AppendAlignmentGaps(next);
             }
         }
