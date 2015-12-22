@@ -128,6 +128,7 @@ public:
     int Initialize(string &hdfCmpFileName, set<string> includedFieldsP, unsigned int flags=H5F_ACC_RDONLY, const H5::FileAccPropList & fileAccPropList = H5::FileAccPropList::DEFAULT) {
         Initialize(hdfCmpFileName, flags, fileAccPropList);
         includedFields = includedFieldsP;
+        return 1;
     }
 
     void Create(string &hdfCmpFileName) {
@@ -201,7 +202,7 @@ public:
         return id;
     }
 
-    int StoreAlnArray(vector<unsigned char> &alnArray, string refName, string &experimentName,
+    void StoreAlnArray(vector<unsigned char> &alnArray, string refName, string &experimentName,
             unsigned int &offsetBegin,
             unsigned int &offsetEnd) {
         //
@@ -217,7 +218,7 @@ public:
     
     // Write a vector of quality values to the appropriate experiment group.
     // This is similar to StoreAlignment, but for QVs 
-    int StoreQVs(const vector<UChar> &qvArray, const string &refName, const string &fieldName,
+    void StoreQVs(const vector<UChar> &qvArray, const string &refName, const string &fieldName,
                  const string &experimentName, unsigned int *offsetBegin,
                  unsigned int *offsetEnd) {
         assert(refNameToArrayIndex.find(refName) != refNameToArrayIndex.end());
@@ -231,7 +232,7 @@ public:
     // Write a vector of tag to the appropriate experiment group.
     // This is similar to StoreAlignment, but for DeletionTag and
     // SubstitutionTag.
-    int StoreTags(const vector<char> &qvArray, const string &refName, const string &fieldName,
+    void StoreTags(const vector<char> &qvArray, const string &refName, const string &fieldName,
                   const string &experimentName, unsigned int *offsetBegin,
                   unsigned int *offsetEnd) {
         assert(refNameToArrayIndex.find(refName) != refNameToArrayIndex.end());
@@ -416,8 +417,7 @@ public:
                 assert(0);
             }
 
-            HDFCmpExperimentGroup *alnGroupPtr;
-            alnGroupPtr = refAlignGroups[refGroupArrayIndex]->InitializeExperimentGroup(readGroupName, includedFields);
+            refAlignGroups[refGroupArrayIndex]->InitializeExperimentGroup(readGroupName, includedFields);
             // experimentNameToIndex should have been set in InitializeExperimentGroup();
             assert( refAlignGroups[refGroupArrayIndex]->experimentNameToIndex[readGroupName] 
                     == refAlignGroups[refGroupArrayIndex]->readGroups.size()-1);

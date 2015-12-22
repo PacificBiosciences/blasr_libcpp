@@ -33,6 +33,7 @@ class HDFCmpRefAlignmentGroup {
 		refGroupName = _refGroupName;
 		refGroup.Initialize(group, _refGroupName);
 		//		annotationStringAtom.Initialize(refGroup.group, "annotationString");
+        return 1;
 	}
 
   void Create(HDFGroup parent, string refGroupNameP) {
@@ -47,7 +48,7 @@ class HDFCmpRefAlignmentGroup {
     //
     map<string,int>::iterator it = experimentNameToIndex.find(readGroupName);
 		if (it != experimentNameToIndex.end()) {
-      assert(it->second < readGroups.size());
+      assert(it->second < int(readGroups.size()));
       return readGroups[it->second];
     }
 
