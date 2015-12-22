@@ -6,13 +6,13 @@
 inline bool 
 leq(DNALength a1, DNALength a2,   DNALength b1, DNALength b2) // lexicographic order
 {
-    return(a1 < b1 || a1 == b1 && a2 <= b2); 
+    return((a1 < b1) || ((a1 == b1) && (a2 <= b2)));
 } // for pairs
 
 inline bool 
 leq(DNALength a1, DNALength a2, DNALength a3,   DNALength b1, DNALength b2, DNALength b3)
 {
-    return(a1 < b1 || a1 == b1 && leq(a2, a3, b2, b3)); 
+    return((a1 < b1) || ((a1 == b1) && leq(a2, a3, b2, b3)));
 } // and triples
 
 // stably sort a[0..n-1] to b[0..n-1] with keys in 0..K from r
