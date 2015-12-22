@@ -68,7 +68,7 @@ class HDFRefInfoGroup {
       exit(1);
     }
     */
-    int i;
+    size_t i;
     for (i = 0; i < refInfo.fullName.size();i++) {
       fullNameArray.Read(i,i+1,&refInfo.fullName[i]);
     }
