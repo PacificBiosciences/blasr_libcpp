@@ -81,7 +81,6 @@ class Bwt {
 
 	int Read(std::string inName) {
 		std::ifstream bwtIn;
-		DNALength seqStorageSize;
 		CrucialOpen(inName, bwtIn, std::ios::binary|std::ios::in);
 		bwtSequence.Read(bwtIn);
 		bwtIn.read((char*)charCount, sizeof(DNALength)*CharCountSize);
