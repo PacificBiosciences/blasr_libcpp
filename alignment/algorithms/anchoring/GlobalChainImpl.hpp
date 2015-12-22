@@ -48,8 +48,6 @@ UInt RestrictedGlobalChain(T_Fragment *fragments,
 	}
 	
 	for (f1 = 0; f1 < nFragments - 1; f1++) {
-		UInt maxF1Score = 0;
-		UInt maxF1Prev  = f1;
 		for (f2 = f1+1; f2 < nFragments; f2++ ){ 
 			//
 			//  Check to see if the fragments may be connected within the
@@ -64,8 +62,6 @@ UInt RestrictedGlobalChain(T_Fragment *fragments,
 				UInt tDiff, qDiff;
 				tDiff = fragments[f2].GetT() - (fragments[f1].GetT() + fragments[f1].GetW());
 				qDiff = fragments[f2].GetQ() - (fragments[f1].GetQ() + fragments[f1].GetW());
-				UInt tIns, qIns;
-				tIns = qIns = 0;
 				UInt maxDiff = max(tDiff, qDiff);
 				UInt minDiff = min(tDiff, qDiff);
 				if (maxDiff - minDiff < minDiff*maxIndelRate) {
