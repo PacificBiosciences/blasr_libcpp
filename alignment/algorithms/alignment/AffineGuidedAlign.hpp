@@ -21,7 +21,6 @@ int AffineGuidedAlign(QSequence &origQSeq, TSequence &origTSeq,  Alignment &guid
     Guide guide;
     AlignmentToGuide(guideAlignment, guide, bandSize);
     StoreMatrixOffsets(guide);
-    int guideSize = ComputeMatrixNElem(guide);
 
     //
     // Make a copy of the sequences that is guaranteed to be in 3-bit format for faster alignment.
@@ -135,7 +134,7 @@ int AffineGuidedAlign(QSequence &origQSeq, TSequence &origTSeq,  Alignment &guid
     GetBufferIndexFunctor GetBufferIndex;
     GetBufferIndex.seqRowOffset = qStart;
     GetBufferIndex.guideSize    = guide.size();
-    int indicesAreValid, delIndexIsValid, insIndexIsValid, matchIndexIsValid;
+    int indicesAreValid, delIndexIsValid, insIndexIsValid;
     bufferIndex = -1;
     indicesAreValid = GetBufferIndex(guide, qStart-1, tStart-1, bufferIndex);
     assert(indicesAreValid);
