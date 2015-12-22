@@ -43,47 +43,47 @@
 
 class MovieAlnIndexLookupTable {
 public: 
-    bool  skip;                   
+    bool  skip;
     // as movies may split into multiple parts, skip=true if 
     // this alignment is not found in the movie
      
-    int   movieAlignmentIndex;    
+    size_t   movieAlignmentIndex;
     // movieIndexSets[movieIndex][toFrom[movieAlignmentIndex]] 
     
-    UInt  alignmentIndex;         
+    UInt  alignmentIndex;
     // cmpFile.alnInfo.alignments[alignmentIndex]
     
     UInt  holeNumber;
     // holeNumber corresponding to this alignment in baseFile
     
-    int   refGroupIndex;          
+    size_t   refGroupIndex;
     // cmpReader.refAlignGroups[refGroupIndex]
     
-    int   readGroupIndex;         
+    size_t   readGroupIndex;
     // cmpReader.refAlignGroups[refGroupIndex]->readGroups[readGroupIndex]
     
     UInt  offsetBegin, offsetEnd; 
     // offset begin and end for this alignment in /ref/movie/AlnArray
     // = cmpFile.alnInfo.alignments[alignmentIndex].GetOffsetBegin/End()
     
-    int   queryStart,  queryEnd;  
+    UInt   queryStart,  queryEnd;
     // start/end for this read = cmpFile.alnInfo.
     // alignments[alignmentIndex].GetQueryStart/End()
 
-    int   readIndex;              
+    size_t   readIndex;
     // index of this alignment in baseFile.readStartPositions
     // = index of this hole number in BaseCalls/ZMW/HoleNumber
     // baseFile.LookupReadIndexByHoleNumber(holeNumber, out=readIndex)
     
-    int   readStart;              
+    size_t   readStart;
     // start pos of this alignment in baseFile
     // = baseFile.readStartPositions[readIndex]
 
-    int   readLength;             
+    int   readLength;
     // read length of this alignment in baseFile
     // = baseFile.readStartPositions[readIndex+1] - readStart 
 
-    int   plsReadIndex;
+    size_t   plsReadIndex;
     // index of this alignment in pulseFile.pulseStartPositions
     // = index of this hole number in PulseCalls/ZMW/HoleNumbers
     // = pulseFile.LookupReadIndexByHoleNumber(holeNumber, out=plsReadIndex)
@@ -97,20 +97,20 @@ public:
 
     MovieAlnIndexLookupTable();
 
-    void SetValue(const bool & skipP,            
-                  const int  & movieAlignmentIndexP,
-                  const UInt & alignmentIndexP,  
-                  const int  & refGroupIndexP,   
-                  const int  & readGroupIndexP,  
+    void SetValue(const bool & skipP,
+                  const size_t  & movieAlignmentIndexP,
+                  const UInt & alignmentIndexP,
+                  const size_t  & refGroupIndexP,
+                  const size_t  & readGroupIndexP,
                   const UInt & holeNumberP,
-                  const UInt & offsetBeginP,     
+                  const UInt & offsetBeginP,
                   const UInt & offsetEndP,
-                  const int  & queryStartP,      
-                  const int  & queryEndP,
-                  const int  & readIndexP,
-                  const int  & readStartP,       
+                  const UInt & queryStartP,
+                  const UInt & queryEndP,
+                  const size_t  & readIndexP,
+                  const size_t  & readStartP,
                   const int  & readLengthP,
-                  const int  & plsReadIndexP);
+                  const size_t  & plsReadIndexP);
 
     void print();
 };

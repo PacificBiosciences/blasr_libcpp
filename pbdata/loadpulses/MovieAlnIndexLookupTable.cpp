@@ -8,19 +8,19 @@ MovieAlnIndexLookupTable::MovieAlnIndexLookupTable() {
 
 void MovieAlnIndexLookupTable::SetValue(
                 const bool & skipP,            
-                const int  & movieAlignmentIndexP,
+                const size_t  & movieAlignmentIndexP,
                 const UInt & alignmentIndexP,  
-                const int  & refGroupIndexP,   
-                const int  & readGroupIndexP,  
+                const size_t  & refGroupIndexP,   
+                const size_t  & readGroupIndexP,  
                 const UInt & holeNumberP,
                 const UInt & offsetBeginP,     
                 const UInt & offsetEndP,
-                const int  & queryStartP,      
-                const int  & queryEndP,
-                const int  & readIndexP,
-                const int  & readStartP,       
+                const UInt & queryStartP,      
+                const UInt & queryEndP,
+                const size_t  & readIndexP,
+                const size_t  & readStartP,       
                 const int  & readLengthP,
-                const int  & plsReadIndexP) {
+                const size_t  & plsReadIndexP) {
     skip = skipP; 
     movieAlignmentIndex = movieAlignmentIndexP;
     alignmentIndex      = alignmentIndexP;
