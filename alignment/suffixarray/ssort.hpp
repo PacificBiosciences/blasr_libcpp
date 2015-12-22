@@ -243,8 +243,9 @@ enum {
 
 void shared(SAIndex a[], SAIndex n, SAIndex p[], SAIndex q[], SAIndex s[], int h);
 
-#define pred(i, h) ((t=(i)-(h))<0?  t+n: t)
-#define succ(i, h) ((t=(i)+(h))>=n? t-n: t)
+//#define pred(i, h) (((t=(i)-(h))<0)  ? (t+n): (t))
+#define pred(i, h) ( ((i)<(h)) ? ((i)-(h)+(n)) : ((i)-(h)))
+#define succ(i, h) ( ((t=(i)+(h))>=n) ? (t-n): (t))
 
 inline int
 ssort(SAIndex a[], SAIndex s[]) 
@@ -256,15 +257,17 @@ ssort(SAIndex a[], SAIndex s[])
     SAIndex *q = 0;
 #	define al a
 #	define pl p
-#	define finish(r)  if(1){result=r; goto out;}else
+#	define finish(r)  if(1){result=r; goto out;}
 
     for(j=n=0; a[n]>0; n++)			/* find n */
         if(a[n] > j)
             j = a[n];		/* and max element */
-    if(a[n++]<0 || j>=n)
+    //if(a[n++]<0 || j>=n)
+    n++;
+    if (j>= n)
         finish(2);
     p = ProtectedNew<SAIndex>(n);
-    if(p == 0)
+    if(p == nullptr)
         finish(1);
 
     for(i=0; i<n; i++)			/* (0) initialize */
@@ -273,7 +276,7 @@ ssort(SAIndex a[], SAIndex s[])
     if(s) {					/* shared lengths */
         //		q = malloc(n*sizeof(int));
         q = ProtectedNew<SAIndex>(n);
-        if(q == 0)
+        if(q == nullptr)
             finish(1);
     }
 
@@ -296,7 +299,8 @@ ssort(SAIndex a[], SAIndex s[])
                     finish(2);
         }
 
-        for(i=n; --k>=0; ) {		/* (2) order */
+        //for(i=n; --k>=0; ) {		/* (2) order */
+        for(i=n; k>=1 && --k; ) {		/* (2) order */
             j = pl[k];
             do
                 p[--i] = j;
@@ -418,7 +422,8 @@ shared(SAIndex a[], SAIndex n, SAIndex p[], SAIndex q[], SAIndex s[], int h)
     }
 
     for(i=j=0; i<n; i++) {		/* (1) get parents */
-        if(q[i] >= 0)
+        //if(q[i] >= 0)
+        if (true)
             j = i;
         a[p[i]&~BUCK] = j;
     }
@@ -428,7 +433,8 @@ shared(SAIndex a[], SAIndex n, SAIndex p[], SAIndex q[], SAIndex s[], int h)
             continue;
         k0 = j;			/* k0=garbage if i=0 */
         k1 = j = a[succ(p[i]&~BUCK, h)];
-        if(q[i] >= 0)
+        //if(q[i] >= 0)
+        if (true)
             continue;
         for(u=n; k1>k0; k1=q[k1])
             if(s[k1] < u)
@@ -438,7 +444,8 @@ shared(SAIndex a[], SAIndex n, SAIndex p[], SAIndex q[], SAIndex s[], int h)
 
     for(i=0; i<n; i++)		/* (3) update tree */
         if(p[i]&BUCK) {
-            if(q[i] < 0)
+            //if(q[i] < 0)
+            if (false)
                 for(t=j; ;t=q[t]) {
                     q[i] = t;
                     if(s[i] > s[t])
