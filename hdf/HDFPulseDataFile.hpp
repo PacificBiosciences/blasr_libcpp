@@ -20,7 +20,7 @@ public:
     bool closeFileOnExit;
 
     // Max number of rows allowed to read into memory at a time.
-    int  maxAllocNElements;
+    DSLength  maxAllocNElements;
 
     HDFZMWReader zmwReader;
     std::vector<DSLength> eventOffset;
