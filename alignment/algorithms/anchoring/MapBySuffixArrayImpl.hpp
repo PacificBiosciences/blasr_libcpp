@@ -36,7 +36,6 @@ int LocateAnchorBoundsInSuffixArray(T_RefSequence &reference,
     }
 
     DNALength p, m;
-    DNALength alignEnd;
     DNALength matchEnd = read.SubreadEnd() - minPrefixMatchLength + 1;
     DNALength numSearchedPositions = matchEnd - read.SubreadStart();
 
@@ -50,11 +49,8 @@ int LocateAnchorBoundsInSuffixArray(T_RefSequence &reference,
     vector<SAIndex> lowMatchBound, highMatchBound;	
 
     for (m = 0, p = read.SubreadStart(); p < matchEnd; p++, m++) {
-        DNALength lcpLow, lcpHigh, lcpLength;
         lowMatchBound.clear(); highMatchBound.clear();
-        lcpLow = 0;
-        lcpHigh = 0;
-        lcpLength = sa.StoreLCPBounds(reference.seq, reference.length, 
+        DNALength lcpLength = sa.StoreLCPBounds(reference.seq, reference.length, 
             &read.seq[p], matchEnd - p,
             params.useLookupTable,
             params.maxLCPLength,
@@ -93,7 +89,6 @@ int LocateAnchorBoundsInSuffixArray(T_RefSequence &reference,
             // one match is found.
             //
             int lcpSearchLength = lowMatchBound.size();
-            bool extendedForward = false;
             while (lcpSearchLength > 0 and 
                     lowMatchBound[lcpSearchLength - 1] == 
                     highMatchBound[lcpSearchLength - 1]) {
@@ -166,7 +161,6 @@ int LocateAnchorBoundsInSuffixArray(T_RefSequence &reference,
                 //
                 // The match is not unique.  Store a possibly expanded search.
                 // 
-                int numBacktrack = params.expand;
                 if (lcpSearchLength > params.expand) {
                     lcpSearchLength -= params.expand;
                 }
@@ -235,7 +229,6 @@ int MapReadToGenome(T_RefSequence &reference,
     // Try evaluating some contexts.
     //
     DNALength pos;
-    DNALength mappedLength = matchLow.size();
     assert(matchLow.size() == matchHigh.size());
 
     DNASequence evalQrySeq, evalRefSeq;
@@ -252,7 +245,6 @@ int MapReadToGenome(T_RefSequence &reference,
         removed.resize(read.length);
         std::fill(removed.begin(), removed.end(), false);
         int i;
-        int nRemoved = 0;
         for (i = 0; i < read.length-1; i++) {
             if (matchLength[i] == matchLength[i+1]+1) {
                 removed[i+1] = true;
