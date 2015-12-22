@@ -150,7 +150,6 @@ void AlignmentSetToCmpH5Adapter<T_CmpFile>::StoreAlignmentCandidate(
 
   std::string path = "/" + refGroupName + "/" + movieName;
   unsigned int pathId = StorePath(path, cmpFile);
-  int pathIndex = pathId - 1;
 
   vector<unsigned int> alnIndex;
   alnIndex.resize(22);
