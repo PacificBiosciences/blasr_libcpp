@@ -55,6 +55,7 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
             detailedAlignment,
             extendFrontByLocalAlignment,
             noRecurseUnder,
+            fastSDP,
             minFragmentsToUseGraphPaper);
 }
 
@@ -136,7 +137,7 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
     // higher sensitivity at the ends of reads, which are more likely to
     // be misaligned.
     //
-    int prefixLength, middleLength, suffixLength, middlePos, suffixPos; // prefix pos is 0
+    int prefixLength, middleLength, suffixLength, suffixPos; // prefix pos is 0
     prefixLength = min(target.length, (DNALength) SDP_PREFIX_LENGTH);
     suffixLength = min(target.length - prefixLength, (DNALength) SDP_SUFFIX_LENGTH);
     middleLength = target.length - prefixLength - suffixLength;
@@ -150,7 +151,6 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
 
     // Align the entire query against the entire target to get alignments 
     // in the middle.
-    middlePos = 0;
     middle.seq = &target.seq[0];
     middle.length = target.length;
 
@@ -173,6 +173,7 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
     qMiddle.seq = &query.seq[0];
     qMiddle.length = query.length;
     qMiddlePos = pos += qPrefixLength;
+    (void)(qMiddlePos);
 
     qSuffixPos = pos += qMiddleLength; // = qPrefixLength + qMiddleLength
     qSuffix.seq = &query.seq[qSuffixPos];
@@ -233,14 +234,12 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
     FlatMatrix2D<int> graphScoreMat;
     FlatMatrix2D<Arrow> graphPathMat;
     FlatMatrix2D<int> graphBins;
-    int nOnOpt = fragmentSet.size();
     if (fragmentSet.size() > minFragmentsToUseGraphPaper and fastSDP) {
         int nCol = 50;
         vector<bool> onOptPath(fragmentSet.size(), false);
-        nOnOpt = GraphPaper<Fragment>(fragmentSet, nCol, nCol,
+        GraphPaper<Fragment>(fragmentSet, nCol, nCol,
                                       graphBins, graphScoreMat, 
                                       graphPathMat, onOptPath);
-        int prev = fragmentSet.size();
         RemoveOffOpt(fragmentSet, onOptPath);
     } 
     graphScoreMat.Clear();
@@ -356,7 +355,6 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
     // zero length.  This shouldn't happen, so to balance this out
     // remove blocks that have zero length.
     //
-    bool badBlock;
     for (b = 0; b < chainAlignment.size(); b++){ 
         if (chainAlignment.blocks[b].length == 0) {
             blockIsGood[b] = false;
@@ -420,7 +418,6 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
                 tFragment.seq = (Nucleotide*) &target.seq[0];
                 tFragment.length = chainAlignment.blocks[0].tPos;
                 blasr::Alignment frontAlignment;
-                int frontAlignmentScore;
                 // Currently, there might be some space between the beginning
                 // of the alignment and the beginning of the read.  Run an
                 // EndAnchored alignment that allows free gaps to the start of
@@ -428,8 +425,7 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
                 // otherwise. 
                 if (extendFrontByLocalAlignment) {
                     if (noRecurseUnder == 0 or qFragment.length * tFragment.length < noRecurseUnder) {
-                        frontAlignmentScore  = 
-                            SWAlign(qFragment, tFragment, fragScoreMat, fragPathMat, frontAlignment, scoreFn, EndAnchored);
+                    SWAlign(qFragment, tFragment, fragScoreMat, fragPathMat, frontAlignment, scoreFn, EndAnchored);
                     } else {
                         // cout << "running recursive sdp alignment. " << endl;
                         vector<int> recurseFragmentChain;
@@ -471,7 +467,6 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
 		//
         for (b = 0; b < chainAlignment.size() - 1; b++) {
             alignment.blocks.push_back(chainAlignment.blocks[b]);
-            int alignScore;
 
             //
             // Do a detaied smith-waterman alignment between blocks, if this
@@ -491,7 +486,7 @@ int SDPAlign(T_QuerySequence &query, T_TargetSequence &target,
                     detailedAlignment == true) {
 
                 if (noRecurseUnder == 0 or qFragment.length * tFragment.length < noRecurseUnder) {
-                    alignScore = SWAlign(qFragment, tFragment, fragScoreMat, fragPathMat, fragAlignment, scoreFn, Global);
+                    SWAlign(qFragment, tFragment, fragScoreMat, fragPathMat, fragAlignment, scoreFn, Global);
                 }
                 else {
                     //          cout << "running recursive sdp alignment on " << qFragment.length * tFragment.length << endl;
