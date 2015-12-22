@@ -8,6 +8,9 @@ template<typename T_Sequence>
 class CompressedDNATuple : public DNATuple {
     static const unsigned char mask = 0xf;
     public:
+    CompressedDNATuple(const CompressedDNATuple & rhs)
+    : DNATuple(rhs) { }
+
     int FromStringLR(Nucleotide *strPtr, TupleMetrics &tm) {
         //
         // Make sure the sequence contains all valid characters.

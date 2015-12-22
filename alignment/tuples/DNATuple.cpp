@@ -1,5 +1,13 @@
 #include "DNATuple.hpp"
 
+DNATuple::DNATuple()
+    : pos(0) 
+{ }
+
+DNATuple::DNATuple(const DNATuple & rhs)
+    : BaseTuple(rhs)
+    , pos(rhs.pos)
+{ }
 
 int DNATuple::FromStringRL(Nucleotide *strPtr, TupleMetrics &tm) {
 
@@ -65,19 +73,30 @@ const {
     return lhs.tuple < rhs.tuple;
 }
 
-int PositionDNATuple::operator==(const DNATuple &pTuple) const {
-    return tuple == pTuple.tuple;
+CountedDNATuple::CountedDNATuple(const CountedDNATuple & rhs) 
+    : DNATuple(rhs)
+    , count(rhs.count)
+{ }
+
+PositionDNATuple::PositionDNATuple()
+    : DNATuple() 
+{ 
+    pos = static_cast<DNALength>(-1);
 }
 
-PositionDNATuple::PositionDNATuple() : DNATuple() {
-    pos = -1;
-}
+PositionDNATuple::PositionDNATuple(const PositionDNATuple & rhs)
+    : DNATuple(rhs)
+{ }
 
-PositionDNATuple::PositionDNATuple(PositionDNATuple &tupleP, DNALength posP) {
-    tuple = tupleP.tuple;
+PositionDNATuple::PositionDNATuple(const PositionDNATuple &tupleP, const DNALength posP)
+    : DNATuple(tupleP)
+{
     pos   = posP;
 }
 
+int PositionDNATuple::operator==(const DNATuple &pTuple) const {
+    return tuple == pTuple.tuple;
+}
 
 int 
 OrderPositionDNATuplesByPosition::operator()(

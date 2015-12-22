@@ -19,30 +19,41 @@ class DNATuple : public BaseTuple {
 public:
     DNALength pos;
 
+    DNATuple();
+
+    DNATuple(const DNATuple & rhs);
+
     inline int FromStringLR(Nucleotide *strPtr, TupleMetrics &tm);
 
-    int FromStringRL(Nucleotide *strPtr, TupleMetrics &tm); 
+    int FromStringRL(Nucleotide *strPtr, TupleMetrics &tm);
 
-    inline int ShiftAddRL(Nucleotide nuc, TupleMetrics &tm); 
+    inline int ShiftAddRL(Nucleotide nuc, TupleMetrics &tm);
 
-    int MakeRC(DNATuple &dest, TupleMetrics &tm); 
+    int MakeRC(DNATuple &dest, TupleMetrics &tm);
 
-    std::string ToString(TupleMetrics &tm); 
+    std::string ToString(TupleMetrics &tm);
 };
 
 class CompareByTuple {
 public:
-    bool operator()(const DNATuple &lhs, const DNATuple &rhs) const; 
+    bool operator()(const DNATuple &lhs, const DNATuple &rhs) const;
 };
 
 
 class CountedDNATuple : public DNATuple {
 public:
     int count;
+    CountedDNATuple(const CountedDNATuple & rhs);
 };
 
 class PositionDNATuple : public DNATuple {
 public:
+    PositionDNATuple();
+
+    PositionDNATuple(const PositionDNATuple &tupleP, const DNALength posP);
+
+    PositionDNATuple(const PositionDNATuple & rhs);
+
     PositionDNATuple& operator=(const PositionDNATuple &rhs) {
         pos = rhs.pos;
         tuple = rhs.tuple;
@@ -66,37 +77,32 @@ public:
         return (tuple < pTuple.tuple);
     }
 
-    int operator==(const DNATuple &pTuple) const; 
+    int operator==(const DNATuple &pTuple) const;
 
     int operator!=(const DNATuple &pTuple) const {
         return tuple != pTuple.tuple;
     }
-
-    PositionDNATuple();
-
-    PositionDNATuple(PositionDNATuple &tupleP, DNALength posP); 
-
 };
 
 class OrderPositionDNATuplesByPosition {
 public:
-    int operator()(const PositionDNATuple &lhs, const PositionDNATuple &rhs) const; 
+    int operator()(const PositionDNATuple &lhs, const PositionDNATuple &rhs) const;
 };
 
 class OrderPositionDNATuplesByTuple {
 public:
-    int operator()(const PositionDNATuple &lhs, const PositionDNATuple &rhs) const; 
+    int operator()(const PositionDNATuple &lhs, const PositionDNATuple &rhs) const;
 };
 
 
 template<typename Sequence> 
-int SearchSequenceForTuple(Sequence &seq, TupleMetrics &tm, DNATuple &queryTuple); 
+int SearchSequenceForTuple(Sequence &seq, TupleMetrics &tm, DNATuple &queryTuple);
 
 template<typename Sequence>
 int SequenceToTupleList(Sequence &seq, TupleMetrics &tm, TupleList<DNATuple> &tupleList);
 
 template<typename Sequence>
-int SequenceToTupleList(Sequence &seq, TupleMetrics &tm, TupleList<PositionDNATuple> &tupleList); 
+int SequenceToTupleList(Sequence &seq, TupleMetrics &tm, TupleList<PositionDNATuple> &tupleList);
 
 #include "DNATupleImpl.hpp"
 
