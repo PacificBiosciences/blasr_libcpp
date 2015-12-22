@@ -40,12 +40,14 @@ bool GetReadTrimCoordinates(T_Sequence &fastaRead,
         if (regions.HasHQRegion()) {
             readStart = regions.HQStart();
             readEnd   = regions.HQEnd();
+            score     = regions.HQScore();
             return true;
         }
     }
 
     readStart = 0;
     readEnd = fastaRead.length;
+    score = 0;
     return false;
 }
 
