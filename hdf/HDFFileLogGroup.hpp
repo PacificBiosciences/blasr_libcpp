@@ -41,13 +41,14 @@ class HDFFileLogGroup {
 
   bool Create(HDFGroup &parent) {
     parent.AddGroup("FileLog");
-    if (group.Initialize(parent.group, "FileLog") == 0) { return 0; }
+    if (group.Initialize(parent.group, "FileLog") == 0) { return false; }
     commandLineArray.Create(group, "CommandLine");
     versionArray.Create(group, "Version");
     timestampArray.Create(group, "Timestamp");
     programArray.Create(group, "Program");
     logArray.Create(group, "Log");
     idArray.Create(group, "ID");
+    return true;
   }    
 
 };
