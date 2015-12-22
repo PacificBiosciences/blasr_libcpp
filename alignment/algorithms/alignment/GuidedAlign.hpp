@@ -489,9 +489,9 @@ int GuidedAlign(QSequence &origQSeq, TSequence &origTSeq,
             scoreFn, sdpTupleSize, 
             sdpIns, sdpDel, sdpIndelRate,
             sdpAlignment); //, Local, false, false);
+    (void)(alignScore);
 
-    int b;
-    for (b = 0; b < sdpAlignment.blocks.size(); b++) {
+    for (size_t b = 0; b < sdpAlignment.blocks.size(); b++) {
         sdpAlignment.blocks[b].qPos += sdpAlignment.qPos;
         sdpAlignment.blocks[b].tPos += sdpAlignment.tPos;
     }
@@ -528,8 +528,8 @@ int GuidedAlign(QSequence &origQSeq, TSequence &origTSeq,
             sdpIns, sdpDel, sdpIndelRate,
             sdpAlignment, buffers, Local, false, false);
 
-    int b;
-    for (b = 0; b < sdpAlignment.blocks.size(); b++) {
+    (void)(alignScore);
+    for (size_t b = 0; b < sdpAlignment.blocks.size(); b++) {
         sdpAlignment.blocks[b].qPos += sdpAlignment.qPos;
         sdpAlignment.blocks[b].tPos += sdpAlignment.tPos;
     }
