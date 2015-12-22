@@ -15,6 +15,7 @@
 
 template<typename T_Fragment>
 void StoreAbove(std::vector<T_Fragment> &fragmentSet, DNALength fragmentLength) {
+    (void)(fragmentLength);
 	std::sort(fragmentSet.begin(), fragmentSet.end(), LexicographicFragmentSortByY<T_Fragment>());	
 	int i;
 	for (i = 1; i < fragmentSet.size(); i++) {
@@ -83,7 +84,7 @@ int SDPLongestCommonSubsequence(DNALength queryLength,
             //
             // Compute the cost of fragment_f
             int foundPrev = 0;
-            int drift, driftPenalty;
+            int driftPenalty;
             if (colSet.Predecessor(curCol, predCol)) {
                 //
                 // predCol points to the fragment with greatest value less than curCol.
