@@ -79,6 +79,7 @@ float ComputeLISPValue(std::vector<T_MatchPos> &lis,
     T_TextSequence &text, T_Sequence &read,
 	TupleMetrics &tm, TupleCountTable<T_TextSequence, T_Tuple> &ct,
     int &lisNBases, int &lisSize ) {
+    (void)(read);
 	//
 	// First, find a subset of the lis that has non-overlapping matches.
 	//
@@ -88,9 +89,6 @@ float ComputeLISPValue(std::vector<T_MatchPos> &lis,
         lisNBases += lis[i].l;
     }
     lisSize = lis.size();
-
-    float neginf = -1.0/0.0;
-    float inf = 1.0/0.0;
 
     if (lis.size() == 1) {
         //
@@ -133,20 +131,14 @@ float ComputeLISPValue(std::vector<T_MatchPos> &lis,
 			// the probabilities multiply.
 			//
 			for (i = 1; i < lis.size(); i++ ){ 
-
-				int tupleMatchCount;
 				//
 				// Find out how many times this word appears in the genome.
-				//
-				int approxNumMatches;
 				//
 				// Assume all hits are uniformly distributed across the
 				// genome.  qLambda is the frequency of seeing hit i in the
 				// genome.
 				//
 				float qLambda;
-				int   tGap;
-				int   qGap;
 				qLambda = lis[i].GetMultiplicity() / (1.0*text.length);
 			
 				// Now compute the probability of the chain.  Since the
