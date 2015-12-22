@@ -46,7 +46,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
 
 
  public:
- HDFPlsReader() : HDFPulseDataFile(), DatasetCollection() {
+ HDFPlsReader() : DatasetCollection(), HDFPulseDataFile() {
 		fieldNames.push_back("MeanSignal");
 		fieldNames.push_back("MidSignal");
 		fieldNames.push_back("MaxSignal");
@@ -126,7 +126,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
 		return 1;
 	}
 
-    UInt GetStartFrameSize() {
+    DSLength GetStartFrameSize() {
         return startFrameArray.arrayLength;
     }
 
@@ -211,7 +211,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
         if (pulseFile.numEvent.size() > 0) {
             pulseFile.pulseStartPositions.resize(pulseFile.numEvent.size());
             pulseFile.pulseStartPositions[0] = 0;
-            for (int i = 1; i < pulseFile.numEvent.size(); i++) {
+            for (size_t i = 1; i < pulseFile.numEvent.size(); i++) {
                 pulseFile.pulseStartPositions[i] = pulseFile.pulseStartPositions[i-1] +
                                                    pulseFile.numEvent[i-1];
             }
@@ -315,7 +315,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
         Nucleotide * destSeqCopy = NULL;
         if (destSequence != "") {
             destSeqCopy = ProtectedNew<Nucleotide>(destSequence.size());
-            for(int i = 0 ; i < destSequence.size(); i++) {
+            for(size_t i = 0 ; i < destSequence.size(); i++) {
                 destSeqCopy[i] = (Nucleotide)destSequence[i];
             }
         }
@@ -338,7 +338,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
         } else if (field == "MeanSignal") {
             assert(pulseFile.meanSignal.size() > 0 and 
                    pulseFile.meanSignal.size() >  pulseStartPos);
-            assert(destLength ==  destSequence.size());
+            assert(destLength == static_cast<int>(destSequence.size()));
 
             pulseFile.CopySignal((HalfWord*)(&pulseFile.meanSignal[0]), 
                     meanSignalNDims, 
@@ -350,7 +350,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
         } else if (field == "MidSignal") {
             assert(pulseFile.midSignal.size() > 0 and 
                    pulseFile.midSignal.size() > pulseStartPos);
-            assert(destLength ==  destSequence.size());
+            assert(destLength == static_cast<int>(destSequence.size()));
 
             pulseFile.CopySignal((HalfWord*)(&pulseFile.midSignal[0]), 
                     midSignalNDims, 
@@ -362,7 +362,7 @@ class HDFPlsReader : public DatasetCollection, public HDFPulseDataFile  {
         } else if (field == "MaxSignal") {
             assert(pulseFile.maxSignal.size() > 0 and 
                    pulseFile.maxSignal.size() > pulseStartPos);
-            assert(destLength ==  destSequence.size());
+            assert(destLength == static_cast<int>(destSequence.size()));
             pulseFile.CopySignal((HalfWord*)(&pulseFile.maxSignal[0]), 
                     maxSignalNDims, 
                     0, //basToPlsIndex maps bases to abs pulse positions
