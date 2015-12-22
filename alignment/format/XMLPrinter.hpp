@@ -11,6 +11,7 @@ void Print(T_Alignment &alignment,
     int qPrintStart = 0,
     int tPrintStart = 0,
     int maxPrintLength = 50) {
+    (void)(qPrintStart); (void)(tPrintStart); (void)(maxPrintLength);
     /*
      * Sample alignment:
      *
