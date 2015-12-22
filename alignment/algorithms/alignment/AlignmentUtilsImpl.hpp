@@ -11,7 +11,7 @@ int ComputeAlignmentScore(Alignment &alignment,
     T_TargetSequence &text,
     T_ScoreFn &scoreFn,
     bool useAffinePenalty) {
-  VectorIndex b, q, t, l, bi, gi;
+  VectorIndex b, q, t, l, gi;
   int alignmentScore = 0;
 
 	for (b = 0; b < alignment.blocks.size(); b++ ) {
@@ -407,6 +407,7 @@ void CreateAlignmentStrings(T_Alignment &alignment,
 
 template<typename T_Alignment, typename T_ScoreFn>
 void ComputeAlignmentStats(T_Alignment & alignment, Nucleotide* qSeq, Nucleotide * tSeq, T_ScoreFn & scoreFn, bool useAffineScore) {
+    (void)(useAffineScore);
     int qp = 0, tp = 0;
     int nMatch = 0, nMismatch = 0, nIns =0, nDel = 0;
     float pctSimilarity;
@@ -468,7 +469,6 @@ void ComputeAlignmentStats(T_Alignment &alignment, Nucleotide* qSeq, Nucleotide 
 template<typename T_Alignment>
 int ComputeDrift(T_Alignment &alignment) {
     VectorIndex b;
-    int qGap = 0, tGap = 0;
     int drift = 0;
     int maxDrift = 0;
     int driftBetweenBlocks;
