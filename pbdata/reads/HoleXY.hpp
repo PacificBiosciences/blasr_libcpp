@@ -2,6 +2,9 @@
 #define _BLASR_HOLE_XY_HPP_
 
 #include <stdlib.h>
+#ifndef int16_t
+#  include <stdint.h>
+#endif
 
 class HoleXY {
 public:
