@@ -40,4 +40,13 @@ inline std::ostream & operator<<(std::ostream & ss, const ReadInterval & interva
     ss << interval.start << "_" << interval.end;
     return ss;
 }
+
+struct ReadIntervalComparer {
+    bool operator()(const ReadInterval& lhs, const ReadInterval& rhs) {
+        if (lhs.start == rhs.start)
+            return lhs.end < rhs.end;
+        return lhs.start < rhs.start;
+    }
+};
+
 #endif
