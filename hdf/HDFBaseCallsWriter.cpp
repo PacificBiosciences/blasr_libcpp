@@ -33,7 +33,6 @@ HDFBaseCallsWriter::HDFBaseCallsWriter(const std::string & filename,
                                        const std::vector<PacBio::BAM::BaseFeature> & qvsToWrite)
     : HDFWriterBase(filename)
     , parentGroup_(parentGroup)
-    , baseMap_(baseMap)
     , qvsToWrite_({})
     , basecallerVersion_(basecallerVersion)
     , arrayLength_(0)

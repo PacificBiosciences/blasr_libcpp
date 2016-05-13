@@ -3,20 +3,15 @@
 #include "HDFBaxWriter.hpp"
 
 HDFBaxWriter::HDFBaxWriter(const std::string & filename,
-                           const ScanData & sd,
                            const std::string & basecallerVersion,
+                           const std::map<char, size_t>& baseMap,
                            const std::vector<PacBio::BAM::BaseFeature> & qvsToWrite,
                            const H5::FileAccPropList & fileAccPropList)
     : HDFWriterBase(filename)
     , fileaccproplist_(fileAccPropList)
-    , scandataWriter_(nullptr)
     , basecallsWriter_(nullptr) 
     , regionsWriter_(nullptr)
 {
-    // sanity check chemistry meta data. 
-    SanityCheckChemistry(sd.BindingKit(),
-                         sd.SequencingKit(), 
-                         basecallerVersion);
 
     // open file 
     outfile_.Open(filename_, H5F_ACC_TRUNC, fileaccproplist_);
@@ -24,21 +19,20 @@ HDFBaxWriter::HDFBaxWriter(const std::string & filename,
     // Add PulseData group to the root group '/'
     AddChildGroup(outfile_.rootGroup, pulseDataGroup_, PacBio::GroupNames::pulsedata);
 
-    // Create a ScanData writer.
-    scandataWriter_.reset(new HDFScanDataWriter(outfile_.rootGroup)); 
-    scandataWriter_->Write(sd);
-
+    if (basecallerVersion.empty()) {
+        AddErrorMessage("Base caller version must be specified.");
+    }
     // Create a BaseCaller writer.
-    basecallsWriter_.reset(new HDFBaseCallsWriter(filename_, pulseDataGroup_, sd.BaseMap(), basecallerVersion, qvsToWrite));
+    basecallsWriter_.reset(new HDFBaseCallsWriter(filename_, pulseDataGroup_, baseMap, basecallerVersion, qvsToWrite));
 }
 
 HDFBaxWriter::HDFBaxWriter(const std::string & filename,
-                           const ScanData & sd,
                            const std::string & basecallerVersion,
+                           const std::map<char, size_t>& baseMap,
                            const std::vector<PacBio::BAM::BaseFeature> & qvsToWrite,
                            const std::vector<std::string> & regionTypes,
                            const H5::FileAccPropList & fileAccPropList)
-    : HDFBaxWriter(filename, sd, basecallerVersion, qvsToWrite, fileAccPropList)
+    : HDFBaxWriter(filename, basecallerVersion, baseMap, qvsToWrite, fileAccPropList)
 {
     // Create a Regions writer.
     regionsWriter_.reset(new HDFRegionsWriter(filename_, pulseDataGroup_, regionTypes));
@@ -69,29 +63,8 @@ std::vector<std::string> HDFBaxWriter::Errors(void) {
 
 void HDFBaxWriter::Close(void) {
     if (basecallsWriter_) basecallsWriter_.reset();
-    if (scandataWriter_) scandataWriter_.reset();
     if (HasRegions() and regionsWriter_) regionsWriter_.reset();
     outfile_.Close();
-}
-
-bool HDFBaxWriter::SanityCheckChemistry(const std::string & bindingKit,
-                                        const std::string & sequencingKit,
-                                        const std::string & basecallerVersion)
-{
-    bool OK = true;
-    if (bindingKit.empty()) {
-        OK = false;
-        AddErrorMessage("Binding kit must be specified.");
-    }
-    if (sequencingKit.empty()) {
-        OK = false;
-        AddErrorMessage("Sequencing kit must be specified.");
-    }
-    if (basecallerVersion.empty()) {
-        OK = false;
-        AddErrorMessage("Base caller version must be specified.");
-    }
-    return OK;
 }
 
 bool HDFBaxWriter::WriteOneZmw(const SMRTSequence & seq) {

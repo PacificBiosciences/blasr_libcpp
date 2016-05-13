@@ -26,13 +26,12 @@ public:
     ///        QVs to write, and h5 file access property list.
     /// \note Should not create /PulseData/Regions.
     /// \param[in] filename output h5 file name.
-    /// \param[in] ScanData meta data string, must contain bindingKit and sequencingKit.
     /// \param[in] basecallerVersion meta data string
     /// \param[in] qvsToWrite Quality values to include in output h5 file. 
     /// \param[in] fileAccPropList H5 file access property list
     HDFBaxWriter(const std::string & filename,
-                 const ScanData & sd,
                  const std::string & basecallerVersion,
+                 const std::map<char, size_t>& baseMap,
                  const std::vector<PacBio::BAM::BaseFeature> & qvsToWrite,
                  const H5::FileAccPropList & fileAccPropList = H5::FileAccPropList::DEFAULT);
 
@@ -41,8 +40,8 @@ public:
     /// \note /PulseData/Regions dataset should be created.
     /// \param[in] regionTypes, regionTypes as /Regions/RegionTypes
     HDFBaxWriter(const std::string & filename,
-                 const ScanData & sd,
                  const std::string & basecallerVersion,
+                 const std::map<char, size_t>& baseMap,
                  const std::vector<PacBio::BAM::BaseFeature> & qvsToWrite,
                  const std::vector<std::string> & regionTypes,
                  const H5::FileAccPropList & fileAccPropList = H5::FileAccPropList::DEFAULT);
@@ -74,12 +73,7 @@ public:
     /// \}
 
 private:
-    /// \name Private Variables
-    /// \{
-	HDFFile outfile_;  ///< HDFFile file handler
-
     H5::FileAccPropList fileaccproplist_; ///< H5 file access property list
-
 	HDFGroup pulseDataGroup_; ///< /PulseData group
 
 private:
@@ -94,14 +88,6 @@ private:
 private:
     /// \name Private Methods.
     /// \{
-    /// \brief Checks whether chemistry triple, including
-    ///        binding kit, sequencing kit and base caller version
-    ///        are set. 
-    ///        If not, add error messages.
-    bool SanityCheckChemistry(const std::string & bindingKit,
-                              const std::string & sequencingKit,
-                              const std::string & basecallerVersion);
-
     /// \brief Closes HDFBaxWriter.
     void Close(void);
     /// \}

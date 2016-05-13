@@ -3,6 +3,8 @@
 *.a
 *.so
 *.dylib
+*.swp
+tags
 defines.mk
 all.xml
 *.h5

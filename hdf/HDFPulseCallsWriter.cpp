@@ -2,6 +2,7 @@
 #ifdef USE_PBBAM
 #include <ctype.h>
 #include <sstream>
+#include <algorithm>
 #include "HDFPulseCallsWriter.hpp"
 #include "../pbdata/utils/TimeUtils.hpp"
 
@@ -72,6 +73,8 @@ HDFPulseCallsWriter::HDFPulseCallsWriter(const std::string & filename,
 
     // Create a zmwWriter.
     zmwWriter_.reset(new HDFZMWWriter(Filename(), pulsecallsGroup_, true, baseMap));
+
+    inverseGain_ = 1.0f;
 
     // Note: ignore /PulseCalls/ZMWMetrics none of its metrics exist in BAM.
 }
@@ -172,6 +175,10 @@ void HDFPulseCallsWriter::Content(std::vector<std::string> & names,
         names.push_back(PacBio::GroupNames::widthinframes);
         types.push_back(widthinframestype);
     }
+}
+
+void HDFPulseCallsWriter::SetInverseGain(const float igain) {
+    inverseGain_ = igain;
 }
 
 bool HDFPulseCallsWriter::_WriteAttributes(void) {
@@ -353,9 +360,13 @@ bool HDFPulseCallsWriter::_WriteLabelQV(const PacBio::BAM::BamRecord & read) {
 bool HDFPulseCallsWriter::_WritePkmean(const PacBio::BAM::BamRecord & read) {
     if (HasPkmean()) {
         if (read.HasPkmean()) {
-            const PacBio::BAM::Tag & tag = read.Impl().TagValue("pa");
-            std::vector<uint16_t> data = tag.ToUInt16Array();
-            _CheckRead(read, data.size(), "Pkmean");
+            std::vector<float> pkmids = read.Pkmean();
+
+            // convert from photoE to counts
+            std::for_each(pkmids.begin(), pkmids.end(), [&](float& x){x*=inverseGain_;});
+
+            // down-convert to ushorts (required by pulse file specification)
+            std::vector<uint16_t> data(pkmids.begin(), pkmids.end());
 
             const std::string & pulsecall = read.PulseCall();
             for (size_t i = 0; i < pulsecall.size(); i++) {
@@ -387,9 +398,14 @@ bool HDFPulseCallsWriter::_WritePulseMergeQV(const PacBio::BAM::BamRecord & read
 bool HDFPulseCallsWriter::_WritePkmid(const PacBio::BAM::BamRecord & read) {
     if (HasPkmid()) {
         if (read.HasPkmid()) {
-            const PacBio::BAM::Tag & tag = read.Impl().TagValue("pm");
-            std::vector<uint16_t> data = tag.ToUInt16Array();
-            _CheckRead(read, data.size(), "Pkmid");
+            std::vector<float> pkmids = read.Pkmid();
+
+            // convert from photoE to counts
+            std::for_each(pkmids.begin(), pkmids.end(), [&](float& x){x*=inverseGain_;});
+
+            // down-convert to ushorts (required by pulse file specification)
+            std::vector<uint16_t> data(pkmids.begin(), pkmids.end());
+
             pkmidArray_.Write(&data[0], data.size());
         } else {
             AddErrorMessage(std::string("Pkmid is absent in read " + read.FullName()));

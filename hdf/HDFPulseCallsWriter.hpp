@@ -54,6 +54,9 @@ public:
     void Content(std::vector<std::string> & names, 
                  std::vector<std::string> & types) const;
 
+    /// Sets the inverse gain, used to convert photo-electrons to counts
+    void SetInverseGain(const float igain);
+
 public:
     /// \returns true if has PulseCall dataset and pulseCallArray_
     ///          has been initialized.
@@ -106,6 +109,7 @@ private:
 	HDFGroup pulsecallsGroup_;
     uint32_t arrayLength_; /// dataset length e.g., length of Channel
     std::string basecallerVersion_; /// basecall version, mandatory
+    float inverseGain_;
 
 private:
 	/// \brief Datasets which exist in both PulseCalls and BAM.
