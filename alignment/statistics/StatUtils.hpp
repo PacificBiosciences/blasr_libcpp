@@ -3,6 +3,9 @@
 
 #include <math.h>
 #include <stdlib.h>
+#ifndef __WORDSIZE
+#  include <bits/user.h>
+#endif
 #include <limits.h>
 #include <time.h>
 #include <vector>
