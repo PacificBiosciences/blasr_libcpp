@@ -5,14 +5,14 @@ compiler:
   - gcc
 # - clang
 install:
-- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-6.1" CC="gcc-6.1"; fi
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - gcc-4.8
-    - g++-4.8
+    - gcc-6.1
+    - g++-6.1
 #   - clang
 #   - libhdf5-serial-1.8.4
 notifications:
