@@ -13,6 +13,7 @@ addons:
     packages:
     - gcc-6.1
     - g++-6.1
+    - hdf5
 #   - clang
 #   - libhdf5-serial-1.8.4
 notifications:
