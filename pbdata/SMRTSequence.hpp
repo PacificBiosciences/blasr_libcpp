@@ -158,10 +158,10 @@ public:
 
     void MakeSubreadAsReference(SMRTSequence &subread, DNALength subreadStart = 0,
                                 int subreadEnd = -1);
-
+#ifdef USE_PBBAM
     // Copy native orientated view of record to this->bamRecord
     void MakeNativeOrientedBamRecord(const PacBio::BAM::BamRecord &record);
-
+#endif
     void Copy(const SMRTSequence &rhs);
 
     void Copy(const SMRTSequence &rhs, DNALength rhsPos, DNALength rhsLength);

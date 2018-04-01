@@ -1,6 +1,6 @@
 [submodule "pbbam"]
 	path = pbbam
-	url = ../pbbam.git
+    url = https://github.com/PacificBiosciences/pbbam.git
 	branch = master
 [submodule "googletest"]
 	path = googletest
